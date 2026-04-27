@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — CRM WhatsApp</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0A0C0F;
+      --bg2: #0F1215;
+      --surface: #141820;
+      --surface2: #1A1F2A;
+      --border: rgba(255,255,255,0.06);
+      --green: #00D97E;
+      --green-dim: rgba(0,217,126,0.12);
+      --yellow: #F5C542;
+      --yellow-dim: rgba(245,197,66,0.12);
+      --red: #FF4D4D;
+      --red-dim: rgba(255,77,77,0.1);
+      --blue: #3D8EF0;
+      --blue-dim: rgba(61,142,240,0.12);
+      --text: #E8ECF4;
+      --muted: #4A5568;
+      --muted2: #718096;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      display: flex;
+    }
+
+    /* MOBILE BOTTOM NAV */
+    .mobile-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 8px 0 12px;
+    }
+    .mobile-nav-items { display: flex; justify-content: space-around; }
+    .mobile-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 16px; cursor: pointer; position: relative;
+      color: var(--muted2); font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .mobile-nav-item.active { color: var(--green); }
+    .mobile-nav-item .icon { font-size: 1.1rem; }
+    .mobile-nav-badge {
+      position: absolute; top: 2px; right: 10px;
+      background: var(--red); color: white;
+      font-size: 0.55rem; font-weight: 700;
+      width: 14px; height: 14px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* MOBILE VIEWS */
+    .mobile-view { display: none; }
+    .mobile-only { display: none !important; }
+    .desktop-only { display: block !important; }
+    
+    /* HIDE MOBILE ELEMENTS BY DEFAULT */
+    .hamburger, .sidebar-overlay, .conv-detail-overlay { display: none; }
+
+
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 24px 0;
+    }
+    .sidebar-logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .logo-name {
+      font-family: var(--mono);
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--text); letter-spacing: 0.02em;
+    }
+    .logo-sub {
+      font-size: 0.68rem; color: var(--muted2);
+      margin-top: 3px; letter-spacing: 0.04em;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px; cursor: pointer;
+      font-size: 0.8rem; color: var(--muted2);
+      transition: all 0.2s; border-left: 2px solid transparent;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .nav-item.active { color: var(--text); border-left-color: var(--green); background: rgba(0,217,126,0.05); }
+    .nav-icon { width: 16px; text-align: center; font-size: 0.85rem; }
+    .nav-badge {
+      margin-left: auto; background: var(--red);
+      color: white; font-size: 0.6rem; font-weight: 700;
+      padding: 2px 6px; border-radius: 100px;
+    }
+    .sidebar-section {
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); padding: 16px 20px 8px;
+    }
+    .sidebar-footer {
+      margin-top: auto; padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .user-av {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--green-dim); border: 1px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: var(--green);
+    }
+    .user-name { font-size: 0.78rem; color: var(--text); font-weight: 500; }
+    .user-role { font-size: 0.65rem; color: var(--muted2); }
+
+    /* MAIN */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* TOPBAR */
+    .topbar {
+      height: 56px; flex-shrink: 0;
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+    }
+    .topbar-title {
+      font-family: var(--mono);
+      font-size: 0.82rem; font-weight: 500; color: var(--text);
+    }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-time {
+      font-family: var(--mono);
+      font-size: 0.75rem; color: var(--muted2);
+    }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--green-dim); border: 1px solid rgba(0,217,126,0.2);
+      border-radius: 100px; padding: 4px 12px;
+      font-size: 0.7rem; font-weight: 600; color: var(--green);
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+
+    /* CONTENT */
+    .content { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .content::-webkit-scrollbar { width: 4px; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* METRICS ROW */
+    .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .metric-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .metric-card.green::before { background: var(--green); }
+    .metric-card.yellow::before { background: var(--yellow); }
+    .metric-card.red::before { background: var(--red); }
+    .metric-card.blue::before { background: var(--blue); }
+    .metric-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted2); margin-bottom: 10px; }
+    .metric-val {
+      font-family: var(--mono);
+      font-size: 2rem; font-weight: 600; line-height: 1;
+      color: var(--text);
+    }
+    .metric-val.green { color: var(--green); }
+    .metric-val.yellow { color: var(--yellow); }
+    .metric-val.red { color: var(--red); }
+    .metric-val.blue { color: var(--blue); }
+    .metric-sub { font-size: 0.7rem; color: var(--muted2); margin-top: 6px; }
+    .metric-trend {
+      position: absolute; top: 16px; right: 16px;
+      font-size: 0.68rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px;
+    }
+    .metric-trend.up { background: var(--green-dim); color: var(--green); }
+    .metric-trend.warn { background: var(--yellow-dim); color: var(--yellow); }
+
+    /* GRID ROW */
+    .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+
+    /* PANEL */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    .panel-head {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-title {
+      font-family: var(--mono);
+      font-size: 0.75rem; font-weight: 500; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel-title-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .panel-action {
+      font-size: 0.68rem; color: var(--muted2);
+      cursor: pointer; transition: color 0.2s;
+      background: none; border: none; font-family: var(--sans);
+    }
+    .panel-action:hover { color: var(--text); }
+
+    /* NÚMEROS TABLE */
+    .numeros-table { width: 100%; }
+    .num-row {
+      display: grid; grid-template-columns: auto 1fr auto auto auto auto;
+      gap: 16px; align-items: center;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .num-row:last-child { border-bottom: none; }
+    .num-row:hover { background: rgba(255,255,255,0.02); }
+    .num-row.selected { background: rgba(0,217,126,0.04); border-left: 2px solid var(--green); }
+    .num-indicator { width: 8px; height: 8px; border-radius: 50%; }
+    .num-name { font-size: 0.82rem; font-weight: 500; color: var(--text); }
+    .num-number { font-family: var(--mono); font-size: 0.7rem; color: var(--muted2); margin-top: 2px; }
+    .num-stat { text-align: center; }
+    .num-stat-val { font-family: var(--mono); font-size: 0.88rem; font-weight: 600; }
+    .num-stat-key { font-size: 0.6rem; color: var(--muted2); margin-top: 1px; letter-spacing: 0.04em; }
+    .badge {
+      font-size: 0.65rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+    .badge-green { background: var(--green-dim); color: var(--green); }
+    .badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
+    .badge-red { background: var(--red-dim); color: var(--red); }
+    .badge-muted { background: rgba(255,255,255,0.05); color: var(--muted2); }
+
+    /* CONVERSAS */
+    .conv-list { max-height: 320px; overflow-y: auto; }
+    .conv-list::-webkit-scrollbar { width: 3px; }
+    .conv-list::-webkit-scrollbar-thumb { background: var(--border); }
+    .conv-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .conv-item:last-child { border-bottom: none; }
+    .conv-item:hover { background: rgba(255,255,255,0.02); }
+    .conv-item.active { background: rgba(61,142,240,0.06); border-left: 2px solid var(--blue); }
+    .conv-av {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface2); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--muted2);
+    }
+    .conv-av.new { background: var(--green-dim); color: var(--green); }
+    .conv-av.pending { background: var(--yellow-dim); color: var(--yellow); }
+    .conv-info { flex: 1; min-width: 0; }
+    .conv-name { font-size: 0.8rem; font-weight: 500; color: var(--text); }
+    .conv-preview { font-size: 0.72rem; color: var(--muted2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .conv-time { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); }
+    .conv-unread {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--green); color: var(--bg);
+      font-size: 0.55rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* CHAT DETAIL */
+    .chat-detail { display: flex; flex-direction: column; height: 100%; }
+    .chat-detail-head {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .chat-detail-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .chat-detail-sub { font-size: 0.7rem; color: var(--muted2); margin-top: 2px; }
+    .chat-detail-actions { display: flex; gap: 8px; }
+    .action-btn {
+      font-size: 0.7rem; font-weight: 600;
+      padding: 5px 12px; border-radius: 4px; border: none;
+      cursor: pointer; font-family: var(--sans); transition: all 0.2s;
+    }
+    .action-btn.primary { background: var(--green-dim); color: var(--green); }
+    .action-btn.primary:hover { background: var(--green); color: var(--bg); }
+    .action-btn.secondary { background: var(--surface2); color: var(--muted2); }
+    .action-btn.secondary:hover { color: var(--text); }
+
+    .chat-msgs { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .chat-msgs::-webkit-scrollbar { width: 3px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: var(--border); }
+    .msg-wrap { display: flex; flex-direction: column; }
+    .msg-wrap.bot { align-items: flex-start; }
+    .msg-wrap.user { align-items: flex-end; }
+    .msg-bubble {
+      max-width: 80%; padding: 8px 12px;
+      border-radius: 8px; font-size: 0.78rem; line-height: 1.5;
+    }
+    .msg-bubble.bot { background: var(--surface2); color: var(--text); border-bottom-left-radius: 2px; }
+    .msg-bubble.user { background: var(--blue-dim); color: var(--text); border: 1px solid rgba(61,142,240,0.2); border-bottom-right-radius: 2px; }
+    .msg-bubble.ai { background: rgba(0,217,126,0.08); color: var(--text); border: 1px solid rgba(0,217,126,0.15); border-bottom-left-radius: 2px; }
+    .msg-tag { font-size: 0.58rem; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+    .msg-tag.ai-tag { color: var(--green); }
+
+    /* MINI CHART */
+    .mini-chart { padding: 16px 20px; }
+    .chart-bars { display: flex; gap: 4px; align-items: flex-end; height: 60px; }
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar {
+      width: 100%; border-radius: 3px 3px 0 0;
+      background: var(--green-dim); border: 1px solid rgba(0,217,126,0.2);
+      transition: all 0.3s;
+    }
+    .bar:hover { background: rgba(0,217,126,0.25); }
+    .bar.today { background: rgba(0,217,126,0.3); border-color: var(--green); }
+    .bar-label { font-family: var(--mono); font-size: 0.55rem; color: var(--muted); }
+
+    /* LEADS TABLE */
+    .leads-table { width: 100%; }
+    .lead-row {
+      display: grid; grid-template-columns: 1fr auto auto auto;
+      gap: 12px; align-items: center;
+      padding: 10px 20px; border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+    .lead-row:last-child { border-bottom: none; }
+    .lead-row.header { color: var(--muted2); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+    .lead-name { color: var(--text); font-weight: 500; }
+    .lead-phone { font-family: var(--mono); color: var(--muted2); font-size: 0.7rem; }
+    .lead-time { font-family: var(--mono); font-size: 0.7rem; color: var(--muted2); }
+
+    /* SCROLL ANIMATIONS */
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .metric-card { animation: fadeIn 0.4s ease both; }
+    .metric-card:nth-child(1){animation-delay:0s}
+    .metric-card:nth-child(2){animation-delay:0.05s}
+    .metric-card:nth-child(3){animation-delay:0.1s}
+    .metric-card:nth-child(4){animation-delay:0.15s}
+    @media(max-width: 768px) {
+      .mobile-only { display: flex !important; }
+      .desktop-only { display: none !important; }
+      
+      html, body { overflow: auto; height: auto; margin: 0; padding: 0; }
+      body { flex-direction: column; }
+
+      .sidebar { 
+        display: flex;
+        position: fixed; 
+        top: 0; left: 0; bottom: 0; 
+        z-index: 300;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+      }
+      .sidebar.open { transform: translateX(0); }
+      
+      .sidebar-overlay {
+        display: none;
+        position: fixed; inset: 0; z-index: 290;
+        background: rgba(0,0,0,0.6);
+        opacity: 0; transition: opacity 0.3s ease;
+      }
+      .sidebar-overlay.open { display: block; opacity: 1; }
+
+      .hamburger {
+        background: none; border: none; color: var(--text);
+        font-size: 1.4rem; cursor: pointer; padding: 4px;
+        margin-right: 12px; display: flex; align-items: center; justify-content: center;
+      }
+      
+      .main { display: flex; flex-direction: column; overflow: visible; height: auto; }
+      .content { padding: 16px; display: flex; flex-direction: column; gap: 24px; overflow: visible; height: auto; }
+
+      .topbar { padding: 0 16px; height: 56px; position: sticky; top: 0; z-index: 100; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;}
+      .topbar-left-container { display: flex; align-items: center; }
+      .topbar-title { font-size: 0.8rem; margin-top: 2px; }
+      .topbar-time { display: none; }
+      .status-pill { font-size: 0.65rem; padding: 4px 10px; }
+
+      /* Fix grid stacking */
+      .grid-row, .grid-row-3 { display: flex !important; flex-direction: column !important; gap: 24px; }
+      .metrics { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px; margin-bottom: 0; }
+      .metric-card { min-width: 0; padding: 16px; display: flex; flex-direction: column; }
+      .metric-trend { position: relative !important; top: auto !important; right: auto !important; align-self: flex-start; margin-top: 8px; }
+
+      /* Desktop detail hidden */
+      .chat-detail { display: none !important; }
+      .conv-list { border-right: none !important; max-height: 400px !important; overflow-y: auto !important; }
+      .chat-container-grid { display: block !important; height: auto !important; }
+
+      .panel { margin-bottom: 0; border: 1px solid var(--border); background: var(--surface); width: 100%; box-sizing: border-box; }
+      
+      /* Mobile View Sections (just stack them) */
+      .mobile-view-section { display: block !important; }
+
+      /* Numbers card style */
+      .num-row { grid-template-columns: auto 1fr auto !important; padding: 16px; border-bottom: 1px solid var(--border); gap: 12px; align-items: start; }
+      .num-row:last-child { border-bottom: none; }
+      .num-stat-group-mobile { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+      .num-row > .num-stat { display: none; } 
+
+      /* Leads card style */
+      .lead-row { display: flex; flex-direction: column; padding: 16px; gap: 8px; border-bottom: 1px solid var(--border); }
+      .lead-row.header { display: none; }
+      .lead-meta-mobile { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; width: 100%; }
+
+      /* Hide mobile nav */
+      .mobile-nav { display: none !important; }
+
+      /* Overlay chat */
+      .conv-detail-overlay {
+        display: flex; position: fixed; inset: 0; z-index: 400; background: var(--bg);
+        flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease;
+      }
+      .conv-detail-overlay.open { transform: translateX(0); }
+      .overlay-back { padding: 16px; border-bottom: 1px solid var(--border); background: var(--bg2); font-size: 0.9rem; }
+    }
+
+    @media(max-width: 400px) {
+      .metrics { grid-template-columns: 1fr 1fr !important; }
+      .metric-val { font-size: 1.4rem; }
+      .metric-label { font-size: 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-name">CRM WhatsApp</div>
+      <div class="logo-sub">Escola de Inglês</div>
+    </div>
+
+    <div class="sidebar-section">Principal</div>
+    <div class="nav-item active"><span class="nav-icon">⊞</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">💬</span> Conversas <span class="nav-badge">4</span></div>
+    <div class="nav-item"><span class="nav-icon">👥</span> Leads</div>
+    <div class="nav-item"><span class="nav-icon">📊</span> Relatórios</div>
+
+    <div class="sidebar-section">Números</div>
+    <div class="nav-item" onclick="filterNum('all')"><span class="nav-icon" style="color:var(--green)">●</span> Todos</div>
+    <div class="nav-item" onclick="filterNum('comercial')"><span class="nav-icon" style="color:var(--blue)">●</span> Comercial SP</div>
+    <div class="nav-item" onclick="filterNum('rj')"><span class="nav-icon" style="color:var(--yellow)">●</span> Comercial RJ</div>
+    <div class="nav-item" onclick="filterNum('suporte')"><span class="nav-icon" style="color:var(--muted2)">●</span> Suporte</div>
+
+    <div class="sidebar-section">Sistema</div>
+    <div class="nav-item"><span class="nav-icon">⚙</span> Configurações</div>
+    <div class="nav-item"><span class="nav-icon">🤖</span> Bot IA</div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-av">GS</div>
+        <div>
+          <div class="user-name">Gestora</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left-container">
+        <button class="hamburger mobile-only" style="display:none;" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title">// dashboard — visão geral</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-time" id="clock">--:--:--</div>
+        <div class="status-pill"><span class="status-dot"></span> Bot ativo — 3 números</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- VIEW: DASHBOARD -->
+      <div id="view-dashboard" class="mobile-view-section active">
+        <!-- METRICS -->
+        <div class="metrics">
+          <div class="metric-card green">
+            <div class="metric-label">Conversas hoje</div>
+            <div class="metric-val green" id="metConv">47</div>
+            <div class="metric-sub">em todos os números</div>
+            <div class="metric-trend up">+18%</div>
+          </div>
+          <div class="metric-card yellow">
+            <div class="metric-label">Pendentes</div>
+            <div class="metric-val yellow" id="metPend">4</div>
+            <div class="metric-sub">aguardando resposta</div>
+            <div class="metric-trend warn">atenção</div>
+          </div>
+          <div class="metric-card blue">
+            <div class="metric-label">Leads capturados</div>
+            <div class="metric-val blue" id="metLeads">12</div>
+            <div class="metric-sub">novos hoje</div>
+            <div class="metric-trend up">+3 hora</div>
+          </div>
+          <div class="metric-card red" style="--red:#A78BFA">
+            <div class="metric-label">Taxa bot</div>
+            <div class="metric-val" style="color:#A78BFA">94%</div>
+            <div class="metric-sub">respondidas</div>
+            <div class="metric-trend up" style="background:rgba(167,139,250,0.12);color:#A78BFA">excelente</div>
+          </div>
+        </div>
+
+        <!-- Chart (visible in dashboard on mobile) -->
+        <div class="panel mobile-only" id="dashboard-chart-mobile">
+           <div class="panel-head">
+              <div class="panel-title">Conversas — últimos 7 dias</div>
+            </div>
+            <div class="mini-chart"></div>
+        </div>
+      </div>
+
+      <!-- NUMEROS + CONVERSAS -->
+      <div class="grid-row-3">
+        <!-- VIEW: CONVERSAS -->
+        <div id="view-conversas" class="mobile-view-section">
+          <!-- Conversas recentes -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><span class="panel-title-dot" style="background:var(--blue)"></span> Conversas recentes</div>
+              <button class="panel-action">ver todas →</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;height:320px" class="chat-container-grid">
+
+            <!-- Lista -->
+            <div style="border-right:1px solid var(--border);overflow-y:auto" class="conv-list" id="convList">
+              <div class="conv-item active" onclick="showConv(0)">
+                <div class="conv-av new">MA</div>
+                <div class="conv-info">
+                  <div class="conv-name">Maria Aparecida</div>
+                  <div class="conv-preview">Tenho interesse no curso de inglês...</div>
+                </div>
+                <div class="conv-meta">
+                  <div class="conv-time">14:32</div>
+                  <div class="conv-unread">2</div>
+                </div>
+              </div>
+              <div class="conv-item" onclick="showConv(1)">
+                <div class="conv-av pending">JC</div>
+                <div class="conv-info">
+                  <div class="conv-name">João Carlos</div>
+                  <div class="conv-preview">Qual o horário da aula de adultos?</div>
+                </div>
+                <div class="conv-meta">
+                  <div class="conv-time">14:18</div>
+                  <div class="conv-unread">1</div>
+                </div>
+              </div>
+              <div class="conv-item" onclick="showConv(2)">
+                <div class="conv-av">RS</div>
+                <div class="conv-info">
+                  <div class="conv-name">Roberta Silva</div>
+                  <div class="conv-preview">✓ Bot respondeu automaticamente</div>
+                </div>
+                <div class="conv-meta">
+                  <div class="conv-time">13:55</div>
+                </div>
+              </div>
+              <div class="conv-item" onclick="showConv(3)">
+                <div class="conv-av">PL</div>
+                <div class="conv-info">
+                  <div class="conv-name">Pedro Lima</div>
+                  <div class="conv-preview">Meu filho tem 8 anos, tem turma?</div>
+                </div>
+                <div class="conv-meta">
+                  <div class="conv-time">13:40</div>
+                </div>
+              </div>
+              <div class="conv-item" onclick="showConv(4)">
+                <div class="conv-av new">AC</div>
+                <div class="conv-info">
+                  <div class="conv-name">Ana Costa</div>
+                  <div class="conv-preview">Boa tarde! Quero saber sobre...</div>
+                </div>
+                <div class="conv-meta">
+                  <div class="conv-time">13:22</div>
+                  <div class="conv-unread">3</div>
+                </div>
+              </div>
+              <div class="conv-item" onclick="showConv(5)">
+                <div class="conv-av">FM</div>
+                <div class="conv-info">
+                  <div class="conv-name">Felipe Martins</div>
+                  <div class="conv-preview">✓ Matriculado com sucesso</div>
+                </div>
+                <div class="conv-meta">
+                  <div class="conv-time">12:48</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detalhe conversa -->
+            <div class="chat-detail" id="chatDetail">
+              <div class="chat-detail-head">
+                <div>
+                  <div class="chat-detail-name" id="detailName">Maria Aparecida</div>
+                  <div class="chat-detail-sub" id="detailSub">Comercial SP · Lead novo · 14:32</div>
+                </div>
+                <div class="chat-detail-actions">
+                  <button class="action-btn secondary">Transferir</button>
+                  <button class="action-btn primary">✓ Resolver</button>
+                </div>
+              </div>
+              <div class="chat-msgs" id="chatMsgs">
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-numbers-leads">
+          <!-- VIEW: NÚMEROS -->
+          <div id="view-numbers" class="mobile-view-section">
+            <div class="panel">
+              <div class="panel-head">
+                <div class="panel-title"><span class="panel-title-dot" style="background:var(--green)"></span> Números ativos</div>
+              </div>
+              <div class="numeros-table">
+                <div class="num-row selected" onclick="selectNum(this)">
+                  <div class="num-indicator" style="background:var(--green)"></div>
+                  <div>
+                    <div class="num-name">Comercial SP</div>
+                    <div class="num-number">+55 11 99999-0001</div>
+                  </div>
+                  <div class="num-stat-group-mobile">
+                    <div class="num-stat">
+                      <div class="num-stat-val" style="color:var(--green)">24</div>
+                      <div class="num-stat-key">hoje</div>
+                    </div>
+                    <div class="num-stat">
+                      <div class="num-stat-val" style="color:var(--yellow)">3</div>
+                      <div class="num-stat-key">pendentes</div>
+                    </div>
+                  </div>
+                  <div><span class="badge badge-green">ONLINE</span></div>
+                </div>
+                <div class="num-row" onclick="selectNum(this)">
+                  <div class="num-indicator" style="background:var(--blue)"></div>
+                  <div>
+                    <div class="num-name">Comercial RJ</div>
+                    <div class="num-number">+55 21 99999-0002</div>
+                  </div>
+                  <div class="num-stat-group-mobile">
+                    <div class="num-stat">
+                      <div class="num-stat-val" style="color:var(--blue)">15</div>
+                      <div class="num-stat-key">hoje</div>
+                    </div>
+                    <div class="num-stat">
+                      <div class="num-stat-val" style="color:var(--yellow)">1</div>
+                      <div class="num-stat-key">pendentes</div>
+                    </div>
+                  </div>
+                  <div><span class="badge badge-green">ONLINE</span></div>
+                </div>
+                <div class="num-row" onclick="selectNum(this)">
+                  <div class="num-indicator" style="background:var(--muted2)"></div>
+                  <div>
+                    <div class="num-name">Suporte Alunos</div>
+                    <div class="num-number">+55 11 99999-0003</div>
+                  </div>
+                  <div class="num-stat-group-mobile">
+                    <div class="num-stat">
+                      <div class="num-stat-val" style="color:var(--muted2)">8</div>
+                      <div class="num-stat-key">hoje</div>
+                    </div>
+                    <div class="num-stat">
+                      <div class="num-stat-val" style="color:var(--green)">0</div>
+                      <div class="num-stat-key">pendentes</div>
+                    </div>
+                  </div>
+                  <div><span class="badge badge-muted">SOMENTE BOT</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW: LEADS -->
+          <div id="view-leads" class="mobile-view-section">
+            <div class="panel">
+              <div class="panel-head">
+                <div class="panel-title"><span class="panel-title-dot" style="background:var(--green)"></span> Leads de hoje</div>
+                <button class="panel-action">exportar xlsx →</button>
+              </div>
+              <div class="leads-table">
+                <div class="lead-row header">
+                  <div>Nome</div><div>Fone</div><div>Interesse</div><div>Hora</div>
+                </div>
+                <div class="lead-row">
+                  <div class="lead-name">Maria Aparecida</div>
+                  <div class="lead-phone">11 98765-4321</div>
+                  <div class="lead-meta-mobile">
+                    <span class="badge badge-green">Adulto</span>
+                    <span class="lead-time">14:32</span>
+                  </div>
+                </div>
+                <div class="lead-row">
+                  <div class="lead-name">João Carlos</div>
+                  <div class="lead-phone">11 91234-5678</div>
+                  <div class="lead-meta-mobile">
+                    <span class="badge badge-blue" style="background:var(--blue-dim);color:var(--blue)">Kids</span>
+                    <span class="lead-time">14:18</span>
+                  </div>
+                </div>
+                <div class="lead-row">
+                  <div class="lead-name">Ana Costa</div>
+                  <div class="lead-phone">21 99876-5432</div>
+                  <div class="lead-meta-mobile">
+                    <span class="badge badge-green">Adulto</span>
+                    <span class="lead-time">13:22</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE CONV DETAIL OVERLAY -->
+  <div class="conv-detail-overlay" id="mobileOverlay">
+    <div class="overlay-back" onclick="closeMobileOverlay()">← voltar</div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2)">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text)" id="mobileDetailName"></div>
+      <div style="font-size:0.7rem;color:var(--muted2);margin-top:2px" id="mobileDetailSub"></div>
+    </div>
+    <div class="overlay-msgs" id="mobileDetailMsgs"></div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px">
+      <button class="action-btn secondary" style="flex:1">Transferir</button>
+      <button class="action-btn primary" style="flex:1">✓ Resolver</button>
+    </div>
+  </div>
+
+  <!-- CONV OVERLAY (Mobile) -->
+  <div class="conv-detail-overlay" id="mobileOverlay">
+    <div class="overlay-back" onclick="closeMobileOverlay()">← voltar</div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2)">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--text)" id="mobileDetailName"></div>
+      <div style="font-size:0.7rem;color:var(--muted2);margin-top:2px" id="mobileDetailSub"></div>
+    </div>
+    <div class="overlay-msgs" id="mobileDetailMsgs"></div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px">
+      <button class="action-btn secondary" style="flex:1">Transferir</button>
+      <button class="action-btn primary" style="flex:1">✓ Resolver</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    }
+
+    function openMobileConv(idx) {
+      const conv = convs[idx];
+      document.getElementById('mobileDetailName').textContent = conv.name;
+      document.getElementById('mobileDetailSub').textContent = conv.sub;
+      const msgsEl = document.getElementById('mobileDetailMsgs');
+      msgsEl.innerHTML = '';
+      conv.msgs.forEach(m => {
+        const wrap = document.createElement('div');
+        wrap.className = 'msg-wrap ' + (m.type==='user'?'user':'bot');
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble ' + (m.type==='ai'?'ai':m.type);
+        bubble.textContent = m.text;
+        const tag = document.createElement('div');
+        tag.className = 'msg-tag ' + (m.type==='ai'?'ai-tag':'');
+        tag.textContent = m.type==='ai' ? '🤖 Bot IA · '+m.time : '👤 Cliente · '+m.time;
+        wrap.appendChild(bubble); wrap.appendChild(tag); msgsEl.appendChild(wrap);
+      });
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+      document.getElementById('mobileOverlay').classList.add('open');
+    }
+    function closeMobileOverlay() {
+      document.getElementById('mobileOverlay').classList.remove('open');
+    }
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Chart bars
+    function initCharts() {
+      const data = [18, 24, 31, 28, 35, 42, 47];
+      const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Hoje'];
+      const max = Math.max(...data);
+      
+      const containers = document.querySelectorAll('.mini-chart');
+      containers.forEach(container => {
+        container.innerHTML = '<div class="chart-bars"></div>';
+        const barsEl = container.querySelector('.chart-bars');
+        
+        data.forEach((v, i) => {
+          const wrap = document.createElement('div');
+          wrap.className = 'bar-wrap';
+          const bar = document.createElement('div');
+          bar.className = 'bar' + (i === 6 ? ' today' : '');
+          bar.style.height = (v / max * 52) + 'px';
+          bar.title = `${days[i]}: ${v} conversas`;
+          const label = document.createElement('div');
+          label.className = 'bar-label';
+          label.textContent = days[i];
+          wrap.appendChild(bar);
+          wrap.appendChild(label);
+          barsEl.appendChild(wrap);
+        });
+      });
+    }
+    initCharts();
+
+    // Conversations data
+    const convs = [
+      {
+        name: 'Maria Aparecida', sub: 'Comercial SP · Lead novo · 14:32',
+        msgs: [
+          {type:'user', text:'Boa tarde! Tenho interesse no curso de inglês para adultos. Podem me dar mais informações?', time:'14:30'},
+          {type:'ai', text:'Olá, Maria! 👋 Boa tarde! Temos ótimas opções para adultos. Temos turmas matutinas (9h-11h), vespertinas (14h-16h) e noturnas (19h-21h). O investimento mensal é de R$320. Você teria preferência de horário?', time:'14:30'},
+          {type:'user', text:'Noturno seria melhor. Quanto tempo dura o curso?', time:'14:31'},
+          {type:'ai', text:'O curso básico tem duração de 18 meses, dividido em 3 módulos de 6 meses. Ao final você terá nível intermediário-avançado. Gostaria de agendar uma visita para conhecer a escola?', time:'14:31'},
+          {type:'user', text:'Sim! Como funciona?', time:'14:32'},
+        ]
+      },
+      {
+        name: 'João Carlos', sub: 'Comercial SP · Pendente · 14:18',
+        msgs: [
+          {type:'user', text:'Oi, qual o horário da aula de adultos aos sábados?', time:'14:17'},
+          {type:'ai', text:'Olá, João! Aos sábados temos turmas às 9h e às 11h para adultos. São turmas menores (máx. 8 alunos) com foco em conversação. Interesse em algum desses horários?', time:'14:17'},
+          {type:'user', text:'Qual o horário da aula de adultos?', time:'14:18'},
+        ]
+      },
+      {
+        name: 'Roberta Silva', sub: 'Comercial SP · Resolvido · 13:55',
+        msgs: [
+          {type:'user', text:'Olá! Quero saber sobre matrícula para crianças.', time:'13:50'},
+          {type:'ai', text:'Oi Roberta! 😊 Para crianças temos turmas divididas por faixa etária: Kids (6-9 anos) e Juniors (10-13 anos). As aulas são 2x por semana, 1h cada. O valor é R$280/mês. Qual a idade do seu filho(a)?', time:'13:50'},
+          {type:'user', text:'7 anos. Tem vaga?', time:'13:52'},
+          {type:'ai', text:'Ótimo! Temos vagas na turma Kids. Posso registrar seu interesse e passar para nossa equipe entrar em contato para agendamento de matrícula? 🎉', time:'13:52'},
+          {type:'user', text:'Sim por favor! Meu nome é Roberta, fone 11 95555-4444', time:'13:54'},
+          {type:'ai', text:'Perfeito, Roberta! ✅ Registrei seu interesse. Nossa equipe vai entrar em contato em até 2 horas para confirmar a matrícula. Até logo!', time:'13:55'},
+        ]
+      },
+      {
+        name: 'Pedro Lima', sub: 'Comercial RJ · Em andamento · 13:40',
+        msgs: [
+          {type:'user', text:'Boa tarde! Meu filho tem 8 anos, vocês tem turma pra essa idade?', time:'13:38'},
+          {type:'ai', text:'Oi Pedro! Sim! Temos a turma Kids especialmente para essa faixa etária (6-9 anos). As aulas são dinâmicas e divertidas, com jogos e músicas. 2x por semana, 1h cada aula. Valor: R$280/mês.', time:'13:38'},
+          {type:'user', text:'Que dias da semana são as aulas?', time:'13:40'},
+          {type:'ai', text:'Temos opções de: Seg/Qua, Ter/Qui ou Qua/Sex. Qual combinação ficaria melhor para vocês?', time:'13:40'},
+        ]
+      },
+      {
+        name: 'Ana Costa', sub: 'Comercial RJ · Lead novo · 13:22',
+        msgs: [
+          {type:'user', text:'Boa tarde! Quero saber sobre o curso de inglês para adultos iniciantes.', time:'13:20'},
+          {type:'ai', text:'Olá, Ana! 👋 Boa tarde! Temos um módulo específico para iniciantes absolutos. As aulas começam do zero com foco em comunicação do dia a dia. Duração: 6 meses, 2x por semana. R$320/mês.', time:'13:20'},
+          {type:'user', text:'Tem aula online também?', time:'13:21'},
+          {type:'ai', text:'Sim! Oferecemos modalidade híbrida — você pode combinar aulas presenciais e online. Ideal para quem tem agenda variada. Quer saber mais sobre essa opção?', time:'13:21'},
+          {type:'user', text:'Sim! E qual o valor?', time:'13:22'},
+          {type:'ai', text:'A modalidade híbrida tem o mesmo valor: R$320/mês. Você escolhe semana a semana se vai presencial ou online. Posso te passar mais detalhes sobre como funciona?', time:'13:22'},
+        ]
+      },
+      {
+        name: 'Felipe Martins', sub: 'Comercial SP · Matriculado · 12:48',
+        msgs: [
+          {type:'user', text:'Quero fazer minha matrícula no curso noturno de adultos.', time:'12:40'},
+          {type:'ai', text:'Que ótimo, Felipe! 🎉 Para realizar a matrícula preciso de: nome completo, CPF, telefone e e-mail. Pode me informar?', time:'12:40'},
+          {type:'user', text:'Felipe Martins, CPF 123.456.789-00, tel 11 98888-7777, email felipe@email.com', time:'12:43'},
+          {type:'ai', text:'Perfeito! Registrei seus dados. Nossa equipe vai confirmar a matrícula e enviar o contrato por e-mail em até 1 hora. Bem-vindo à família! 🏆', time:'12:43'},
+          {type:'user', text:'Obrigado!', time:'12:48'},
+          {type:'ai', text:'Disponha! Qualquer dúvida é só chamar. Boas aulas! 😊', time:'12:48'},
+        ]
+      }
+    ];
+
+    function showConv(idx) {
+      const isMobile = window.innerWidth <= 768;
+      if(isMobile) { openMobileConv(idx); return; }
+      document.querySelectorAll('.conv-item').forEach((el,i) => el.classList.toggle('active', i === idx));
+      const conv = convs[idx];
+      document.getElementById('detailName').textContent = conv.name;
+      document.getElementById('detailSub').textContent = conv.sub;
+      const msgsEl = document.getElementById('chatMsgs');
+      msgsEl.innerHTML = '';
+      conv.msgs.forEach(m => {
+        const wrap = document.createElement('div');
+        wrap.className = 'msg-wrap ' + (m.type === 'user' ? 'user' : 'bot');
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble ' + (m.type === 'ai' ? 'ai' : m.type);
+        bubble.textContent = m.text;
+        const tag = document.createElement('div');
+        tag.className = 'msg-tag ' + (m.type === 'ai' ? 'ai-tag' : '');
+        tag.textContent = m.type === 'ai' ? '🤖 Bot IA · ' + m.time : (m.type === 'user' ? '👤 Cliente · ' + m.time : m.time);
+        wrap.appendChild(bubble);
+        wrap.appendChild(tag);
+        msgsEl.appendChild(wrap);
+      });
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    if (window.innerWidth > 768) {
+      showConv(0);
+    }
+
+    // Nav items
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.addEventListener('click', function() {
+        if(this.closest('.sidebar')) {
+          document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
+
+    // Select num
+    function selectNum(el) {
+      document.querySelectorAll('.num-row').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    // Simulate live updates
+    let convCount = 47;
+    setInterval(() => {
+      if(Math.random() > 0.7) {
+        convCount++;
+        document.getElementById('metConv').textContent = convCount;
+      }
+    }, 8000);
+  </script>
+</body>
+</html>
