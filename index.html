@@ -1209,11 +1209,15 @@
             }
 
             .topbar {
-                padding: 0 16px;
+                padding: 0 12px !important;
                 height: 56px;
                 position: sticky;
                 top: 0;
                 z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
             }
 
             .topbar-time {
@@ -1223,7 +1227,50 @@
             .metrics {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
-                gap: 12px;
+                gap: 10px !important;
+            }
+
+            .metric-card {
+                padding: 16px 12px !important;
+            }
+
+            .metric-label {
+                font-size: 0.58rem !important;
+                letter-spacing: 0.05em !important;
+                padding-right: 35px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .metric-val {
+                font-size: 1.5rem !important;
+                margin-top: 4px !important;
+            }
+
+            .metric-trend {
+                top: 12px !important;
+                right: 8px !important;
+                font-size: 0.55rem !important;
+                padding: 2px 4px !important;
+            }
+
+            .topbar-title {
+                font-size: 0.7rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 160px;
+            }
+
+            .status-pill {
+                padding: 3px 8px !important;
+                font-size: 0.6rem !important;
+            }
+
+            .metric-sub {
+                font-size: 0.62rem !important;
+                margin-top: 4px !important;
             }
 
             .grid-row-3 {
@@ -1268,6 +1315,82 @@
                 cursor: pointer;
             }
 
+            /* LEADS TABLE RESPONSIVE */
+            .full-leads-table {
+                background: transparent !important;
+                border: none !important;
+            }
+
+            .fl-header {
+                display: none !important;
+            }
+
+            .fl-body {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .fl-row {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-areas: 
+                    "phone action"
+                    "vendedor status"
+                    "time time"
+                    "preview preview" !important;
+                gap: 12px !important;
+                padding: 16px !important;
+                background: var(--surface) !important;
+                border: 1px solid var(--border) !important;
+                border-radius: 12px !important;
+                height: auto !important;
+                margin-bottom: 0 !important;
+            }
+
+            .fl-phone {
+                grid-area: phone;
+                font-size: 0.95rem !important;
+                font-weight: 600 !important;
+                color: var(--text) !important;
+            }
+
+            .fl-row > div:nth-child(2) { grid-area: vendedor; }
+            .fl-msg-count { display: none !important; }
+            .fl-preview { 
+                grid-area: preview;
+                white-space: normal !important;
+                font-size: 0.72rem !important;
+                color: var(--muted2) !important;
+                border-top: 1px solid var(--border);
+                padding-top: 8px;
+                margin-top: 4px;
+            }
+            .fl-time { 
+                grid-area: time;
+                font-size: 0.65rem !important;
+                color: var(--muted) !important;
+            }
+            .fl-row > div:nth-child(6) { 
+                grid-area: status;
+                justify-self: end;
+            }
+            .fl-action {
+                grid-area: action;
+                justify-self: end;
+                font-size: 1.1rem !important;
+            }
+
+            .filters-bar {
+                gap: 8px !important;
+            }
+
+            .filter-select, .filter-input {
+                flex: 1;
+                font-size: 0.75rem !important;
+                padding: 6px 10px !important;
+            }
+
             .overlay-msgs {
                 flex: 1;
                 overflow-y: auto;
@@ -1310,6 +1433,126 @@
                 color: var(--green);
                 border-color: var(--green);
                 transform: translateY(-2px);
+            }
+
+            /* RELATÓRIOS RESPONSIVE */
+            .report-row {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+
+            .chart-container {
+                height: 240px !important;
+                padding: 16px !important;
+            }
+
+            .report-table th, .report-table td {
+                padding: 10px 8px !important;
+                font-size: 0.72rem !important;
+            }
+
+            .heatmap-container {
+                margin: 0 -8px;
+                padding: 0 8px 8px;
+                overflow-x: auto;
+            }
+
+            .heatmap-grid {
+                min-width: 500px !important;
+            }
+
+            .config-section-title {
+                font-size: 0.7rem !important;
+                margin-bottom: 12px !important;
+            }
+
+            /* CONFIGURAÇÕES RESPONSIVE */
+            .master-scale-card {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .master-scale-table {
+                display: block !important;
+                min-width: auto !important;
+            }
+
+            .master-scale-table thead {
+                display: none !important;
+            }
+
+            .master-scale-table tbody {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+
+            .master-scale-table tr {
+                display: flex !important;
+                flex-direction: column !important;
+                background: var(--surface) !important;
+                border: 1px solid var(--border) !important;
+                border-radius: 12px !important;
+                padding: 16px !important;
+                gap: 12px !important;
+            }
+
+            .master-scale-table td {
+                display: flex !important;
+                flex-direction: column !important;
+                padding: 0 !important;
+                border: none !important;
+                gap: 6px !important;
+                width: 100% !important;
+                text-align: left !important;
+            }
+
+            .master-scale-table td.day-label {
+                font-size: 0.85rem !important;
+                color: var(--green) !important;
+                border-bottom: 1px solid var(--border) !important;
+                padding-bottom: 8px !important;
+                margin-bottom: 4px !important;
+                font-weight: 700 !important;
+                padding-left: 0 !important;
+            }
+
+            /* Labels para os turnos via CSS */
+            .master-scale-table tr:not(:last-child) td:nth-child(2)::before { content: "Manhã (08:00 - 12:00)"; color: var(--muted2); font-size: 0.62rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+            .master-scale-table tr:not(:last-child) td:nth-child(3)::before { content: "Tarde (12:00 - 16:50)"; color: var(--muted2); font-size: 0.62rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+            .master-scale-table tr:not(:last-child) td:nth-child(4)::before { content: "Noite (16:50 - 21:00)"; color: var(--muted2); font-size: 0.62rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+            .master-scale-table tr:last-child td:nth-child(2)::before { content: "Turno Sábado (08:00 - 12:00)"; color: var(--muted2); font-size: 0.62rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+
+            .slot-select {
+                width: 100% !important;
+                font-size: 0.78rem !important;
+                padding: 10px !important;
+                background: var(--bg2) !important;
+                border-radius: 8px !important;
+            }
+            
+            .config-card-body {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .rag-table {
+                min-width: 700px !important;
+            }
+            .rag-keyword {
+                max-width: 120px !important;
+            }
+
+            .vendedor-list {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .form-row {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
             }
         }
 
@@ -3072,14 +3315,22 @@
 
         function brISO(date, hours = 0, minutes = 0, seconds = 0) {
             const d = new Date(date);
+            // Se passar horas, ajusta no objeto date primeiro
             if (hours !== null) d.setHours(hours, minutes, seconds, 0);
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            const h = String(d.getHours()).padStart(2, '0');
-            const min = String(d.getMinutes()).padStart(2, '0');
-            const s = String(d.getSeconds()).padStart(2, '0');
-            return `${y}-${m}-${day}T${h}:${min}:${s}-03:00`;
+            
+            // Mas precisamos formatar a string ISO no timezone de Brasília
+            // O código original fazia um hack com setHours e hardcoded offset.
+            // Vamos usar Intl para formatar de forma robusta.
+            const fmt = new Intl.DateTimeFormat('sv-SE', {
+                timeZone: 'America/Sao_Paulo',
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }).formatToParts(d);
+            
+            const p = {};
+            fmt.forEach(part => p[part.type] = part.value);
+            
+            return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}-03:00`;
         }
 
         function todayRange() {
@@ -3103,12 +3354,13 @@
             if (!iso) return '';
             const d = new Date(iso);
             const now = brNow();
+            
             const dateStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-            const todayStr = now.toLocaleDateString('pt-BR');
+            const todayStr = now.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
             const yesterday = new Date(now);
             yesterday.setDate(now.getDate() - 1);
-            const yesterdayStr = yesterday.toLocaleDateString('pt-BR');
+            const yesterdayStr = yesterday.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
             if (dateStr === todayStr) return 'Hoje';
             if (dateStr === yesterdayStr) return 'Ontem';
@@ -3286,7 +3538,7 @@
             const webhookEl = document.getElementById('botWebhookVal');
             if (ultimoWebhook) {
                 const d = new Date(ultimoWebhook);
-                webhookEl.textContent = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                webhookEl.textContent = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
                 webhookEl.style.color = '';
             } else {
                 webhookEl.textContent = 'Nenhum registrado';
@@ -3465,8 +3717,8 @@
             }
             el.innerHTML = `<div class="event-list">${log.map(e => {
                 const d = new Date(e.ts);
-                const ts = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' +
-                    d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const ts = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ' ' +
+                    d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
                 return `<div class="event-item">
         <span style="font-size:1rem">${e.icon}</span>
         <span class="event-time">${ts}</span>
@@ -3498,7 +3750,7 @@
 
         // ─── CLOCK ───────────────────────────────────
         function updateClock() {
-            document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR');
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         }
         setInterval(updateClock, 1000);
         updateClock();
