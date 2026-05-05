@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard — CRM WhatsApp</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='%2325D366'><path d='M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.1 0-65.6-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.2-8.5-44.2-27.1-16.4-14.6-27.4-32.7-30.6-38.2-3.2-5.6-.3-8.6 2.5-11.3 2.5-2.5 5.5-6.5 8.3-9.7 2.8-3.2 3.7-5.5 5.6-9.2 1.9-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.8 23.5 9.2 31.5 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.5 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z'/></svg>">
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet" />
@@ -1808,84 +1809,33 @@
             flex-wrap: wrap;
         }
 
-        /* LOGIN MOCK */
-        .login-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
+        /* LOGIN */
+        #loginScreen {
+            position: fixed; inset: 0; z-index: 9999;
             background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 24px;
-            transition: opacity 0.3s ease;
+            align-items: center; justify-content: center;
         }
-
-        .login-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
         .login-box {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 32px;
-            width: 90%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 40px; width: 360px;
+            display: flex; flex-direction: column; gap: 16px; align-items: center;
         }
-
-        .login-title {
-            font-family: var(--mono);
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
+        .login-logo { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--text); }
+        .login-sub { font-size: 0.75rem; color: var(--muted2); margin-bottom: 8px; }
+        .login-input {
+            width: 100%; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 6px; padding: 10px 14px; color: var(--text);
+            font-family: var(--sans); font-size: 0.85rem; outline: none;
         }
-
-        .login-sub {
-            font-size: 0.8rem;
-            color: var(--muted2);
-        }
-
+        .login-input:focus { border-color: var(--green); }
         .login-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--surface2);
-            color: var(--text);
-            font-size: 0.9rem;
-            font-family: var(--sans);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            width: 100%; background: var(--green); color: var(--bg);
+            border: none; border-radius: 6px; padding: 12px;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            font-family: var(--sans); transition: opacity 0.2s;
         }
-
-        .login-btn:hover {
-            border-color: var(--green);
-            background: rgba(0, 217, 126, 0.05);
-            color: var(--green);
-        }
-
-        .login-btn.admin {
-            border-color: rgba(61, 142, 240, 0.3);
-        }
-
-        .login-btn.admin:hover {
-            border-color: var(--blue);
-            background: rgba(61, 142, 240, 0.05);
-            color: var(--blue);
-        }
+        .login-btn:hover { opacity: 0.85; }
+        .login-erro { font-size: 0.75rem; color: var(--red); }
 
         /* CONFIG TAB */
         .config-grid {
@@ -2419,17 +2369,14 @@
 
 <body>
 
-    <div class="login-overlay" id="loginOverlay">
+    <div id="loginScreen" style="display:none">
         <div class="login-box">
-            <div>
-                <div class="login-title">Acesso ao CRM</div>
-                <div class="login-sub">Selecione o seu perfil para entrar</div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button class="login-btn admin" onclick="loginAs('Admin')">👑 Entrar como Gestor (Admin)</button>
-                <button class="login-btn" onclick="loginAs('Paulo')">👤 Entrar como Paulo</button>
-                <button class="login-btn" onclick="loginAs('Rebeca')">👤 Entrar como Rebeca</button>
-            </div>
+            <div class="login-logo">CRM WhatsApp</div>
+            <div class="login-sub">Escola de Idiomas</div>
+            <input id="loginUser" type="text" placeholder="Usuário" class="login-input" onkeypress="if(event.key === 'Enter') fazerLogin()"/>
+            <input id="loginPass" type="password" placeholder="Senha" class="login-input" onkeypress="if(event.key === 'Enter') fazerLogin()"/>
+            <button onclick="fazerLogin()" class="login-btn">Entrar</button>
+            <div id="loginErro" class="login-erro" style="display:none">Usuário ou senha incorretos</div>
         </div>
     </div>
 
@@ -2437,7 +2384,7 @@
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-name">CRM WhatsApp</div>
+            <div class="logo-name">📲 CRM WhatsApp</div>
             <div class="logo-sub">Escola de Idiomas</div>
         </div>
         <div class="sidebar-section">Principal</div>
@@ -2459,6 +2406,12 @@
         <div class="nav-item" id="navConfig" onclick="showView('config')"><span class="nav-icon">⚙</span> Configurações
         </div>
         <div class="nav-item" id="navBotIA" onclick="showView('botia')"><span class="nav-icon">🤖</span> Bot IA</div>
+        <div style="padding: 8px 20px; border-top: 1px solid var(--border);">
+            <a href="#" onclick="showPrivacidade()" 
+               style="font-size:0.65rem;color:var(--muted2);text-decoration:none">
+              Política de Privacidade
+            </a>
+        </div>
         <div class="sidebar-footer">
             <div class="user-info" style="justify-content: space-between; width: 100%;">
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -3144,6 +3097,11 @@
             <div class="lead-modal-body">
                 <div class="lead-modal-chat" id="lmChat"></div>
                 <div class="lead-modal-controls">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" class="filter-input" id="lmNome" placeholder="Nome" autocomplete="off">
+                        <input type="text" class="filter-input" id="lmIdade" placeholder="Idade" autocomplete="off">
+                        <input type="text" class="filter-input" id="lmInteresse" placeholder="Interesse" style="grid-column: span 2;" autocomplete="off">
+                    </div>
                     <textarea class="lead-modal-textarea" id="lmNota"
                         placeholder="Anotações sobre este lead..."></textarea>
                     <select class="filter-select" id="lmMotivoPerda" style="display: none;">
@@ -3381,29 +3339,83 @@
         }
 
         // ─── AUTH / ROLE SYSTEM ──────────────────────
-        let currentUser = localStorage.getItem('crm_logged_user');
+        const USUARIOS = {
+            'gestora': { hash: btoa('escola2025'), nome: 'Gestora', role: 'admin' },
+            'rebeca':  { hash: btoa('rebeca123'),  nome: 'Rebeca',  role: 'vendedor' },
+            'paulo':   { hash: btoa('paulo123'),   nome: 'Paulo',   role: 'vendedor' }
+        };
+
+        let currentUserObj = null;
+        let currentUser = null; // para compatibilidade legada ('Admin', 'Rebeca', etc)
 
         function initAuth() {
-            if (!currentUser) {
-                document.getElementById('loginOverlay').classList.remove('hidden');
+            // [TEMPORÁRIO] Login automático para desenvolvimento
+            currentUserObj = { usuario: 'gestora', nome: 'Gestora', role: 'admin' };
+            currentUser = 'Admin';
+            document.getElementById('loginScreen').style.display = 'none';
+            applyRoleUI();
+            return;
+
+            const saved = sessionStorage.getItem('crm_user');
+            if (!saved) {
+                document.getElementById('loginScreen').style.display = 'flex';
             } else {
-                document.getElementById('loginOverlay').classList.add('hidden');
+                currentUserObj = JSON.parse(saved);
+                currentUser = currentUserObj.role === 'admin' ? 'Admin' : currentUserObj.nome;
+                document.getElementById('loginScreen').style.display = 'none';
                 applyRoleUI();
+                
+                if (currentUserObj.role === 'vendedor') {
+                    filtroVendedorAtivo = currentUserObj.nome;
+                    setTimeout(() => {
+                        document.querySelectorAll('.sub-nav-item').forEach(i => {
+                            i.classList.remove('active');
+                            if (i.getAttribute('onclick') && i.getAttribute('onclick').includes("'" + currentUserObj.nome + "'")) {
+                                i.classList.add('active');
+                            }
+                        });
+                    }, 100);
+                }
             }
         }
 
-        function loginAs(role) {
-            currentUser = role;
-            localStorage.setItem('crm_logged_user', role);
-            document.getElementById('loginOverlay').classList.add('hidden');
-            applyRoleUI();
-            showView('dashboard');
-            loadAllData(); // Trigger initial load
+        function fazerLogin() {
+            const user = document.getElementById('loginUser').value.toLowerCase().trim();
+            const pass = document.getElementById('loginPass').value;
+            const erro = document.getElementById('loginErro');
+
+            if (USUARIOS[user] && USUARIOS[user].hash === btoa(pass)) {
+                erro.style.display = 'none';
+                const u = USUARIOS[user];
+                sessionStorage.setItem('crm_user', JSON.stringify({ usuario: user, nome: u.nome, role: u.role }));
+                
+                currentUserObj = { usuario: user, nome: u.nome, role: u.role };
+                currentUser = u.role === 'admin' ? 'Admin' : u.nome;
+                document.getElementById('loginScreen').style.display = 'none';
+                
+                applyRoleUI();
+                
+                if (u.role === 'vendedor') {
+                    filtroVendedorAtivo = u.nome;
+                    document.querySelectorAll('.sub-nav-item').forEach(i => {
+                        i.classList.remove('active');
+                        if (i.getAttribute('onclick') && i.getAttribute('onclick').includes("'" + u.nome + "'")) {
+                            i.classList.add('active');
+                        }
+                    });
+                }
+                
+                showView('dashboard');
+                loadAllData(); // Trigger initial load
+            } else {
+                erro.style.display = 'block';
+            }
         }
 
         function logout() {
+            currentUserObj = null;
             currentUser = null;
-            localStorage.removeItem('crm_logged_user');
+            sessionStorage.removeItem('crm_user');
             location.reload();
         }
 
@@ -3821,7 +3833,11 @@
 
                 // Filtro lateral adicional (Coordenação / Todos / Busca)
                 if (filtroVendedorAtivo === 'coord') {
-                    rowsFiltradas = rowsFiltradas.filter(r => r.tipo === 'aluno');
+                    rowsFiltradas = rowsFiltradas.filter(r => {
+                        const v = firstVend[r.telefone]?.toLowerCase();
+                        const isCoord = v === 'coord' || v === 'coordenação' || v === 'coordenacao';
+                        return isCoord || (r.tipo === 'aluno' && !v);
+                    });
                 } else if (filtroVendedorAtivo !== 'todos') {
                     // Se o admin selecionar um vendedor específico na sidebar, filtra as conversas daquele dono
                     rowsFiltradas = rowsFiltradas.filter(r => firstVend[r.telefone]?.toLowerCase() === filtroVendedorAtivo.toLowerCase());
@@ -4223,7 +4239,10 @@
                             primeiroContato: r.created_at,
                             vendedor: r.vendedor || 'desconhecido', // ← primeiro vendedor, não sobrescrito
                             status: st.status || 'novo',
-                            nota: st.anotacao || ''
+                            nota: st.anotacao || '',
+                            nome: st.nome || '',
+                            idade: st.idade || '',
+                            interesse: st.interesse || ''
                         };
                     }
                     leadsMap[r.telefone].msgs.push(r);
@@ -4306,10 +4325,13 @@
 
         function exportFullLeads() {
             if (!fullLeadsData.length) return;
-            const rows = [['Telefone', 'Vendedor', 'Total Mensagens', 'Primeiro Contato', 'Ultimo Contato', 'Status', 'Anotação']];
+            const rows = [['Telefone', 'Nome', 'Idade', 'Interesse', 'Vendedor', 'Total Mensagens', 'Primeiro Contato', 'Ultimo Contato', 'Status', 'Anotação']];
             fullLeadsData.forEach(l => {
                 rows.push([
                     fmtTel(l.telefone),
+                    l.nome || '',
+                    l.idade || '',
+                    l.interesse || '',
                     l.vendedor || '—',
                     l.msgs.length,
                     new Date(l.primeiroContato).toLocaleString('pt-BR'),
@@ -4337,6 +4359,9 @@
             const leadData = fullLeadsData.find(l => l.telefone === telefone);
             document.getElementById('lmStatus').value = leadData ? leadData.status : 'novo';
             document.getElementById('lmNota').value = leadData ? leadData.nota : '';
+            document.getElementById('lmNome').value = leadData ? (leadData.nome || '') : '';
+            document.getElementById('lmIdade').value = leadData ? (leadData.idade || '') : '';
+            document.getElementById('lmInteresse').value = leadData ? (leadData.interesse || '') : '';
             toggleMotivoPerda();
 
             document.getElementById('lmChat').innerHTML = '<div class="state-msg"><span class="spinner"></span></div>';
@@ -4419,11 +4444,18 @@
                 btn.disabled = true;
             }
 
+            const nome = document.getElementById('lmNome').value.trim();
+            const idade = document.getElementById('lmIdade').value.trim();
+            const interesse = document.getElementById('lmInteresse').value.trim();
+
             try {
                 await sbUpsert('status_de_leads', [{
                     telefone: currentModalLead,
                     status: status,
-                    anotacao: nota
+                    anotacao: nota,
+                    nome: nome,
+                    idade: idade,
+                    interesse: interesse
                 }], 'telefone');
 
                 if (btn) {
@@ -4669,28 +4701,63 @@
             }
         }
 
-        function exportReportCSV() {
+        async function exportReportCSV() {
             const rows = window.lastReportRows;
             if (!rows || !rows.length) return alert('Nenhum dado para exportar');
 
-            const csvRows = [['Telefone', 'Vendedor', 'Tipo', 'De', 'Data', 'Mensagem']];
-            rows.forEach(r => {
-                csvRows.push([
-                    r.telefone,
-                    r.vendedor || '',
-                    r.tipo || '',
-                    r.de,
-                    new Date(r.created_at).toLocaleString('pt-BR'),
-                    (r.mensagem || '').replace(/\n/g, ' ').replace(/;/g, ',')
-                ]);
-            });
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'gerando...';
+            btn.disabled = true;
 
-            const csvContent = "\uFEFF" + csvRows.map(e => e.join(";")).join("\n");
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `relatorio_crm_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
+            try {
+                const statusRows = await sbGet('status_de_leads?select=*');
+                const statusMap = {};
+                statusRows.forEach(s => statusMap[s.telefone] = s);
+
+                const leadsMap = {};
+                rows.forEach(r => {
+                    if (!leadsMap[r.telefone]) {
+                        const st = statusMap[r.telefone] || {};
+                        leadsMap[r.telefone] = {
+                            telefone: r.telefone,
+                            primeiroContato: r.created_at,
+                            vendedor: r.vendedor || 'desconhecido',
+                            status: st.status || 'novo',
+                            nota: st.anotacao || '',
+                            nome: st.nome || '',
+                            idade: st.idade || '',
+                            interesse: st.interesse || ''
+                        };
+                    }
+                });
+
+                const csvRows = [['Data', 'Telefone', 'Nome', 'Idade', 'Interesse', 'Ação', 'Anotação']];
+                Object.values(leadsMap).forEach(l => {
+                    csvRows.push([
+                        new Date(l.primeiroContato).toLocaleString('pt-BR'),
+                        l.telefone,
+                        l.nome,
+                        l.idade,
+                        l.interesse,
+                        l.status,
+                        (l.nota || '').replace(/\n/g, ' ').replace(/;/g, ',')
+                    ]);
+                });
+
+                const csvContent = "\uFEFF" + csvRows.map(e => e.join(";")).join("\n");
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `relatorio_leads_completo_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+            } catch (e) {
+                console.error(e);
+                alert('Erro ao gerar exportação completa.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         }
 
         function getDateRange(period) {
@@ -5249,6 +5316,14 @@
             document.getElementById('sidebarOverlay').classList.toggle('open');
         }
 
+        function showPrivacidade() {
+            document.getElementById('privacidadeModal').style.display = 'flex';
+        }
+
+        function hidePrivacidade() {
+            document.getElementById('privacidadeModal').style.display = 'none';
+        }
+
         // ─── INIT ────────────────────────────────────
         async function loadAllData() {
             if (!currentUser) return;
@@ -5323,6 +5398,36 @@
             }
         }, 60000);
     </script>
+    <div id="privacidadeModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);align-items:center;justify-content:center">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto">
+        <div style="font-family:var(--mono);font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:16px">
+          // política de privacidade
+        </div>
+        <div style="font-size:0.78rem;color:var(--muted2);line-height:1.7">
+          <p><strong style="color:var(--text)">1. Quem somos</strong><br>
+          Este sistema é operado pela escola de idiomas para fins de atendimento ao cliente via WhatsApp.</p>
+          <br>
+          <p><strong style="color:var(--text)">2. Dados coletados</strong><br>
+          Coletamos número de telefone, nome e mensagens trocadas durante o atendimento.</p>
+          <br>
+          <p><strong style="color:var(--text)">3. Finalidade</strong><br>
+          Os dados são usados exclusivamente para atendimento, qualificação de leads e contato comercial.</p>
+          <br>
+          <p><strong style="color:var(--text)">4. Armazenamento</strong><br>
+          Os dados são armazenados em servidores seguros e mantidos pelo período necessário para o atendimento.</p>
+          <br>
+          <p><strong style="color:var(--text)">5. Seus direitos (LGPD)</strong><br>
+          Você pode solicitar a remoção dos seus dados a qualquer momento enviando "REMOVER MEUS DADOS" no WhatsApp.</p>
+          <br>
+          <p><strong style="color:var(--text)">6. Contato</strong><br>
+          Dúvidas sobre privacidade: entre em contato pelo WhatsApp da escola.</p>
+        </div>
+        <button onclick="hidePrivacidade()" 
+          style="margin-top:24px;background:var(--green);color:var(--bg);border:none;border-radius:6px;padding:10px 24px;cursor:pointer;font-weight:700;font-family:var(--sans)">
+          Fechar
+        </button>
+      </div>
+    </div>
     <div id="ragGlobalTooltip"></div>
 </body>
 
