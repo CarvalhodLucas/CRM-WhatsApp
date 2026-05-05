@@ -3008,6 +3008,7 @@
                             <textarea class="lead-modal-textarea" id="simInput" placeholder="Digite algo para testar..."
                                 style="height:60px"></textarea>
                         </div>
+                        <button class="action-btn secondary" style="height:60px; padding:0 16px; border-color:var(--red); color:var(--red)" onclick="clearSimChat()" title="Limpar memória do bot e reiniciar o chat">Limpar</button>
                         <button class="action-btn primary" style="height:60px; padding:0 24px" id="btnSimular"
                             onclick="simulateResponse()">Simular Resposta</button>
                     </div>
@@ -3600,6 +3601,13 @@
             if (m.includes('coordena') || m.includes('sou aluno') || m.includes('minha aula') || m.includes('mensalidade') || m.includes('já estudo')) return 'aluno';
             if (m.includes('comercial') || m.includes('matricul') || m.includes('quero aprender') || m.includes('turma') || m.includes('tem vaga') || m.includes('quanto custa')) return 'lead';
             return 'indefinido';
+        }
+
+        async function clearSimChat() {
+            document.getElementById('simChat').innerHTML = ''; // Limpa o visual do chat
+            const inputEl = document.getElementById('simInput');
+            inputEl.value = '/clear';
+            await simulateResponse();
         }
 
         async function simulateResponse() {
