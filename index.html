@@ -3494,11 +3494,19 @@
             return s.slice(-2);
         }
 
+        function fmtVendedor(nome) {
+            if (!nome) return 'Vendedor';
+            const n = nome.toLowerCase();
+            if (n === 'rebeca') return 'Vendedor Manhã';
+            if (n === 'paulo') return 'Vendedor Tarde';
+            return nome;
+        }
+
         // ─── AUTH / ROLE SYSTEM ──────────────────────
         let USUARIOS = JSON.parse(localStorage.getItem('crm_users')) || {
             'adm': { hash: '24459be3a000763dd9212258ee70f41655460c81d393910fdbfb1d236294bd7e', nome: 'ADM', role: 'admin' },
-            'rebeca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Rebeca', role: 'vendedor' },
-            'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Paulo', role: 'vendedor' }
+            'rebeca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Vendedor Manhã', role: 'vendedor' },
+            'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Vendedor Tarde', role: 'vendedor' }
         };
 
         let currentUserObj = null;
@@ -3581,7 +3589,7 @@
             const isVendedor = currentUser !== 'Admin';
 
             // Update Sidebar User Info
-            document.getElementById('sidebarUserName').textContent = currentUser;
+            document.getElementById('sidebarUserName').textContent = fmtVendedor(currentUser);
             document.getElementById('sidebarUserRole').textContent = isVendedor ? 'Vendedor' : 'Administrador';
             document.getElementById('sidebarUserAv').textContent = isVendedor ? currentUser.substring(0, 2).toUpperCase() : 'GS';
             document.getElementById('sidebarUserAv').style.background = isVendedor ? 'var(--blue-dim)' : 'var(--green-dim)';
@@ -3626,6 +3634,8 @@
                 if (vendCard) vendCard.style.display = 'block';
                 const totalCard = document.getElementById('metTotalCard');
                 if (totalCard) totalCard.style.display = '';
+                
+                loadSidebarNumeros();
             }
         }
 
@@ -3957,6 +3967,37 @@
             document.getElementById('metLeadsTrend').textContent = leadsUnicos.size + ' hoje';
         }
 
+        // ─── SIDEBAR DINÂMICA ─────────────────────────
+        async function loadSidebarNumeros() {
+            // Só executa para admin
+            if (currentUser !== 'Admin') return;
+
+            try {
+                const rows = await sbGet('conversas?select=vendedor&order=vendedor.asc');
+                const vendedores = [...new Set(rows.map(r => r.vendedor).filter(Boolean))].sort();
+
+                const container = document.getElementById('sidebarNumeros');
+                if (!container) return;
+
+                // Remove itens antigos exceto "Todos" (primeiro filho)
+                container.querySelectorAll('.sub-nav-item:not(:first-child)').forEach(el => el.remove());
+
+                // Cores por vendedor
+                const cores = ['var(--green)', 'var(--blue)', 'var(--yellow)', '#A78BFA'];
+
+                vendedores.forEach((vendedor, i) => {
+                    const cor = cores[i % cores.length];
+                    const div = document.createElement('div');
+                    div.className = 'sub-nav-item';
+                    div.innerHTML = `<span class="status-dot-mini" style="background:${cor}"></span> ${fmtVendedor(vendedor)}`;
+                    div.onclick = () => filterByNumero(vendedor, div);
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Erro ao carregar sidebar números:', err);
+            }
+        }
+
         // ─── CONVERSAS RECENTES ──────────────────────
         let allConvsData = {};
         let activeChatTel = null;
@@ -4133,7 +4174,7 @@
                 
                 let tagLabel = '👤 Cliente · ' + fmtHora(m.created_at);
                 if (isBot) tagLabel = '🤖 Bot IA · ' + fmtHora(m.created_at);
-                if (isVendedor) tagLabel = `👤 ${m.vendedor || 'Vendedor'} · ` + fmtHora(m.created_at);
+                if (isVendedor) tagLabel = `👤 ${fmtVendedor(m.vendedor)} · ` + fmtHora(m.created_at);
 
                 return `
         <div class="msg-wrap ${wrapClass}">
