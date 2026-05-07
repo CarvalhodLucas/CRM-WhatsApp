@@ -959,6 +959,13 @@
             border-bottom-left-radius: 2px;
         }
 
+        .msg-bubble.vendedor {
+            background: rgba(255, 159, 67, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 159, 67, 0.2);
+            border-bottom-left-radius: 2px;
+        }
+
         .msg-tag {
             font-size: 0.58rem;
             color: var(--muted);
@@ -967,6 +974,10 @@
 
         .msg-tag.ai-tag {
             color: var(--green);
+        }
+
+        .msg-tag.vendedor-tag {
+            color: var(--orange);
         }
 
         /* LEADS TABLE */
@@ -4115,10 +4126,15 @@
 
             const msgsHtml = conv.msgs.map(m => {
                 const isBot = m.de === 'bot';
-                const wrapClass = isBot ? 'bot' : 'user';
-                const bubbleClass = isBot ? 'ai' : 'user';
-                const tagClass = isBot ? 'ai-tag' : '';
-                const tagLabel = isBot ? '🤖 Bot IA · ' + fmtHora(m.created_at) : '👤 Cliente · ' + fmtHora(m.created_at);
+                const isVendedor = m.de === 'vendedor';
+                const wrapClass = isBot ? 'bot' : (isVendedor ? 'bot' : 'user'); // Vendedor aparece do lado "bot" (direita)
+                const bubbleClass = isBot ? 'ai' : (isVendedor ? 'vendedor' : 'user');
+                const tagClass = isBot ? 'ai-tag' : (isVendedor ? 'vendedor-tag' : '');
+                
+                let tagLabel = '👤 Cliente · ' + fmtHora(m.created_at);
+                if (isBot) tagLabel = '🤖 Bot IA · ' + fmtHora(m.created_at);
+                if (isVendedor) tagLabel = `👤 ${m.vendedor || 'Vendedor'} · ` + fmtHora(m.created_at);
+
                 return `
         <div class="msg-wrap ${wrapClass}">
           <div class="msg-bubble ${bubbleClass}">${escapeHtml(m.mensagem)}</div>
