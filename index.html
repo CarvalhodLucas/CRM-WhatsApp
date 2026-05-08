@@ -2503,6 +2503,10 @@
             <div class="sub-nav-item active" onclick="filterByNumero('todos', this)">
                 <span class="status-dot-mini" style="background:var(--text)"></span> Todos
             </div>
+            <div class="sub-nav-item" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
+                <span class="status-dot-mini" style="background:var(--yellow)"></span> Em atendimento
+                <span id="badgeEmAtendimento" style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
+            </div>
             <!-- Dinâmico -->
         </div>
 
@@ -4056,6 +4060,19 @@
                     if (r.vendedor) byTel[r.telefone].vendedor = r.vendedor;
                 });
 
+                // Filtro por tipo (ex: Em atendimento = ainda não confirmado)
+                if (filtroTipoAtivo === 'em_atendimento') {
+                    Object.keys(byTel).forEach(tel => {
+                        const tipos = byTel[tel].msgs.map(m => m.tipo);
+                        const foiConfirmado = tipos.includes('lead_confirmado');
+                        const foiAluno = tipos.includes('aluno');
+                        const isVendedor = tipos.every(t => t === 'conversa_vendedor');
+                        if (foiConfirmado || foiAluno || isVendedor) {
+                            delete byTel[tel];
+                        }
+                    });
+                }
+
                 let convs = Object.values(byTel);
                 convs.sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
 
@@ -5269,7 +5286,10 @@
         }
 
         let filtroVendedorAtivo = 'todos';
+        let filtroTipoAtivo = null;
+
         function filterByNumero(vendedor, el) {
+            filtroTipoAtivo = null; // Reseta filtro de tipo ao clicar em vendedor
             document.querySelectorAll('.sub-nav-item').forEach(i => i.classList.remove('active'));
             if (el) el.classList.add('active');
             filtroVendedorAtivo = vendedor;
@@ -5281,6 +5301,45 @@
             }
 
             loadConversas();
+        }
+
+        function filterByTipo(tipo, el) {
+            document.querySelectorAll('.sub-nav-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+            filtroTipoAtivo = tipo;
+            filtroVendedorAtivo = 'todos';
+
+            // Mostra Conversas se não estiver nelas
+            const currentView = document.querySelector('.nav-item.active')?.id;
+            if (currentView !== 'navDashboard' && currentView !== 'navConversas') {
+                showView('conversas');
+            }
+
+            loadConversas();
+        }
+
+        async function updateBadgeEmAtendimento() {
+            try {
+                const { start, end } = todayRange();
+                const rows = await sbGet(`conversas?select=telefone,tipo&created_at=gte.${start}&created_at=lt.${end}`);
+
+                const byTel = {};
+                rows.forEach(r => {
+                    if (!byTel[r.telefone]) byTel[r.telefone] = [];
+                    byTel[r.telefone].push(r.tipo);
+                });
+
+                let count = 0;
+                Object.values(byTel).forEach(tipos => {
+                    const foiConfirmado = tipos.includes('lead_confirmado');
+                    const foiAluno = tipos.includes('aluno');
+                    const isVendedor = tipos.every(t => t === 'conversa_vendedor');
+                    if (!foiConfirmado && !foiAluno && !isVendedor) count++;
+                });
+
+                const badge = document.getElementById('badgeEmAtendimento');
+                if (badge) badge.textContent = count;
+            } catch (err) {}
         }
 
         function renderConfigVendedores() {
@@ -5572,7 +5631,8 @@
                     loadConversas(),
                     loadVendedores(),
                     loadLeads(),
-                    loadChart()
+                    loadChart(),
+                    updateBadgeEmAtendimento()
                 ]);
 
                 pill.className = 'status-pill';
