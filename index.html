@@ -3955,6 +3955,13 @@
             let filteredRows = rows;
             if (currentUser !== 'Admin') {
                 filteredRows = rows.filter(r => firstVend[r.telefone]?.toLowerCase() === currentUser.toLowerCase());
+                // E para vendedor, conta apenas os leads confirmados nas métricas de conversas
+                const confirmados = new Set(filteredRows.filter(r => r.tipo === 'lead_confirmado').map(r => r.telefone));
+                filteredRows = filteredRows.filter(r => confirmados.has(r.telefone));
+            } else if (filtroVendedorAtivo !== 'todos') {
+                // Se for Admin vendo um vendedor específico, aplica a mesma lógica de lead_confirmado
+                const confirmados = new Set(rows.filter(r => r.tipo === 'lead_confirmado' && firstVend[r.telefone]?.toLowerCase() === filtroVendedorAtivo.toLowerCase()).map(r => r.telefone));
+                filteredRows = rows.filter(r => confirmados.has(r.telefone));
             }
 
             const totalRows = currentUser === 'Admin' ? await sbCount('conversas') : 0;
@@ -4042,8 +4049,18 @@
                         return isCoord || (r.tipo === 'aluno' && !v);
                     });
                 } else if (filtroVendedorAtivo !== 'todos') {
-                    // Se o admin selecionar um vendedor específico na sidebar, filtra as conversas daquele dono
-                    rowsFiltradas = rowsFiltradas.filter(r => firstVend[r.telefone]?.toLowerCase() === filtroVendedorAtivo.toLowerCase());
+                    // Pega os telefones que têm lead_confirmado para este vendedor
+                    const telefonesConfirmados = new Set(
+                        rows
+                            .filter(r =>
+                                r.tipo === 'lead_confirmado' &&
+                                firstVend[r.telefone]?.toLowerCase() === filtroVendedorAtivo.toLowerCase()
+                            )
+                            .map(r => r.telefone)
+                    );
+
+                    // Filtra só as conversas desses telefones confirmados
+                    rowsFiltradas = rows.filter(r => telefonesConfirmados.has(r.telefone));
                 }
 
                 if (!rowsFiltradas.length) {
@@ -4261,9 +4278,9 @@
         async function loadVendedores() {
             const { start, end } = todayRange();
 
-            // Busca ordenado por created_at asc para pegar o primeiro atendimento
+            // Busca apenas leads confirmados hoje para a tabela de vendedores
             const rows = await sbGet(
-                `conversas?select=vendedor,telefone,created_at&de=eq.cliente&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`
+                `conversas?select=vendedor,telefone,created_at&tipo=eq.lead_confirmado&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`
             );
 
             // Para cada telefone, registra APENAS o primeiro vendedor
