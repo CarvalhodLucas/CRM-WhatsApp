@@ -3983,8 +3983,10 @@
                 const container = document.getElementById('sidebarNumeros');
                 if (!container) return;
 
-                // Remove itens antigos exceto "Todos" (primeiro filho)
-                container.querySelectorAll('.sub-nav-item:not(:first-child)').forEach(el => el.remove());
+                // Remove itens antigos exceto "Todos" e "Em atendimento" (dois primeiros)
+                container.querySelectorAll('.sub-nav-item').forEach((el, idx) => {
+                    if (idx > 1) el.remove();
+                });
 
                 // Cores por vendedor
                 const cores = ['var(--green)', 'var(--blue)', 'var(--yellow)', '#A78BFA'];
@@ -5276,13 +5278,24 @@
 
             const colors = { ativo: 'var(--green)', inativo: 'var(--yellow)', desconectado: 'var(--muted2)' };
             const list = document.getElementById('sidebarNumeros');
-            const todosHtml = `<div class="sub-nav-item active" onclick="filterByNumero('todos', this)"><span class="status-dot-mini" style="background:var(--text)"></span> Todos</div>`;
+            const todosHtml = `
+                <div class="sub-nav-item active" onclick="filterByNumero('todos', this)">
+                    <span class="status-dot-mini" style="background:var(--text)"></span> Todos
+                </div>
+                <div class="sub-nav-item" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
+                    <span class="status-dot-mini" style="background:var(--yellow)"></span> Em atendimento
+                    <span id="badgeEmAtendimento" style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
+                </div>
+            `;
 
             list.innerHTML = todosHtml + nums.map(n => `
       <div class="sub-nav-item" onclick="filterByNumero('${n.vendedor}', this)">
-        <span class="status-dot-mini" style="background:${colors[n.status]}"></span> ${n.nome}
+        <span class="status-dot-mini" style="background:${colors[n.status]}"></span> ${fmtVendedor(n.nome)}
       </div>
     `).join('');
+            
+            // Chama a atualização do badge imediatamente
+            updateBadgeEmAtendimento();
         }
 
         let filtroVendedorAtivo = 'todos';
