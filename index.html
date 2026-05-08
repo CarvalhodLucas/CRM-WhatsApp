@@ -2505,7 +2505,8 @@
             </div>
             <div class="sub-nav-item" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
                 <span class="status-dot-mini" style="background:var(--yellow)"></span> Em atendimento
-                <span id="badgeEmAtendimento" style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
+                <span id="badgeEmAtendimento"
+                    style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
             </div>
             <!-- Dinâmico -->
         </div>
@@ -2894,9 +2895,9 @@
                                                 placeholder="Nova senha adm">
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Senha Rebeca</label>
-                                            <input type="password" class="filter-input" id="pwd_rebeca"
-                                                placeholder="Nova senha rebeca">
+                                            <label class="form-label">Senha Rebecca</label>
+                                            <input type="password" class="filter-input" id="pwd_rebecca"
+                                                placeholder="Nova senha Rebecca">
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Senha Paulo</label>
@@ -3501,7 +3502,7 @@
         function fmtVendedor(nome) {
             if (!nome) return 'Vendedor';
             const n = nome.toLowerCase();
-            if (n === 'rebeca') return 'Vendedor Manhã';
+            if (n === 'rebeca' || n === 'rebecca') return 'Vendedor Manhã';
             if (n === 'paulo') return 'Vendedor Tarde';
             return nome;
         }
@@ -3509,7 +3510,7 @@
         // ─── AUTH / ROLE SYSTEM ──────────────────────
         let USUARIOS = JSON.parse(localStorage.getItem('crm_users')) || {
             'adm': { hash: '24459be3a000763dd9212258ee70f41655460c81d393910fdbfb1d236294bd7e', nome: 'ADM', role: 'admin' },
-            'rebeca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Vendedor Manhã', role: 'vendedor' },
+            'rebecca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Vendedor Manhã', role: 'vendedor' },
             'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Vendedor Tarde', role: 'vendedor' }
         };
 
@@ -3638,7 +3639,7 @@
                 if (vendCard) vendCard.style.display = 'block';
                 const totalCard = document.getElementById('metTotalCard');
                 if (totalCard) totalCard.style.display = '';
-                
+
                 loadSidebarNumeros();
             }
         }
@@ -4207,7 +4208,7 @@
                 const wrapClass = isBot ? 'bot' : (isVendedor ? 'bot' : 'user'); // Vendedor aparece do lado "bot" (direita)
                 const bubbleClass = isBot ? 'ai' : (isVendedor ? 'vendedor' : 'user');
                 const tagClass = isBot ? 'ai-tag' : (isVendedor ? 'vendedor-tag' : '');
-                
+
                 let tagLabel = '👤 Cliente · ' + fmtHora(m.created_at);
                 if (isBot) tagLabel = '🤖 Bot IA · ' + fmtHora(m.created_at);
                 if (isVendedor) tagLabel = `👤 ${fmtVendedor(m.vendedor)} · ` + fmtHora(m.created_at);
@@ -5264,19 +5265,19 @@
 
         function saveAdminPasswords() {
             const pAdm = document.getElementById('pwd_adm').value;
-            const pRebeca = document.getElementById('pwd_rebeca').value;
+            const pRebecca = document.getElementById('pwd_rebecca').value;
             const pPaulo = document.getElementById('pwd_paulo').value;
 
-            if (!pAdm && !pRebeca && !pPaulo) return alert('Digite ao menos uma nova senha.');
+            if (!pAdm && !pRebecca && !pPaulo) return alert('Digite ao menos uma nova senha.');
 
             if (pAdm) USUARIOS['adm'].hash = btoa(pAdm);
-            if (pRebeca) USUARIOS['rebeca'].hash = btoa(pRebeca);
+            if (pRebecca) USUARIOS['rebecca'].hash = btoa(pRebecca);
             if (pPaulo) USUARIOS['paulo'].hash = btoa(pPaulo);
 
             localStorage.setItem('crm_users', JSON.stringify(USUARIOS));
 
             document.getElementById('pwd_adm').value = '';
-            document.getElementById('pwd_rebeca').value = '';
+            document.getElementById('pwd_rebecca').value = '';
             document.getElementById('pwd_paulo').value = '';
 
             showToast();
@@ -5310,7 +5311,7 @@
         <span class="status-dot-mini" style="background:${colors[n.status]}"></span> ${fmtVendedor(n.nome)}
       </div>
     `).join('');
-            
+
             // Chama a atualização do badge imediatamente
             updateBadgeEmAtendimento();
         }
@@ -5369,7 +5370,7 @@
 
                 const badge = document.getElementById('badgeEmAtendimento');
                 if (badge) badge.textContent = count;
-            } catch (err) {}
+            } catch (err) { }
         }
 
         function renderConfigVendedores() {
