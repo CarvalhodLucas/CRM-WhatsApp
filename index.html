@@ -10,6 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         *,
         *::before,
@@ -271,7 +272,7 @@
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 24px 28px;
+            padding: 24px 28px 40px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -2323,6 +2324,7 @@
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 20px;
+            flex-shrink: 0;
         }
 
         .heatmap-container {
@@ -2371,6 +2373,7 @@
             padding: 20px;
             height: 280px;
             position: relative;
+            flex-shrink: 0;
         }
 
         .chart-svg {
@@ -2387,20 +2390,32 @@
 
         .report-table th {
             text-align: left;
-            padding: 12px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             color: var(--muted2);
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.01);
         }
 
         .report-table td {
-            padding: 12px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--border);
-            color: var(--text);
+            color: var(--muted2);
         }
 
-        /* MASTER SCALE */
+        .report-row-hover:hover {
+            background: rgba(255, 255, 255, 0.03) !important;
+        }
+
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
         .master-scale-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -2560,7 +2575,7 @@
         <div class="content">
 
             <!-- VIEW DASHBOARD -->
-            <div id="viewDashboard" style="display:flex; flex-direction:column; gap:20px; flex:1;">
+            <div id="viewDashboard" style="display:flex; flex-direction:column; gap:20px; width:100%;">
 
                 <!-- MÉTRICAS -->
                 <div class="metrics" id="dashboardMetrics">
@@ -2677,7 +2692,7 @@
             </div>
 
             <!-- VIEW LEADS -->
-            <div id="viewLeads" style="display:none; flex-direction:column; gap:20px; flex:1; height:100%;">
+            <div id="viewLeads" style="display:none; flex-direction:column; gap:20px; width:100%;">
 
                 <!-- FILTERS -->
                 <div class="filters-bar">
@@ -2690,13 +2705,22 @@
                     </select>
                     <select class="filter-select" id="leadFilterVend" onchange="loadLeadsView()">
                         <option value="todos">Todos Vendedores</option>
-                        <option value="Rebeca">Rebeca</option>
+                        <option value="Rebecca">Rebecca</option>
                         <option value="Paulo">Paulo</option>
+                    </select>
+                    <select class="filter-select" id="leadFilterStatus" onchange="loadLeadsView()">
+                        <option value="todos">Todos Status</option>
+                        <option value="novo">Novo</option>
+                        <option value="em_andamento">Em Andamento</option>
+                        <option value="matriculado">Matriculado</option>
+                        <option value="perdido">Perdido</option>
                     </select>
                     <input type="text" class="filter-input" id="leadFilterSearch" placeholder="Buscar telefone..."
                         oninput="loadLeadsView()">
                     <button class="action-btn secondary" style="margin-left:auto; padding:8px 16px"
-                        onclick="exportFullLeads()">exportar csv →</button>
+                        onclick="clearLeadsFilters()">limpar filtros ↺</button>
+                    <button class="action-btn secondary" style="padding:8px 16px"
+                        onclick="exportFullLeads()">exportar excel ↓</button>
                 </div>
 
                 <!-- METRICS LEADS -->
@@ -2743,7 +2767,7 @@
 
             <!-- VIEW RELATORIOS -->
             <div id="viewRelatorios"
-                style="display:none; flex-direction:column; gap:20px; flex:1; height:100%; overflow-y:auto; padding-right:10px">
+                style="display:none; flex-direction:column; gap:20px; width:100%; padding-right:10px">
                 <div class="filters-bar" style="flex-shrink:0">
                     <select class="filter-select" id="reportFilterPeriod" onchange="loadRelatorios()">
                         <option value="hoje">Hoje</option>
@@ -2752,30 +2776,35 @@
                         <option value="tudo">Tudo</option>
                     </select>
                     <button class="action-btn secondary" style="margin-left:auto; padding:8px 16px"
-                        onclick="exportReportCSV(this)">exportar csv completo ↓</button>
+                        onclick="exportReportExcel(this)">exportar excel profissional ↓</button>
                 </div>
 
                 <!-- SEÇÃO 1: RESUMO -->
-                <div class="metrics" id="reportMetrics">
+                <div class="metrics" id="reportMetrics" style="grid-template-columns: repeat(5, 1fr);">
                     <div class="metric-card blue">
+                        <div class="metric-label">Leads Bot</div>
+                        <div class="metric-val blue" id="repLeadsBot">0</div>
+                        <div class="metric-sub">pelo fluxo bot</div>
+                    </div>
+                    <div class="metric-card orange">
+                        <div class="metric-label">Leads Vendedor</div>
+                        <div class="metric-val orange" id="repLeadsVend">0</div>
+                        <div class="metric-sub">humanos</div>
+                    </div>
+                    <div class="metric-card cyan">
                         <div class="metric-label">Total de Leads</div>
-                        <div class="metric-val blue" id="repTotalLeads">0</div>
-                        <div class="metric-sub">novos no período</div>
+                        <div class="metric-val cyan" id="repTotalLeads">0</div>
+                        <div class="metric-sub">período total</div>
                     </div>
                     <div class="metric-card yellow">
                         <div class="metric-label">Alunos Atendidos</div>
                         <div class="metric-val yellow" id="repTotalAlunos">0</div>
-                        <div class="metric-sub">identificados pelo bot</div>
+                        <div class="metric-sub">pelo bot</div>
                     </div>
                     <div class="metric-card green">
                         <div class="metric-label">Mensagens</div>
                         <div class="metric-val green" id="repTotalMsgs">0</div>
-                        <div class="metric-sub">trocadas no total</div>
-                    </div>
-                    <div class="metric-card purple">
-                        <div class="metric-label">Taxa Encaminhamento</div>
-                        <div class="metric-val purple" id="repTaxa">0%</div>
-                        <div class="metric-sub">alunos / total</div>
+                        <div class="metric-sub">total período</div>
                     </div>
                 </div>
 
@@ -2795,9 +2824,9 @@
                             <thead>
                                 <tr>
                                     <th>Vendedor</th>
-                                    <th>Leads</th>
-                                    <th>Msgs</th>
-                                    <th>Pico</th>
+                                    <th>Leads Bot</th>
+                                    <th>Leads Vendedor</th>
+                                    <th>Total de Leads</th>
                                 </tr>
                             </thead>
                             <tbody id="reportVendorTable">
@@ -2830,7 +2859,7 @@
             </div>
 
             <!-- VIEW CONFIG -->
-            <div id="viewConfig" style="display:none; flex-direction:column; gap:20px; flex:1; height:100%;">
+            <div id="viewConfig" style="display:none; flex-direction:column; gap:20px; width:100%;">
                 <div class="config-grid">
 
                     <div id="configAdminSections" style="display: flex; flex-direction: column; gap: 32px;">
@@ -2864,14 +2893,6 @@
                             </div>
                         </div>
 
-                        <!-- SEÇÃO 2: EQUIPE DE VENDAS -->
-                        <div>
-                            <div class="config-section-title">// equipe de vendas</div>
-                            <div id="configVendedoresList" class="vendedor-list">
-                                <!-- Dinâmico -->
-                            </div>
-                            <button class="btn-add-vend" onclick="addVendedor()">+ Adicionar vendedor</button>
-                        </div>
 
 
                         <!-- SEÇÃO: GERENCIAR ACESSOS -->
@@ -3087,11 +3108,30 @@
                     </div>
                 </div> <!-- End configVendedorSection -->
 
+                <!-- SEÇÃO: FILTROS DE EXCLUSÃO (Para Todos) -->
+                <div style="margin-top: 32px; max-width: 800px;">
+                    <div class="config-section-title">// filtros de exclusão</div>
+                    <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
+                        Números nesta lista não aparecerão nas listas de leads, conversas ou relatórios.
+                    </div>
+                    <div class="config-card">
+                        <div class="config-card-body" style="gap:16px;">
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="cfgExcluirInput" class="filter-input" placeholder="Novo número (ex: 5521999999999)" style="flex:1">
+                                <button class="action-btn secondary" onclick="addExclusionNumber()" style="font-size:0.7rem; padding:0 15px;">Adicionar</button>
+                            </div>
+                            <div id="cfgExcluirList" style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; background:var(--bg2);">
+                                <!-- Dinâmico -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <!-- VIEW BOT IA -->
-        <div id="viewBotIA" style="display:none; flex-direction:column; gap:20px; flex:1; height:100%;">
+        <div id="viewBotIA" style="display:none; flex-direction:column; gap:20px; width:100%;">
 
             <!-- SEÇÃO 1: STATUS -->
             <div class="metrics" id="botStatusMetrics">
@@ -3176,8 +3216,6 @@
 
             </div>
         </div>
-
-    </div>
     </div>
 
     <div id="toast">✓ Salvo!</div>
@@ -3427,6 +3465,31 @@
             return '"' + String(val ?? '').replace(/"/g, '""') + '"';
         }
 
+        function exportToExcel(data, filename, sheetName = "Dados") {
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+            
+            // Ajustar largura das colunas e forçar texto para números longos (telefones)
+            const wscols = data[0].map((_, i) => {
+                let max = 10;
+                data.forEach((row, rIdx) => {
+                    const val = String(row[i] || "");
+                    if (val.length > max) max = val.length;
+                    
+                    // Se for um número longo (como telefone), força tipo 's' (string)
+                    if (rIdx > 0 && val.length >= 10 && !isNaN(val)) {
+                        const cellRef = XLSX.utils.encode_cell({ r: rIdx, c: i });
+                        if (worksheet[cellRef]) worksheet[cellRef].t = 's';
+                    }
+                });
+                return { wch: Math.min(max + 2, 50) };
+            });
+            worksheet['!cols'] = wscols;
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+            XLSX.writeFile(workbook, filename + ".xlsx");
+        }
+
         // Centraliza todas as datas no horário de Brasília (UTC-3)
         function brNow() {
             return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
@@ -3493,6 +3556,15 @@
             return tel;
         }
 
+        function isExcluded(tel) {
+            if (!crmConfig.crm.excluirNumeros) return false;
+            const s = String(tel || '').replace(/\D/g, '');
+            return crmConfig.crm.excluirNumeros.some(n => {
+                const cleanN = String(n).replace(/\D/g, '');
+                return s === cleanN || s.endsWith(cleanN);
+            });
+        }
+
         function initials(tel) {
             if (!tel) return '??';
             const s = String(tel).replace(/\D/g, '');
@@ -3507,15 +3579,24 @@
             return nome;
         }
 
+        function matchVendedor(v1, v2) {
+            if (!v1 || !v2) return false;
+            const a = v1.toLowerCase();
+            const b = v2.toLowerCase();
+            if (a === b) return true;
+            if ((a === 'rebeca' || a === 'rebecca') && (b === 'rebeca' || b === 'rebecca')) return true;
+            return false;
+        }
+
         // ─── AUTH / ROLE SYSTEM ──────────────────────
         let USUARIOS = JSON.parse(localStorage.getItem('crm_users')) || {
-            'adm': { hash: '24459be3a000763dd9212258ee70f41655460c81d393910fdbfb1d236294bd7e', nome: 'ADM', role: 'admin' },
-            'rebecca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Vendedor Manhã', role: 'vendedor' },
-            'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Vendedor Tarde', role: 'vendedor' }
+            'adm': { hash: '24459be3a000763dd9212258ee70f41655460c81d393910fdbfb1d236294bd7e', nome: 'Admin', role: 'admin' },
+            'rebecca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Rebecca', role: 'vendedor' },
+            'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Paulo', role: 'vendedor' }
         };
 
         let currentUserObj = null;
-        let currentUser = null; // para compatibilidade legada ('Admin', 'Rebeca', etc)
+        let currentUser = null; // para compatibilidade legada ('Admin', 'Rebecca', etc)
 
         function initAuth() {
             const saved = sessionStorage.getItem('crm_user');
@@ -3523,12 +3604,16 @@
                 document.getElementById('loginScreen').style.display = 'flex';
             } else {
                 currentUserObj = JSON.parse(saved);
+                // Sincroniza o nome com a configuração atual de USUARIOS para evitar nomes legados (ex: Vendedor Manhã)
+                if (USUARIOS[currentUserObj.usuario]) {
+                    currentUserObj.nome = USUARIOS[currentUserObj.usuario].nome;
+                }
                 currentUser = currentUserObj.role === 'admin' ? 'Admin' : currentUserObj.nome;
                 document.getElementById('loginScreen').style.display = 'none';
                 applyRoleUI();
 
                 if (currentUserObj.role === 'vendedor') {
-                    filtroVendedorAtivo = currentUserObj.nome;
+                    filtroVendedorAtivo = 'todos';
                     setTimeout(() => {
                         document.querySelectorAll('.sub-nav-item').forEach(i => {
                             i.classList.remove('active');
@@ -3564,7 +3649,7 @@
                     applyRoleUI();
 
                     if (u.role === 'vendedor') {
-                        filtroVendedorAtivo = u.nome;
+                        filtroVendedorAtivo = 'todos';
                         setTimeout(() => {
                             document.querySelectorAll('.sub-nav-item').forEach(i => {
                                 i.classList.remove('active');
@@ -3625,6 +3710,10 @@
                 if (subAlunos) subAlunos.textContent = 'alunos que você atendeu';
                 if (subLeads) subLeads.textContent = 'leads encaminhados a você';
 
+                // Ocultar filtro de vendedor na aba leads para vendedores
+                const lfVend = document.getElementById('leadFilterVend');
+                if (lfVend) lfVend.style.display = 'none';
+
                 // Also hide export buttons globally for sellers
                 const exportBtns = document.querySelectorAll('[onclick^="export"]');
                 exportBtns.forEach(btn => btn.style.display = 'none');
@@ -3634,6 +3723,11 @@
                 document.getElementById('sidebarNumeros').style.display = 'flex';
                 document.getElementById('configAdminSections').style.display = 'flex';
                 document.getElementById('configVendedorSection').style.display = 'none';
+
+                // Mostrar filtro de vendedor para admin
+                const lfVend = document.getElementById('leadFilterVend');
+                if (lfVend) lfVend.style.display = 'block';
+
                 // Garantir que o card Vendedores fica visível para Admin
                 const vendCard = document.getElementById('vendedoresTable')?.closest('.panel');
                 if (vendCard) vendCard.style.display = 'block';
@@ -3955,13 +4049,19 @@
             // Se não for Admin, filtra apenas os telefones cujo PRIMEIRO vendedor foi o usuário atual
             let filteredRows = rows;
             if (currentUser !== 'Admin') {
-                filteredRows = rows.filter(r => firstVend[r.telefone]?.toLowerCase() === currentUser.toLowerCase());
+                filteredRows = rows.filter(r => {
+                    const v = firstVend[r.telefone];
+                    return !v || matchVendedor(v, currentUser);
+                });
                 // E para vendedor, conta apenas os leads confirmados nas métricas de conversas
-                const confirmados = new Set(filteredRows.filter(r => r.tipo === 'lead_confirmado').map(r => r.telefone));
+                const confirmados = new Set(filteredRows.filter(r => r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor').map(r => r.telefone));
                 filteredRows = filteredRows.filter(r => confirmados.has(r.telefone));
             } else if (filtroVendedorAtivo !== 'todos') {
                 // Se for Admin vendo um vendedor específico, aplica a mesma lógica de lead_confirmado
-                const confirmados = new Set(rows.filter(r => r.tipo === 'lead_confirmado' && firstVend[r.telefone]?.toLowerCase() === filtroVendedorAtivo.toLowerCase()).map(r => r.telefone));
+                const confirmados = new Set(rows.filter(r => 
+                    (r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && 
+                    matchVendedor(firstVend[r.telefone], filtroVendedorAtivo)
+                ).map(r => r.telefone));
                 filteredRows = rows.filter(r => confirmados.has(r.telefone));
             }
 
@@ -4027,8 +4127,11 @@
 
                 document.getElementById('convList').innerHTML = '<div class="state-msg"><span class="spinner"></span><div style="margin-top:8px">Carregando...</div></div>';
 
-                // Pegar mensagens do período (limitado a 2000 para performance)
-                const rows = await sbGet(`conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=2000`);
+                // Pegar mensagens do período (limitado a 10000 mais recentes para performance)
+                let rows = (await sbGet(`conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.desc&limit=10000`)).filter(r => !isExcluded(r.telefone));
+                
+                // Ordena asc para o processamento de agregação e firstVend funcionar corretamente
+                rows.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
                 // Determinar o primeiro vendedor que atendeu cada telefone hoje
                 const firstVend = {};
@@ -4036,10 +4139,14 @@
                     if (!firstVend[r.telefone] && r.vendedor) firstVend[r.telefone] = r.vendedor;
                 });
 
-                // Se for vendedor, filtra apenas as conversas que "pertencem" a ele
+                // Se for vendedor, filtra as conversas que pertencem a ele ou que estão sem vendedor (novas)
                 let rowsFiltradas = rows;
                 if (currentUser !== 'Admin') {
-                    rowsFiltradas = rows.filter(r => firstVend[r.telefone]?.toLowerCase() === currentUser.toLowerCase());
+                    rowsFiltradas = rows.filter(r => {
+                        const v = firstVend[r.telefone];
+                        // Aceita se for o vendedor atual (com match flexível), ou se não tiver vendedor
+                        return !v || matchVendedor(v, currentUser);
+                    });
                 }
 
                 // Filtro lateral adicional (Coordenação / Todos / Busca)
@@ -4049,13 +4156,13 @@
                         const isCoord = v === 'coord' || v === 'coordenação' || v === 'coordenacao';
                         return isCoord || (r.tipo === 'aluno' && !v);
                     });
-                } else if (filtroVendedorAtivo !== 'todos') {
+                } else if (filtroVendedorAtivo !== 'todos' && currentUser === 'Admin') {
                     // Pega os telefones que têm lead_confirmado para este vendedor
                     const telefonesConfirmados = new Set(
                         rows
                             .filter(r =>
-                                r.tipo === 'lead_confirmado' &&
-                                firstVend[r.telefone]?.toLowerCase() === filtroVendedorAtivo.toLowerCase()
+                                (r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') &&
+                                matchVendedor(firstVend[r.telefone], filtroVendedorAtivo)
                             )
                             .map(r => r.telefone)
                     );
@@ -4086,7 +4193,7 @@
                         const tipos = byTel[tel].msgs.map(m => m.tipo);
                         const foiConfirmado = tipos.includes('lead_confirmado');
                         const foiAluno = tipos.includes('aluno');
-                        const isVendedor = tipos.every(t => t === 'conversa_vendedor');
+                        const isVendedor = tipos.some(t => t === 'conversa_vendedor' || t === 'lead-vendedor');
                         if (foiConfirmado || foiAluno || isVendedor) {
                             delete byTel[tel];
                         }
@@ -4133,7 +4240,7 @@
         </div>
         <div class="conv-meta">
           <div class="conv-time">${fmtHora(conv.lastTime)}</div>
-          <span class="badge ${tipo === 'lead' ? 'badge-green' : tipo === 'aluno' ? 'badge-blue' : 'badge-muted'}" style="font-size:0.55rem">${tipo}</span>
+          <span class="badge ${tipo === 'lead' ? 'badge-green' : (tipo === 'aluno' ? 'badge-blue' : (tipo === 'conversa_vendedor' || tipo === 'lead-vendedor' ? 'badge-orange' : 'badge-muted'))}" style="font-size:0.55rem">${tipo === 'conversa_vendedor' ? 'lead-vendedor' : tipo}</span>
         </div>
       `;
                     item.onclick = () => showConv(conv, item);
@@ -4221,7 +4328,7 @@
       `;
             }).join('');
 
-            const subText = `${conv.vendedor || '—'} · ${conv.tipo || 'desconhecido'} · ${fmtHora(conv.lastTime)}`;
+            const subText = `${conv.vendedor || '—'} · ${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || 'desconhecido')} · ${fmtHora(conv.lastTime)}`;
 
             if (isMobile) {
                 document.getElementById('mobileDetailName').textContent = fmtTel(conv.telefone);
@@ -4240,7 +4347,7 @@
             <div class="chat-detail-sub">${subText}</div>
           </div>
           <div class="chat-detail-actions">
-            <span class="badge ${conv.tipo === 'lead' ? 'badge-green' : conv.tipo === 'aluno' ? 'badge-blue' : 'badge-muted'}">${conv.tipo || '—'}</span>
+            <span class="badge ${conv.tipo === 'lead' ? 'badge-green' : (conv.tipo === 'aluno' ? 'badge-blue' : (conv.tipo === 'conversa_vendedor' || conv.tipo === 'lead-vendedor' ? 'badge-orange' : 'badge-muted'))}">${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || '—')}</span>
           </div>
         </div>
         <div style="position:relative; flex:1; overflow:hidden; display:flex; flex-direction:column">
@@ -4281,14 +4388,21 @@
 
             // Busca apenas leads confirmados hoje para a tabela de vendedores
             const rows = await sbGet(
-                `conversas?select=vendedor,telefone,created_at&tipo=eq.lead_confirmado&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`
+                `conversas?select=vendedor,telefone,created_at&tipo=in.(lead_confirmado,conversa_vendedor,lead-vendedor)&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`
             );
 
-            // Para cada telefone, registra APENAS o primeiro vendedor
+            // Para cada telefone, registra o primeiro vendedor (preferencialmente humano)
             const primeiroVendedor = {};
             rows.forEach(r => {
-                if (!primeiroVendedor[r.telefone]) {
-                    primeiroVendedor[r.telefone] = r.vendedor || 'desconhecido';
+                const v = r.vendedor;
+                if (!v) return;
+                const vLow = v.toLowerCase();
+                if (vLow === 'bot') {
+                    if (!primeiroVendedor[r.telefone]) primeiroVendedor[r.telefone] = 'bot';
+                } else {
+                    if (!primeiroVendedor[r.telefone] || primeiroVendedor[r.telefone] === 'bot') {
+                        primeiroVendedor[r.telefone] = v;
+                    }
                 }
             });
 
@@ -4328,8 +4442,8 @@
 
         async function loadLeads() {
             const { start, end } = todayRange();
-            // Busca ordenado por asc para pegar o PRIMEIRO vendedor de cada telefone
-            const query = `conversas?select=telefone,vendedor,created_at&tipo=eq.lead&de=eq.cliente&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`;
+            // Busca TODAS as conversas do dia iniciadas pelo cliente para virarem leads
+            const query = `conversas?select=telefone,vendedor,created_at,tipo&de=eq.cliente&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`;
             const rows = await sbGet(query);
 
             // Para cada telefone, registra APENAS o primeiro vendedor
@@ -4343,7 +4457,11 @@
             // Para vendedores, filtra só os seus; Admin vê todos
             leadsData = Object.values(primeiroVend);
             if (currentUser !== 'Admin') {
-                leadsData = leadsData.filter(r => r.vendedor?.toLowerCase() === currentUser.toLowerCase());
+                leadsData = leadsData.filter(r => {
+                    const v = r.vendedor?.toLowerCase();
+                    const cur = currentUser.toLowerCase();
+                    return !v || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+                });
             }
 
             const el = document.getElementById('leadsTable');
@@ -4386,7 +4504,11 @@
                     rows.forEach(r => {
                         if (!firstVend[r.telefone] && r.vendedor) firstVend[r.telefone] = r.vendedor;
                     });
-                    return Object.entries(firstVend).filter(([tel, v]) => v?.toLowerCase() === currentUser.toLowerCase()).length;
+                    return Object.entries(firstVend).filter(([tel, v]) => {
+                        const vend = v?.toLowerCase();
+                        const cur = currentUser.toLowerCase();
+                        return !vend || vend === cur || (cur === 'rebeca' && vend === 'rebecca') || (cur === 'rebecca' && vend === 'rebeca');
+                    }).length;
                 }
             }));
 
@@ -4411,29 +4533,33 @@
             });
         }
 
-        // ─── EXPORT XLSX (CSV) ───────────────────────
+        // ─── EXPORT XLSX (EXCEL) ────────────────────
         function exportLeads() {
             if (!leadsData.length) return;
-            const rows = [['Telefone', 'Vendedor', 'Hora'].map(csvEscape)];
-            leadsData.forEach(r => rows.push([
-                csvEscape(fmtTel(r.telefone)),
-                csvEscape(r.vendedor || '—'),
-                csvEscape(fmtHora(r.created_at))
+            const data = [['Telefone', 'Vendedor', 'Hora']];
+            leadsData.forEach(r => data.push([
+                fmtTel(r.telefone),
+                r.vendedor || '—',
+                fmtHora(r.created_at)
             ]));
-            const csv = rows.map(r => r.join(',')).join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url;
-            a.download = 'leads_' + new Date().toISOString().slice(0, 10) + '.csv';
-            a.click(); URL.revokeObjectURL(url);
+            exportToExcel(data, 'leads_' + new Date().toISOString().slice(0, 10), "Leads");
         }
 
         // ─── LEADS TAB LOGIC ─────────────────────────
         let fullLeadsData = [];
+ 
+        function clearLeadsFilters() {
+            document.getElementById('leadFilterPeriod').value = '30d';
+            document.getElementById('leadFilterVend').value = 'todos';
+            document.getElementById('leadFilterStatus').value = 'todos';
+            document.getElementById('leadFilterSearch').value = '';
+            loadLeadsView();
+        }
 
         async function loadLeadsView() {
             const period = document.getElementById('leadFilterPeriod').value;
             const vend = document.getElementById('leadFilterVend').value;
+            const statusFilter = document.getElementById('leadFilterStatus').value;
             const search = document.getElementById('leadFilterSearch').value.toLowerCase();
 
             // Date range
@@ -4461,26 +4587,44 @@
 
             try {
                 // Buscar mensagens do período para identificar leads (consistente com loadConversas)
-                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=3000`;
+                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=10000`;
 
-                const [rows, statusRows] = await Promise.all([
+                let [rows, statusRows] = await Promise.all([
                     sbGet(query),
                     sbGet('status_de_leads?select=*')
                 ]);
+                rows = rows.filter(r => !isExcluded(r.telefone));
 
                 const statusMap = {};
                 statusRows.forEach(s => statusMap[s.telefone] = s);
 
-                // Agrupar por telefone — registra APENAS o PRIMEIRO vendedor (igual ao loadVendedores)
+                // Determina o primeiro vendedor (preferencialmente humano) de cada telefone no período
+                const firstVend = {};
+                rows.forEach(r => {
+                    const v = r.vendedor;
+                    if (!v) return;
+                    const vLow = v.toLowerCase();
+                    if (vLow === 'bot') {
+                        if (!firstVend[r.telefone]) firstVend[r.telefone] = 'bot';
+                    } else {
+                        if (!firstVend[r.telefone] || firstVend[r.telefone] === 'bot') {
+                            firstVend[r.telefone] = v;
+                        }
+                    }
+                });
+
+                // Agrupar por telefone
                 const leadsMap = {};
                 rows.forEach(r => {
+                    if (isExcluded(r.telefone)) return;
                     if (!leadsMap[r.telefone]) {
                         const st = statusMap[r.telefone] || {};
+                        const assignedVend = firstVend[r.telefone];
                         leadsMap[r.telefone] = {
                             telefone: r.telefone,
                             msgs: [],
                             primeiroContato: r.created_at,
-                            vendedor: r.vendedor || 'desconhecido', // ← primeiro vendedor, não sobrescrito
+                            vendedor: assignedVend || 'desconhecido',
                             status: st.status || 'novo',
                             nota: st.anotacao || '',
                             nome: st.nome || '',
@@ -4491,16 +4635,15 @@
                     leadsMap[r.telefone].msgs.push(r);
                     leadsMap[r.telefone].ultimaMensagem = r.mensagem;
                     leadsMap[r.telefone].ultimoContato = r.created_at;
-                    // NÃO sobrescreve o vendedor — mantém o primeiro que atendeu
                 });
 
                 let leadsList = Object.values(leadsMap);
 
-                // Filtrar quem é de fato lead (quem teve msg tipo lead no período OU quem já tem status salvo no banco)
+                // Filtrar quem é de fato lead: qualquer conversa com mensagem de cliente é considerada lead
                 leadsList = leadsList.filter(l => {
-                    const isLeadMsg = l.msgs.some(m => m.tipo === 'lead' || m.tipo === 'lead_confirmado');
+                    const isClientMsg = l.msgs.some(m => m.de === 'cliente');
                     const hasStatus = statusMap[l.telefone];
-                    return isLeadMsg || hasStatus;
+                    return isClientMsg || hasStatus;
                 });
 
                 leadsList.sort((a, b) => new Date(b.ultimoContato) - new Date(a.ultimoContato));
@@ -4508,13 +4651,21 @@
                 // Filtro por vendedor: para vendedores (não-Admin), mostra apenas os SEUS leads
                 // Para Admin, aplica o filtro do dropdown se não for 'todos'
                 if (currentUser !== 'Admin') {
-                    leadsList = leadsList.filter(l => l.vendedor?.toLowerCase() === currentUser.toLowerCase());
+                    leadsList = leadsList.filter(l => {
+                        const v = l.vendedor?.toLowerCase();
+                        const cur = currentUser.toLowerCase();
+                        return !v || v === 'bot' || v === 'desconhecido' || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+                    });
                 } else if (vend !== 'todos') {
                     leadsList = leadsList.filter(l => l.vendedor === vend);
                 }
 
                 if (search) {
                     leadsList = leadsList.filter(l => String(l.telefone).includes(search));
+                }
+
+                if (statusFilter !== 'todos') {
+                    leadsList = leadsList.filter(l => l.status === statusFilter);
                 }
 
                 fullLeadsData = leadsList;
@@ -4576,27 +4727,22 @@
 
         function exportFullLeads() {
             if (!fullLeadsData.length) return;
-            const rows = [['Telefone', 'Nome', 'Idade', 'Interesse', 'Vendedor', 'Total Mensagens', 'Primeiro Contato', 'Ultimo Contato', 'Status', 'Anotação'].map(csvEscape)];
+            const data = [['Telefone', 'Nome', 'Idade', 'Interesse', 'Vendedor', 'Total Mensagens', 'Primeiro Contato', 'Ultimo Contato', 'Status', 'Anotação']];
             fullLeadsData.forEach(l => {
-                rows.push([
-                    csvEscape(fmtTel(l.telefone)),
-                    csvEscape(l.nome || ''),
-                    csvEscape(l.idade || ''),
-                    csvEscape(l.interesse || ''),
-                    csvEscape(l.vendedor || '—'),
-                    csvEscape(l.msgs.length),
-                    csvEscape(new Date(l.primeiroContato).toLocaleString('pt-BR')),
-                    csvEscape(new Date(l.ultimoContato).toLocaleString('pt-BR')),
-                    csvEscape(l.status),
-                    csvEscape(l.nota || '')
+                data.push([
+                    fmtTel(l.telefone),
+                    l.nome || '',
+                    l.idade || '',
+                    l.interesse || '',
+                    l.vendedor || '—',
+                    l.msgs.length,
+                    l.primeiroContato ? new Date(l.primeiroContato).toLocaleString('pt-BR').replace(',', '') : '',
+                    l.ultimoContato ? new Date(l.ultimoContato).toLocaleString('pt-BR').replace(',', '') : '',
+                    l.status,
+                    l.nota || ''
                 ]);
             });
-            const csv = rows.map(r => r.join(';')).join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url;
-            a.download = 'relatorio_leads_' + new Date().toISOString().slice(0, 10) + '.csv';
-            a.click(); URL.revokeObjectURL(url);
+            exportToExcel(data, 'relatorio_leads_' + new Date().toISOString().slice(0, 10), "Relatório Completo");
         }
 
         let currentModalLead = null;
@@ -4805,65 +4951,118 @@
             const { start, end } = getDateRange(period);
 
             // Loading stats...
-            const statsIds = ['repTotalLeads', 'repTotalAlunos', 'repTotalMsgs', 'repTaxa'];
-            statsIds.forEach(id => document.getElementById(id).innerHTML = '<span class="spinner" style="width:12px;height:12px"></span>');
+            const statsIds = ['repLeadsBot', 'repLeadsVend', 'repTotalLeads', 'repTotalAlunos', 'repTotalMsgs'];
+            statsIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '<span class="spinner" style="width:12px;height:12px"></span>';
+            });
 
             try {
                 // Busca todas as mensagens do período para processar localmente
-                // Limit 5000 para relatórios (ajustar conforme escala)
-                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=5000`;
+                // Aumentado limit para 10000 para evitar que o relatório "trave" em dados antigos
+                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=10000`;
+                
+                // NOTA: Removemos o filtro de vendedor da query para permitir identificar o primeiro vendedor em memória
+                // Isso garante consistência com as outras abas (Dashboard e Leads)
+                const rows = (await sbGet(query)).filter(r => !isExcluded(r.telefone));
+
+                // Determina o primeiro vendedor (preferencialmente humano) de cada telefone no período
+                const firstVend = {};
+                rows.forEach(r => {
+                    const v = r.vendedor;
+                    if (!v) return;
+                    const vLow = v.toLowerCase();
+                    if (vLow === 'bot') {
+                        if (!firstVend[r.telefone]) firstVend[r.telefone] = 'bot';
+                    } else {
+                        if (!firstVend[r.telefone] || firstVend[r.telefone] === 'bot') {
+                            firstVend[r.telefone] = v;
+                        }
+                    }
+                });
+
+                // Filtro em memória por vendedor (se não for Admin)
+                let filteredRows = rows.filter(r => !isExcluded(r.telefone));
                 if (currentUser !== 'Admin') {
-                    query += `&vendedor=eq.${currentUser}`;
+                    const cur = currentUser.toLowerCase();
+                    filteredRows = rows.filter(r => {
+                        const v = firstVend[r.telefone]?.toLowerCase();
+                        return !v || v === 'bot' || v === 'desconhecido' || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+                    });
                 }
-                const rows = await sbGet(query);
 
                 // 1. Métricas Gerais
-                const leadsSet = new Set(rows.filter(r => r.tipo === 'lead' && r.de === 'cliente').map(r => r.telefone));
-                const alunosSet = new Set(rows.filter(r => r.tipo === 'aluno' && r.de === 'cliente').map(r => r.telefone));
-                const totalMsgs = rows.length;
-                const taxa = totalMsgs > 0 ? ((alunosSet.size / (leadsSet.size + alunosSet.size || 1)) * 100).toFixed(1) : 0;
+                const leadsBotSet = new Set(filteredRows.filter(r => (r.tipo === 'lead' || r.tipo === 'lead_confirmado') && r.de === 'cliente').map(r => r.telefone));
+                const leadsVendSet = new Set(filteredRows.filter(r => (r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && r.de === 'cliente').map(r => r.telefone));
+                const alunosSet = new Set(filteredRows.filter(r => r.tipo === 'aluno' && r.de === 'cliente').map(r => r.telefone));
+                const totalMsgs = filteredRows.length;
+                
+                const totalLeads = new Set([...leadsBotSet, ...leadsVendSet]);
 
-                document.getElementById('repTotalLeads').textContent = leadsSet.size;
-                document.getElementById('repTotalAlunos').textContent = alunosSet.size;
-                document.getElementById('repTotalMsgs').textContent = totalMsgs;
-                document.getElementById('repTaxa').textContent = taxa + '%';
+                if (document.getElementById('repLeadsBot')) document.getElementById('repLeadsBot').textContent = leadsBotSet.size;
+                if (document.getElementById('repLeadsVend')) document.getElementById('repLeadsVend').textContent = leadsVendSet.size;
+                if (document.getElementById('repTotalLeads')) document.getElementById('repTotalLeads').textContent = totalLeads.size;
+                if (document.getElementById('repTotalAlunos')) document.getElementById('repTotalAlunos').textContent = alunosSet.size;
+                if (document.getElementById('repTotalMsgs')) document.getElementById('repTotalMsgs').textContent = totalMsgs;
 
                 // 2. Gráfico de Leads por Dia
-                renderLineChart(rows, start, end);
+                renderLineChart(filteredRows, start, end);
 
                 // 3. Desempenho por Vendedor
                 const vendors = {};
-                rows.forEach(r => {
-                    const v = r.vendedor || 'Desconhecido';
-                    if (!vendors[v]) vendors[v] = { leads: new Set(), msgs: 0, hours: {} };
-                    if (r.tipo === 'lead' && r.de === 'cliente') vendors[v].leads.add(r.telefone);
-                    vendors[v].msgs++;
-                    const hour = new Date(r.created_at).getHours();
-                    vendors[v].hours[hour] = (vendors[v].hours[hour] || 0) + 1;
+                const performanceRows = currentUser === 'Admin' ? rows : filteredRows;
+                
+                performanceRows.forEach(r => {
+                    const vOwner = firstVend[r.telefone] || 'Desconhecido';
+                    if (!vendors[vOwner]) {
+                        vendors[vOwner] = { 
+                            leadsBot: new Set(), 
+                            leadsVend: new Set(), 
+                            totalLeads: new Set() 
+                        };
+                    }
+                    
+                    if (r.de === 'cliente') {
+                        const type = r.tipo || '';
+                        if (type === 'lead' || type === 'lead_confirmado') {
+                            vendors[vOwner].leadsBot.add(r.telefone);
+                            vendors[vOwner].totalLeads.add(r.telefone);
+                        } else if (type === 'conversa_vendedor' || type === 'lead-vendedor') {
+                            vendors[vOwner].leadsVend.add(r.telefone);
+                            vendors[vOwner].totalLeads.add(r.telefone);
+                        }
+                    }
                 });
 
                 const vendorTable = document.getElementById('reportVendorTable');
-                vendorTable.innerHTML = Object.keys(vendors).map(v => {
-                    const hPico = Object.entries(vendors[v].hours).sort((a, b) => b[1] - a[1])[0]?.[0] || '--';
-                    return `
-          <tr>
-            <td style="font-weight:600">${v}</td>
-            <td>${vendors[v].leads.size}</td>
-            <td>${vendors[v].msgs}</td>
-            <td>${hPico}h</td>
-          </tr>
-        `;
-                }).join('');
+                if (vendorTable) {
+                    vendorTable.innerHTML = Object.keys(vendors)
+                        .filter(v => v !== 'bot' && v !== 'Desconhecido')
+                        .sort((a, b) => vendors[b].totalLeads.size - vendors[a].totalLeads.size)
+                        .map(v => {
+                            return `
+                      <tr class="report-row-hover">
+                        <td style="font-weight:600; color:var(--text)">${v}</td>
+                        <td style="font-family:var(--mono); font-weight:500">${vendors[v].leadsBot.size}</td>
+                        <td style="font-family:var(--mono); font-weight:500">${vendors[v].leadsVend.size}</td>
+                        <td style="font-family:var(--mono); font-weight:600; color:var(--green)">${vendors[v].totalLeads.size}</td>
+                      </tr>
+                    `;
+                        }).join('');
+                }
 
                 // 4. Mapa de Calor
-                renderHeatmap(rows);
+                renderHeatmap(filteredRows);
 
                 // Cache rows para exportação
-                window.lastReportRows = rows;
+                window.lastReportRows = filteredRows;
 
             } catch (e) {
-                console.error(e);
-                statsIds.forEach(id => document.getElementById(id).textContent = 'Erro');
+                console.error('Erro no loadRelatorios:', e);
+                statsIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = 'Erro';
+                });
             }
         }
 
@@ -4878,7 +5077,7 @@
             }
 
             rows.forEach(r => {
-                if (r.tipo === 'lead' && r.de === 'cliente') {
+                if ((r.tipo === 'lead' || r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && r.de === 'cliente') {
                     const brDate = new Date(new Date(r.created_at).toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
                     const day = brISO(brDate).split('T')[0];
                     if (leadsByDay[day] !== undefined) leadsByDay[day]++;
@@ -4952,7 +5151,7 @@
             }
         }
 
-        async function exportReportCSV(btn) {
+        async function exportReportExcel(btn) {
             const rows = window.lastReportRows;
             if (!rows || !rows.length) return alert('Nenhum dado para exportar');
             const originalText = btn.textContent;
@@ -4981,25 +5180,20 @@
                     }
                 });
 
-                const csvRows = [['Data', 'Telefone', 'Nome', 'Idade', 'Interesse', 'Ação', 'Anotação'].map(csvEscape)];
+                const excelData = [['Data', 'Telefone', 'Nome', 'Idade', 'Interesse', 'Status', 'Anotação']];
                 Object.values(leadsMap).forEach(l => {
-                    csvRows.push([
-                        csvEscape(new Date(l.primeiroContato).toLocaleString('pt-BR')),
-                        csvEscape(l.telefone),
-                        csvEscape(l.nome),
-                        csvEscape(l.idade),
-                        csvEscape(l.interesse),
-                        csvEscape(l.status),
-                        csvEscape(l.nota || '')
+                    excelData.push([
+                        new Date(l.primeiroContato).toLocaleString('pt-BR').replace(',', ''),
+                        l.telefone,
+                        l.nome,
+                        l.idade,
+                        l.interesse,
+                        l.status,
+                        l.nota || ''
                     ]);
                 });
 
-                const csvContent = "\uFEFF" + csvRows.map(e => e.join(";")).join("\n");
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = `relatorio_leads_completo_${new Date().toISOString().split('T')[0]}.csv`;
-                link.click();
+                exportToExcel(excelData, `relatorio_leads_completo_${new Date().toISOString().split('T')[0]}`, "Relatório Completo");
             } catch (e) {
                 console.error(e);
                 alert('Erro ao gerar exportação completa.');
@@ -5011,7 +5205,8 @@
 
         function getDateRange(period) {
             const now = brNow();
-            let start, end = brISO(now, 23, 59, 59);
+            let start;
+            let end = brISO(now, 23, 59, 59);
 
             if (period === 'hoje') {
                 start = brISO(now, 0, 0, 0);
@@ -5030,10 +5225,10 @@
         // ─── CONFIG TAB LOGIC ────────────────────────
         let crmConfig = {
             vendedores: [
-                { id: 1, nome: 'Rebeca', whatsapp: '5521999999999', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
+                { id: 1, nome: 'Rebecca', whatsapp: '5521999999999', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
                 { id: 2, nome: 'Paulo', whatsapp: '5521888888888', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true }
             ],
-            crm: { periodoLeads: 'mes', nomeDashboard: 'Escola de Idiomas', autoRefresh: true, botUrl: '', tema: 'dark', github: 'https://github.com/CarvalhodLucas/CRM-WhatsApp' }
+            crm: { periodoLeads: 'mes', nomeDashboard: 'Escola de Idiomas', autoRefresh: true, botUrl: '', tema: 'dark', github: 'https://github.com/CarvalhodLucas/CRM-WhatsApp', excluirNumeros: [] }
         };
 
         function applyTheme() {
@@ -5235,6 +5430,7 @@
               </div>
             `;
                 }
+                renderExclusionList();
                 return;
             }
 
@@ -5249,6 +5445,7 @@
             document.getElementById('cfgCrmBotUrl').value = crmConfig.crm.botUrl || '';
             document.getElementById('cfgCrmTema').value = crmConfig.crm.tema || 'dark';
             document.getElementById('cfgCrmGithub').value = crmConfig.crm.github || '';
+            renderExclusionList();
             updateSwitchLabel('cfgCrmRefresh', 'cfgCrmRefreshLabel', 'Ativo', 'Desativado');
 
             // Set listeners for switches
@@ -5288,7 +5485,7 @@
             const raw = localStorage.getItem('crm_numeros');
             const defaultNums = [
                 { id: 'paulo', nome: 'Paulo', vendedor: 'Paulo', status: 'ativo' },
-                { id: 'rebeca', nome: 'Rebeca', vendedor: 'Rebeca', status: 'ativo' }
+                { id: 'rebecca', nome: 'Rebecca', vendedor: 'Rebecca', status: 'ativo' }
             ];
             let nums = raw ? JSON.parse(raw) : defaultNums;
             nums = nums.filter(n => n.id !== 'coord');
@@ -5352,10 +5549,11 @@
         async function updateBadgeEmAtendimento() {
             try {
                 const { start, end } = todayRange();
-                const rows = await sbGet(`conversas?select=telefone,tipo&created_at=gte.${start}&created_at=lt.${end}`);
+                const rows = (await sbGet(`conversas?select=telefone,tipo&created_at=gte.${start}&created_at=lt.${end}`)).filter(r => !isExcluded(r.telefone));
 
                 const byTel = {};
                 rows.forEach(r => {
+                    if (isExcluded(r.telefone)) return;
                     if (!byTel[r.telefone]) byTel[r.telefone] = [];
                     byTel[r.telefone].push(r.tipo);
                 });
@@ -5364,7 +5562,7 @@
                 Object.values(byTel).forEach(tipos => {
                     const foiConfirmado = tipos.includes('lead_confirmado');
                     const foiAluno = tipos.includes('aluno');
-                    const isVendedor = tipos.every(t => t === 'conversa_vendedor');
+                    const isVendedor = tipos.some(t => t === 'conversa_vendedor' || t === 'lead-vendedor');
                     if (!foiConfirmado && !foiAluno && !isVendedor) count++;
                 });
 
@@ -5451,6 +5649,41 @@
 
             localStorage.setItem('crm_config', JSON.stringify(crmConfig));
             showToast();
+        }
+
+        function renderExclusionList() {
+            const list = document.getElementById('cfgExcluirList');
+            if (!list) return;
+            const nums = crmConfig.crm.excluirNumeros || [];
+            if (nums.length === 0) {
+                list.innerHTML = '<div style="padding:15px; color:var(--muted); font-size:0.75rem; text-align:center;">// nenhum número na lista</div>';
+                return;
+            }
+            list.innerHTML = nums.map(n => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid var(--border);">
+                    <span style="font-family:var(--mono); font-size:0.8rem; color:var(--text);">${fmtTel(n)}</span>
+                    <button class="rag-btn delete" onclick="removeExclusionNumber('${n}')" style="padding:4px; font-size:0.7rem; border:none; background:none; cursor:pointer;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function addExclusionNumber() {
+            const input = document.getElementById('cfgExcluirInput');
+            const val = input.value.trim().replace(/\D/g, '');
+            if (!val) return;
+            if (!crmConfig.crm.excluirNumeros) crmConfig.crm.excluirNumeros = [];
+            if (!crmConfig.crm.excluirNumeros.includes(val)) {
+                crmConfig.crm.excluirNumeros.push(val);
+                renderExclusionList();
+                input.value = '';
+                saveConfig('crm');
+            }
+        }
+
+        function removeExclusionNumber(n) {
+            crmConfig.crm.excluirNumeros = crmConfig.crm.excluirNumeros.filter(num => num !== n);
+            renderExclusionList();
+            saveConfig('crm');
         }
 
         // ─── MASTER SCALE LOGIC ─────────────────────
