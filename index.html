@@ -272,47 +272,51 @@
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 24px 28px 40px;
+            padding: 16px 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            border: 2px solid transparent;
-            background-clip: content-box;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
-            border: 2px solid transparent;
-            background-clip: content-box;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* METRICS */
         .metrics {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
         }
 
         .metric-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 16px 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .metric-card::before {
@@ -338,6 +342,10 @@
 
         .metric-card.purple::before {
             background: #A78BFA;
+        }
+
+        .metric-card.cyan::before {
+            background: var(--cyan);
         }
 
         .metric-label {
@@ -373,6 +381,10 @@
             color: #A78BFA;
         }
 
+        .metric-val.cyan {
+            color: var(--cyan);
+        }
+
         .metric-sub {
             font-size: 0.7rem;
             color: var(--muted2);
@@ -404,19 +416,35 @@
             color: #A78BFA;
         }
 
+        /* Autofill Fix */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--surface) inset !important;
+            -webkit-text-fill-color: var(--text) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
         /* GRID */
         .grid-row-3 {
+            flex: 1;
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 16px;
+            min-height: 0;
+            /* Importante para flex item com overflow */
         }
 
-        /* PANEL */
+        /* PANEL IMPROVEMENTS */
         .panel {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .panel-head {
@@ -931,13 +959,14 @@
         }
 
         .msg-bubble {
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.78rem;
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
             line-height: 1.5;
             word-break: break-word;
             overflow-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .msg-bubble.bot {
@@ -999,6 +1028,8 @@
         .lead-row:last-child {
             border-bottom: none;
         }
+
+        #leadsTable {}
 
         .lead-row.header {
             color: var(--muted2);
@@ -1645,11 +1676,9 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
-            overflow: hidden;
+            overflow: visible;
             display: flex;
             flex-direction: column;
-            flex: 1;
-            min-height: 0;
         }
 
         .fl-header {
@@ -1669,7 +1698,6 @@
 
         .fl-body {
             flex: 1;
-            overflow-y: auto;
         }
 
         .fl-row {
@@ -2568,7 +2596,8 @@
         <div class="content">
 
             <!-- VIEW DASHBOARD -->
-            <div id="viewDashboard" style="display:flex; flex-direction:column; gap:20px; width:100%;">
+            <div id="viewDashboard"
+                style="display:flex; flex-direction:column; gap:16px; width:100%; height:100%; overflow:hidden;">
 
                 <!-- MÉTRICAS -->
                 <div class="metrics" id="dashboardMetrics">
@@ -2590,12 +2619,6 @@
                         <div class="metric-sub" id="metLeadsSub">novos hoje</div>
                         <div class="metric-trend up" id="metLeadsTrend">—</div>
                     </div>
-                    <div class="metric-card purple" id="metTotalCard">
-                        <div class="metric-label">Total histórico</div>
-                        <div class="metric-val purple" id="metTotal"><span class="spinner"></span></div>
-                        <div class="metric-sub">mensagens no banco</div>
-                        <div class="metric-trend purple-t">banco</div>
-                    </div>
                 </div>
 
                 <!-- CONVERSAS + PAINEL LATERAL -->
@@ -2614,7 +2637,7 @@
                             <div class="legend-item"><span class="dot aluno"></span> Aluno</div>
                             <div class="legend-item"><span class="dot unknown"></span> Desconhecido</div>
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;height:65vh;min-height:400px"
+                        <div style="display:grid;grid-template-columns:1fr 1.5fr;flex:1;min-height:0"
                             class="chat-container-grid" id="chatContainerGrid">
                             <div style="border-right:1px solid var(--border);overflow-y:auto" class="conv-list"
                                 id="convList">
@@ -2634,7 +2657,8 @@
                     </div>
 
                     <!-- PAINEL LATERAL -->
-                    <div style="display:flex;flex-direction:column;gap:16px" id="sidePanels">
+                    <div style="display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-right:4px"
+                        id="sidePanels">
 
                         <!-- VENDEDORES -->
                         <div class="panel">
@@ -2685,7 +2709,7 @@
             </div>
 
             <!-- VIEW LEADS -->
-            <div id="viewLeads" style="display:none; flex-direction:column; gap:20px; width:100%;">
+            <div id="viewLeads" style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
 
                 <!-- FILTERS -->
                 <div class="filters-bar">
@@ -2712,12 +2736,12 @@
                         oninput="loadLeadsView()">
                     <button class="action-btn secondary" style="margin-left:auto; padding:8px 16px"
                         onclick="clearLeadsFilters()">limpar filtros ↺</button>
-                    <button class="action-btn secondary" style="padding:8px 16px"
-                        onclick="exportFullLeads()">exportar excel ↓</button>
+                    <button class="action-btn secondary" style="padding:8px 16px" onclick="exportFullLeads()">exportar
+                        excel ↓</button>
                 </div>
 
                 <!-- METRICS LEADS -->
-                <div class="metrics" id="leadsMetrics">
+                <div class="metrics" id="leadsMetrics" style="grid-template-columns: repeat(5, 1fr);">
                     <div class="metric-card blue">
                         <div class="metric-label">Total Leads</div>
                         <div class="metric-val blue" id="metLeadsTotal"><span class="spinner"></span></div>
@@ -2737,6 +2761,12 @@
                         <div class="metric-label">Conversão</div>
                         <div class="metric-val purple" id="metLeadsTaxa"><span class="spinner"></span></div>
                         <div class="metric-sub">% de matrículas</div>
+                    </div>
+                    <div class="metric-card cyan">
+                        <div class="metric-label">🤖 Matrículas via Bot</div>
+                        <div class="metric-val cyan" id="metLeadsBot"><span class="spinner"></span></div>
+                        <div class="metric-sub" id="metLeadsBotSub">do total convertido</div>
+                        <div class="metric-trend" id="metLeadsBotTrend" style="background:rgba(0,207,232,0.12);color:var(--cyan)">—</div>
                     </div>
                 </div>
 
@@ -2760,7 +2790,7 @@
 
             <!-- VIEW RELATORIOS -->
             <div id="viewRelatorios"
-                style="display:none; flex-direction:column; gap:20px; width:100%; padding-right:10px">
+                style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
                 <div class="filters-bar" style="flex-shrink:0">
                     <select class="filter-select" id="reportFilterPeriod" onchange="loadRelatorios()">
                         <option value="hoje">Hoje</option>
@@ -2852,7 +2882,8 @@
             </div>
 
             <!-- VIEW CONFIG -->
-            <div id="viewConfig" style="display:none; flex-direction:column; gap:20px; width:100%;">
+            <div id="viewConfig"
+                style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
                 <div class="config-grid">
 
                     <div id="configAdminSections" style="display: flex; flex-direction: column; gap: 32px;">
@@ -2906,17 +2937,17 @@
                                         <div class="form-group">
                                             <label class="form-label">Senha Administrador (adm)</label>
                                             <input type="password" class="filter-input" id="pwd_adm"
-                                                placeholder="Nova senha adm">
+                                                placeholder="Nova senha adm" autocomplete="new-password">
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Senha Rebecca</label>
                                             <input type="password" class="filter-input" id="pwd_rebecca"
-                                                placeholder="Nova senha Rebecca">
+                                                placeholder="Nova senha Rebecca" autocomplete="new-password">
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Senha Paulo</label>
                                             <input type="password" class="filter-input" id="pwd_paulo"
-                                                placeholder="Nova senha paulo">
+                                                placeholder="Nova senha paulo" autocomplete="new-password">
                                         </div>
                                     </div>
                                 </div>
@@ -2955,6 +2986,28 @@
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO: FILTROS DE EXCLUSÃO (Para Todos) -->
+                        <div style="margin-top: 32px;">
+                            <div class="config-section-title">// filtros de exclusão</div>
+                            <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
+                                Números nesta lista não aparecerão nas listas de leads, conversas ou relatórios.
+                            </div>
+                            <div class="config-card">
+                                <div class="config-card-body" style="gap:16px;">
+                                    <div style="display:flex; gap:10px;">
+                                        <input type="text" id="cfgExcluirInput" class="filter-input"
+                                            placeholder="Novo número (ex: 5521999999999)" style="flex:1">
+                                        <button class="action-btn secondary" onclick="addExclusionNumber()"
+                                            style="font-size:0.7rem; padding:0 15px;">Adicionar</button>
+                                    </div>
+                                    <div id="cfgExcluirList"
+                                        style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; background:var(--bg2);">
+                                        <!-- Dinâmico -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3088,12 +3141,12 @@
                                     <div class="form-group">
                                         <label class="form-label">Nova Senha</label>
                                         <input type="password" class="filter-input" id="vendNovaSenha"
-                                            placeholder="••••••••">
+                                            placeholder="••••••••" autocomplete="new-password">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Confirmar Senha</label>
                                         <input type="password" class="filter-input" id="vendConfirmaSenha"
-                                            placeholder="••••••••">
+                                            placeholder="••••••••" autocomplete="new-password">
                                     </div>
                                 </div>
                             </div>
@@ -3101,30 +3154,12 @@
                     </div>
                 </div> <!-- End configVendedorSection -->
 
-                <!-- SEÇÃO: FILTROS DE EXCLUSÃO (Para Todos) -->
-                <div style="margin-top: 32px; max-width: 800px;">
-                    <div class="config-section-title">// filtros de exclusão</div>
-                    <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
-                        Números nesta lista não aparecerão nas listas de leads, conversas ou relatórios.
-                    </div>
-                    <div class="config-card">
-                        <div class="config-card-body" style="gap:16px;">
-                            <div style="display:flex; gap:10px;">
-                                <input type="text" id="cfgExcluirInput" class="filter-input" placeholder="Novo número (ex: 5521999999999)" style="flex:1">
-                                <button class="action-btn secondary" onclick="addExclusionNumber()" style="font-size:0.7rem; padding:0 15px;">Adicionar</button>
-                            </div>
-                            <div id="cfgExcluirList" style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; background:var(--bg2);">
-                                <!-- Dinâmico -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
 
         <!-- VIEW BOT IA -->
-        <div id="viewBotIA" style="display:none; flex-direction:column; gap:20px; width:100%;">
+        <div id="viewBotIA" style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
 
             <!-- SEÇÃO 1: STATUS -->
             <div class="metrics" id="botStatusMetrics">
@@ -3269,7 +3304,19 @@
                     <div class="lead-modal-title" id="lmTitle"></div>
                     <div class="lead-modal-sub" id="lmSub"></div>
                 </div>
-                <button class="lead-modal-close" onclick="closeLeadModal()">×</button>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button id="lmBlockBtn" onclick="toggleBlockNumber(currentModalLead)" title="Bloquear número" style="
+                        display:none;
+                        background:none; border:1px solid var(--border); cursor:pointer;
+                        font-size:0.75rem; color:var(--muted2); padding:5px 10px;
+                        border-radius:6px; transition:all 0.2s; font-family:var(--sans);
+                        gap:4px; align-items:center;
+                    " onmouseover="this.style.background='var(--red-dim)'; this.style.color='var(--red)'; this.style.borderColor='var(--red)'"
+                        onmouseout="this.style.background='none'; this.style.color=this.dataset.blocked==='1' ? 'var(--red)':'var(--muted2)'; this.style.borderColor='var(--border)'">
+                        <span id="lmBlockIcon">🚫</span> <span id="lmBlockLabel">Bloquear</span>
+                    </button>
+                    <button class="lead-modal-close" onclick="closeLeadModal()">×</button>
+                </div>
             </div>
             <div class="lead-modal-body">
                 <div class="lead-modal-chat" id="lmChat"></div>
@@ -3388,7 +3435,8 @@
 
         const headers = {
             'apikey': SUPABASE_KEY,
-            'Authorization': 'Bearer ' + SUPABASE_KEY
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Range': '0-9999'
         };
 
         async function sbGet(path) {
@@ -3460,14 +3508,14 @@
 
         function exportToExcel(data, filename, sheetName = "Dados") {
             const worksheet = XLSX.utils.aoa_to_sheet(data);
-            
+
             // Ajustar largura das colunas e forçar texto para números longos (telefones)
             const wscols = data[0].map((_, i) => {
                 let max = 10;
                 data.forEach((row, rIdx) => {
                     const val = String(row[i] || "");
                     if (val.length > max) max = val.length;
-                    
+
                     // Se for um número longo (como telefone), força tipo 's' (string)
                     if (rIdx > 0 && val.length >= 10 && !isNaN(val)) {
                         const cellRef = XLSX.utils.encode_cell({ r: rIdx, c: i });
@@ -3485,25 +3533,30 @@
 
         // Centraliza todas as datas no horário de Brasília (UTC-3)
         function brNow() {
-            return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+            // Retorna o timestamp real atual — timezone do usuário não importa
+            return new Date();
         }
 
         function brISO(date, hours = 0, minutes = 0, seconds = 0) {
             const d = new Date(date);
-            // Se passar horas, ajusta no objeto date primeiro
-            if (hours !== null) d.setHours(hours, minutes, seconds, 0);
 
-            // Mas precisamos formatar a string ISO no timezone de Brasília
-            // O código original fazia um hack com setHours e hardcoded offset.
-            // Vamos usar Intl para formatar de forma robusta.
-            const fmt = new Intl.DateTimeFormat('sv-SE', {
+            // Formata as partes no timezone de Brasília usando Intl
+            const fmt = new Intl.DateTimeFormat('en-US', {
                 timeZone: 'America/Sao_Paulo',
                 year: 'numeric', month: '2-digit', day: '2-digit',
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
             }).formatToParts(d);
 
             const p = {};
             fmt.forEach(part => p[part.type] = part.value);
+
+            // Substitui hora/minuto/segundo DEPOIS de obter a data correta no timezone BR
+            // (evita o bug de setHours() que usa o timezone LOCAL do usuário)
+            if (hours !== null) {
+                p.hour   = String(hours).padStart(2, '0');
+                p.minute = String(minutes).padStart(2, '0');
+                p.second = String(seconds).padStart(2, '0');
+            }
 
             return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}-03:00`;
         }
@@ -4029,7 +4082,8 @@
         async function loadMetrics() {
             const { start, end } = todayRange();
             // Busca todas as mensagens de hoje para determinar a primeira atribuição
-            const rows = await sbGet(`conversas?select=telefone,vendedor,tipo,de&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`);
+            // Aplica isExcluded para manter consistência com a lista de conversas
+            const rows = (await sbGet(`conversas?select=telefone,vendedor,tipo,de&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`)).filter(r => !isExcluded(r.telefone));
 
             // Determina o primeiro vendedor de cada telefone hoje
             const firstVend = {};
@@ -4050,12 +4104,11 @@
                 const confirmados = new Set(filteredRows.filter(r => r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor').map(r => r.telefone));
                 filteredRows = filteredRows.filter(r => confirmados.has(r.telefone));
             } else if (filtroVendedorAtivo !== 'todos') {
-                // Se for Admin vendo um vendedor específico, aplica a mesma lógica de lead_confirmado
-                const confirmados = new Set(rows.filter(r => 
-                    (r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && 
-                    matchVendedor(firstVend[r.telefone], filtroVendedorAtivo)
+                // Métricas: conta todas as conversas do vendedor (incluindo leads não confirmados)
+                const telefonesVend = new Set(rows.filter(r =>
+                    r.vendedor && matchVendedor(r.vendedor, filtroVendedorAtivo)
                 ).map(r => r.telefone));
-                filteredRows = rows.filter(r => confirmados.has(r.telefone));
+                filteredRows = rows.filter(r => telefonesVend.has(r.telefone));
             }
 
             const totalRows = currentUser === 'Admin' ? await sbCount('conversas') : 0;
@@ -4067,7 +4120,8 @@
             document.getElementById('metConv').textContent = telefonesHoje.size;
             document.getElementById('metAlunos').textContent = alunosUnicos.size;
             document.getElementById('metLeads').textContent = leadsUnicos.size;
-            document.getElementById('metTotal').textContent = currentUser === 'Admin' ? totalRows : '--';
+            const metTotal = document.getElementById('metTotal');
+            if (metTotal) metTotal.textContent = currentUser === 'Admin' ? totalRows : '--';
             document.getElementById('metConvTrend').textContent = telefonesHoje.size + ' únicos';
             document.getElementById('metLeadsTrend').textContent = leadsUnicos.size + ' hoje';
         }
@@ -4079,7 +4133,12 @@
 
             try {
                 const rows = await sbGet('conversas?select=vendedor&order=vendedor.asc');
-                const vendedores = [...new Set(rows.map(r => r.vendedor).filter(Boolean))].sort();
+                const vendedoresRaw = rows.map(r => r.vendedor).filter(Boolean);
+                const vendedores = [...new Set(vendedoresRaw.map(v => {
+                    const low = v.toLowerCase();
+                    if (low === 'rebeca' || low === 'rebecca') return 'Rebecca';
+                    return v;
+                }))].sort();
 
                 const container = document.getElementById('sidebarNumeros');
                 if (!container) return;
@@ -4120,11 +4179,25 @@
 
                 document.getElementById('convList').innerHTML = '<div class="state-msg"><span class="spinner"></span><div style="margin-top:8px">Carregando...</div></div>';
 
-                // Pegar mensagens do período (limitado a 10000 mais recentes para performance)
-                let rows = (await sbGet(`conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.desc&limit=10000`)).filter(r => !isExcluded(r.telefone));
-                
-                // Ordena asc para o processamento de agregação e firstVend funcionar corretamente
-                rows.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                // ESTRATÉGIA DUPLA: busca hoje separado (sem limite) + histórico (com limite DESC)
+                // Isso garante que o dia atual SEMPRE aparece, independente do limite do Supabase
+                const todayStart = brISO(now, 0, 0, 0);
+
+                const [todayRows, histRows] = await Promise.all([
+                    // Hoje: sem limit — normalmente < 200 registros, nunca cai no limite
+                    sbGet(`conversas?select=*&created_at=gte.${todayStart}&created_at=lt.${end}&order=created_at.asc`),
+                    // Histórico 30 dias (excluindo hoje): DESC para pegar os mais recentes dentro do limite
+                    sbGet(`conversas?select=*&created_at=gte.${start}&created_at=lt.${todayStart}&order=created_at.desc,id.desc&limit=5000`)
+                ]);
+
+                // Inverte histórico para ordem ASC e mescla com hoje
+                histRows.reverse();
+                const seenIds = new Set();
+                let rows = [...histRows, ...todayRows].filter(r => {
+                    if (seenIds.has(r.id)) return false;
+                    seenIds.add(r.id);
+                    return !isExcluded(r.telefone);
+                });
 
                 // Determinar o primeiro vendedor que atendeu cada telefone hoje
                 const firstVend = {};
@@ -4150,18 +4223,14 @@
                         return isCoord || (r.tipo === 'aluno' && !v);
                     });
                 } else if (filtroVendedorAtivo !== 'todos' && currentUser === 'Admin') {
-                    // Pega os telefones que têm lead_confirmado para este vendedor
-                    const telefonesConfirmados = new Set(
+                    // Mostra TODAS as conversas do vendedor selecionado (incluindo leads novos ainda não confirmados)
+                    // Usa qualquer mensagem com esse vendedor como critério (não só lead_confirmado)
+                    const telefonesVendedor = new Set(
                         rows
-                            .filter(r =>
-                                (r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') &&
-                                matchVendedor(firstVend[r.telefone], filtroVendedorAtivo)
-                            )
+                            .filter(r => r.vendedor && matchVendedor(r.vendedor, filtroVendedorAtivo))
                             .map(r => r.telefone)
                     );
-
-                    // Filtra só as conversas desses telefones confirmados
-                    rowsFiltradas = rows.filter(r => telefonesConfirmados.has(r.telefone));
+                    rowsFiltradas = rows.filter(r => telefonesVendedor.has(r.telefone));
                 }
 
                 if (!rowsFiltradas.length) {
@@ -4195,6 +4264,16 @@
 
                 let convs = Object.values(byTel);
                 convs.sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
+
+                // Atualiza o contador "Conversas hoje" com o número real de conversas de HOJE visíveis
+                // (garante consistência com o que é exibido na lista)
+                if (filtroVendedorAtivo === 'todos' && currentUser === 'Admin') {
+                    const convsHoje = convs.filter(c => fmtDataFriendly(c.lastTime) === 'Hoje').length;
+                    const metEl = document.getElementById('metConv');
+                    const trendEl = document.getElementById('metConvTrend');
+                    if (metEl) metEl.textContent = convsHoje;
+                    if (trendEl) trendEl.textContent = convsHoje + ' únicos';
+                }
 
                 // Atualiza título do painel
                 const titleEl = document.querySelector('.panel-title-text');
@@ -4277,9 +4356,9 @@
             }
 
             try {
-                // Buscar histórico completo (últimas 200 mensagens)
-                const fullMsgs = await sbGet(`conversas?select=*&telefone=eq.${conv.telefone}&order=created_at.desc&limit=200`);
-                const newMsgs = fullMsgs.reverse();
+                // Buscar histórico completo (últimas 200 mensagens) em ordem cronológica
+                const fullMsgs = await sbGet(`conversas?select=*&telefone=eq.${conv.telefone}&order=created_at.asc,id.asc&limit=200`);
+                const newMsgs = fullMsgs;
 
                 // Se for auto-refresh e as mensagens forem as mesmas, não faz nada para evitar flicker
                 if (isAutoRefresh && allConvsData[conv.telefone] && allConvsData[conv.telefone].msgs) {
@@ -4333,14 +4412,24 @@
                 }
                 document.getElementById('mobileOverlay').classList.add('open');
             } else {
+                const isBlockedChat = isExcluded(conv.telefone);
+                const blockBtnHtml = currentUser === 'Admin' ? `
+                  <button id="btnBlockNum" onclick="toggleBlockNumber('${conv.telefone}')" title="${isBlockedChat ? 'Desbloquear número' : 'Bloquear número'}" style="
+                    background:none; border:none; cursor:pointer; font-size:1rem;
+                    color:${isBlockedChat ? 'var(--red)' : 'var(--muted2)'};
+                    padding:4px 6px; border-radius:6px; transition:all 0.2s; line-height:1;
+                    margin-left:4px;
+                  " onmouseover="this.style.background='var(--red-dim)'; this.style.color='var(--red)'" onmouseout="this.style.background='none'; this.style.color='${isBlockedChat ? 'var(--red)' : 'var(--muted2)'}'">${isBlockedChat ? '🔓' : '🚫'}</button>
+                ` : '';
                 document.getElementById('chatDetail').innerHTML = `
         <div class="chat-detail-head">
           <div>
             <div class="chat-detail-name" style="font-family:var(--mono);font-size:0.8rem">${fmtTel(conv.telefone)}</div>
             <div class="chat-detail-sub">${subText}</div>
           </div>
-          <div class="chat-detail-actions">
+          <div class="chat-detail-actions" style="display:flex;align-items:center;gap:6px">
             <span class="badge ${conv.tipo === 'lead' ? 'badge-green' : (conv.tipo === 'aluno' ? 'badge-blue' : (conv.tipo === 'conversa_vendedor' || conv.tipo === 'lead-vendedor' ? 'badge-orange' : 'badge-muted'))}">${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || '—')}</span>
+            ${blockBtnHtml}
           </div>
         </div>
         <div style="position:relative; flex:1; overflow:hidden; display:flex; flex-direction:column">
@@ -4540,7 +4629,7 @@
 
         // ─── LEADS TAB LOGIC ─────────────────────────
         let fullLeadsData = [];
- 
+
         function clearLeadsFilters() {
             document.getElementById('leadFilterPeriod').value = '30d';
             document.getElementById('leadFilterVend').value = 'todos';
@@ -4555,106 +4644,87 @@
             const statusFilter = document.getElementById('leadFilterStatus').value;
             const search = document.getElementById('leadFilterSearch').value.toLowerCase();
 
-            // Date range
+            // Date range (horário de Brasília)
             const now = brNow();
             let start, end = brISO(now, 23, 59, 59);
 
             if (period === 'hoje') {
                 start = brISO(now, 0, 0, 0);
             } else if (period === '7d') {
-                const d = new Date(now);
-                d.setDate(now.getDate() - 7);
+                const d = new Date(now); d.setDate(now.getDate() - 7);
                 start = brISO(d, 0, 0, 0);
             } else if (period === '30d') {
-                const d = new Date(now);
-                d.setDate(now.getDate() - 30);
+                const d = new Date(now); d.setDate(now.getDate() - 30);
                 start = brISO(d, 0, 0, 0);
             } else if (period === 'mes') {
                 const d = new Date(now.getFullYear(), now.getMonth(), 1);
                 start = brISO(d, 0, 0, 0);
             } else {
-                start = '2000-01-01T00:00:00-03:00'; // Tudo
+                start = '2000-01-01T00:00:00-03:00';
             }
 
             document.getElementById('fullLeadsTableBody').innerHTML = '<div class="state-msg"><span class="spinner"></span><div style="margin-top:8px">Carregando leads...</div></div>';
 
             try {
-                // Buscar mensagens do período para identificar leads (consistente com loadConversas)
-                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=10000`;
-
-                let [rows, statusRows] = await Promise.all([
-                    sbGet(query),
+                // NOVA ESTRATÉGIA: busca da view leads_resumo — 1 linha por telefone
+                // Em vez de buscar milhares de mensagens e agrupar no JS, o banco já retorna
+                // os dados agregados. Escalável independente do volume de mensagens.
+                let [leadsRaw, statusRows] = await Promise.all([
+                    sbGet(`leads_resumo?tem_msg_cliente=eq.true&ultimo_contato=gte.${start}&ultimo_contato=lte.${end}&order=ultimo_contato.desc`),
                     sbGet('status_de_leads?select=*')
                 ]);
-                rows = rows.filter(r => !isExcluded(r.telefone));
+                leadsRaw = leadsRaw.filter(r => !isExcluded(r.telefone));
 
                 const statusMap = {};
                 statusRows.forEach(s => statusMap[s.telefone] = s);
 
-                // Determina o primeiro vendedor (preferencialmente humano) de cada telefone no período
-                const firstVend = {};
-                rows.forEach(r => {
-                    const v = r.vendedor;
-                    if (!v) return;
-                    const vLow = v.toLowerCase();
-                    if (vLow === 'bot') {
-                        if (!firstVend[r.telefone]) firstVend[r.telefone] = 'bot';
-                    } else {
-                        if (!firstVend[r.telefone] || firstVend[r.telefone] === 'bot') {
-                            firstVend[r.telefone] = v;
-                        }
+                // Mapeia para o mesmo shape de objeto que o resto do código espera
+                let leadsList = leadsRaw.map(r => {
+                    const st = statusMap[r.telefone] || {};
+                    return {
+                        telefone:       r.telefone,
+                        primeiroContato: r.primeiro_contato,
+                        ultimoContato:  r.ultimo_contato,
+                        ultimaMensagem: r.ultima_mensagem || '',
+                        vendedor:       r.vendedor || 'desconhecido',
+                        tipo:           r.tipo    || 'desconhecido',
+                        totalMsgs:      r.total_msgs || 0,
+                        temMsgBot:      r.tem_msg_bot || false,
+                        status:         st.status   || 'novo',
+                        nota:           st.anotacao || '',
+                        nome:           st.nome     || '',
+                        idade:          st.idade    || '',
+                        interesse:      st.interesse || ''
+                    };
+                });
+
+                // Inclui também leads que têm status salvo mas podem estar fora do período
+                statusRows.forEach(s => {
+                    if (!leadsRaw.find(r => r.telefone === s.telefone) && !isExcluded(s.telefone)) {
+                        // Não adiciona — o lead com status mas sem msgs no período fica fora do filtro
                     }
                 });
 
-                // Agrupar por telefone
-                const leadsMap = {};
-                rows.forEach(r => {
-                    if (isExcluded(r.telefone)) return;
-                    if (!leadsMap[r.telefone]) {
-                        const st = statusMap[r.telefone] || {};
-                        const assignedVend = firstVend[r.telefone];
-                        leadsMap[r.telefone] = {
-                            telefone: r.telefone,
-                            msgs: [],
-                            primeiroContato: r.created_at,
-                            vendedor: assignedVend || 'desconhecido',
-                            status: st.status || 'novo',
-                            nota: st.anotacao || '',
-                            nome: st.nome || '',
-                            idade: st.idade || '',
-                            interesse: st.interesse || ''
-                        };
-                    }
-                    leadsMap[r.telefone].msgs.push(r);
-                    leadsMap[r.telefone].ultimaMensagem = r.mensagem;
-                    leadsMap[r.telefone].ultimoContato = r.created_at;
-                });
-
-                let leadsList = Object.values(leadsMap);
-
-                // Filtrar quem é de fato lead: qualquer conversa com mensagem de cliente é considerada lead
-                leadsList = leadsList.filter(l => {
-                    const isClientMsg = l.msgs.some(m => m.de === 'cliente');
-                    const hasStatus = statusMap[l.telefone];
-                    return isClientMsg || hasStatus;
-                });
-
-                leadsList.sort((a, b) => new Date(b.ultimoContato) - new Date(a.ultimoContato));
-
-                // Filtro por vendedor: para vendedores (não-Admin), mostra apenas os SEUS leads
-                // Para Admin, aplica o filtro do dropdown se não for 'todos'
+                // Filtro por vendedor
                 if (currentUser !== 'Admin') {
                     leadsList = leadsList.filter(l => {
                         const v = l.vendedor?.toLowerCase();
                         const cur = currentUser.toLowerCase();
-                        return !v || v === 'bot' || v === 'desconhecido' || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+                        return !v || v === 'bot' || v === 'desconhecido' || v === cur ||
+                               (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
                     });
                 } else if (vend !== 'todos') {
-                    leadsList = leadsList.filter(l => l.vendedor === vend);
+                    leadsList = leadsList.filter(l => matchVendedor(l.vendedor, vend));
                 }
 
+                // Filtro por busca (aceita com ou sem traço/espaço)
                 if (search) {
-                    leadsList = leadsList.filter(l => String(l.telefone).includes(search));
+                    const searchDigits = search.replace(/\D/g, '');
+                    leadsList = leadsList.filter(l => {
+                        const tel = String(l.telefone);
+                        return tel.includes(searchDigits || search) ||
+                               (l.nome || '').toLowerCase().includes(search);
+                    });
                 }
 
                 if (statusFilter !== 'todos') {
@@ -4669,10 +4739,19 @@
                 const andamento = leadsList.filter(l => l.status === 'em_andamento').length;
                 const taxa = total > 0 ? Math.round((matriculados / total) * 100) : 0;
 
+                // Matriculados via bot: usa flag tem_msg_bot da view
+                const matriculadosBot = leadsList.filter(l =>
+                    l.status === 'matriculado' && l.temMsgBot
+                ).length;
+                const taxaBot = matriculados > 0 ? Math.round((matriculadosBot / matriculados) * 100) : 0;
+
                 document.getElementById('metLeadsTotal').textContent = total;
                 document.getElementById('metLeadsConv').textContent = matriculados;
                 document.getElementById('metLeadsAnd').textContent = andamento;
                 document.getElementById('metLeadsTaxa').textContent = taxa + '%';
+                document.getElementById('metLeadsBot').textContent = matriculadosBot;
+                document.getElementById('metLeadsBotSub').textContent = taxaBot + '% dos convertidos';
+                document.getElementById('metLeadsBotTrend').textContent = matriculadosBot + ' bot';
 
                 // Render Table
                 const tbody = document.getElementById('fullLeadsTableBody');
@@ -4695,7 +4774,7 @@
           <div class="fl-row" data-telefone="${l.telefone}" data-vendedor="${escapeHtml(l.vendedor || '')}" data-contato="${l.primeiroContato}">
             <div class="fl-phone">${fmtTel(l.telefone)}</div>
             <div><span class="badge badge-muted" style="font-size:0.6rem">${l.vendedor || '—'}</span></div>
-            <div class="fl-msg-count">${l.msgs.length}</div>
+            <div class="fl-msg-count">${l.totalMsgs}</div>
             <div class="fl-preview">${escapeHtml(preview) || '—'}</div>
             <div class="fl-time">${new Date(l.primeiroContato).toLocaleDateString('pt-BR')} ${fmtHora(l.primeiroContato)}</div>
             <div><span class="badge badge-${l.status}">${statusLabels[l.status] || l.status}</span></div>
@@ -4728,7 +4807,7 @@
                     l.idade || '',
                     l.interesse || '',
                     l.vendedor || '—',
-                    l.msgs.length,
+                    l.totalMsgs,
                     l.primeiroContato ? new Date(l.primeiroContato).toLocaleString('pt-BR').replace(',', '') : '',
                     l.ultimoContato ? new Date(l.ultimoContato).toLocaleString('pt-BR').replace(',', '') : '',
                     l.status,
@@ -4753,6 +4832,23 @@
             document.getElementById('lmIdade').value = leadData ? (leadData.idade || '') : '';
             document.getElementById('lmInteresse').value = leadData ? (leadData.interesse || '') : '';
             toggleMotivoPerda();
+
+            // Mostrar botão de bloqueio apenas para Admin
+            const lmBlockBtn = document.getElementById('lmBlockBtn');
+            if (lmBlockBtn) {
+                if (currentUser === 'Admin') {
+                    const isBlocked = isExcluded(telefone);
+                    lmBlockBtn.style.display = 'inline-flex';
+                    lmBlockBtn.dataset.blocked = isBlocked ? '1' : '0';
+                    lmBlockBtn.title = isBlocked ? 'Desbloquear número' : 'Bloquear número';
+                    lmBlockBtn.style.color = isBlocked ? 'var(--red)' : 'var(--muted2)';
+                    lmBlockBtn.style.borderColor = isBlocked ? 'var(--red)' : 'var(--border)';
+                    document.getElementById('lmBlockIcon').textContent = isBlocked ? '🔓' : '🚫';
+                    document.getElementById('lmBlockLabel').textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
+                } else {
+                    lmBlockBtn.style.display = 'none';
+                }
+            }
 
             document.getElementById('lmChat').innerHTML = '<div class="state-msg"><span class="spinner"></span></div>';
             document.getElementById('leadModal').classList.add('open');
@@ -4954,7 +5050,7 @@
                 // Busca todas as mensagens do período para processar localmente
                 // Aumentado limit para 10000 para evitar que o relatório "trave" em dados antigos
                 let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=10000`;
-                
+
                 // NOTA: Removemos o filtro de vendedor da query para permitir identificar o primeiro vendedor em memória
                 // Isso garante consistência com as outras abas (Dashboard e Leads)
                 const rows = (await sbGet(query)).filter(r => !isExcluded(r.telefone));
@@ -4989,7 +5085,7 @@
                 const leadsVendSet = new Set(filteredRows.filter(r => (r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && r.de === 'cliente').map(r => r.telefone));
                 const alunosSet = new Set(filteredRows.filter(r => r.tipo === 'aluno' && r.de === 'cliente').map(r => r.telefone));
                 const totalMsgs = filteredRows.length;
-                
+
                 const totalLeads = new Set([...leadsBotSet, ...leadsVendSet]);
 
                 if (document.getElementById('repLeadsBot')) document.getElementById('repLeadsBot').textContent = leadsBotSet.size;
@@ -5004,17 +5100,17 @@
                 // 3. Desempenho por Vendedor
                 const vendors = {};
                 const performanceRows = currentUser === 'Admin' ? rows : filteredRows;
-                
+
                 performanceRows.forEach(r => {
                     const vOwner = firstVend[r.telefone] || 'Desconhecido';
                     if (!vendors[vOwner]) {
-                        vendors[vOwner] = { 
-                            leadsBot: new Set(), 
-                            leadsVend: new Set(), 
-                            totalLeads: new Set() 
+                        vendors[vOwner] = {
+                            leadsBot: new Set(),
+                            leadsVend: new Set(),
+                            totalLeads: new Set()
                         };
                     }
-                    
+
                     if (r.de === 'cliente') {
                         const type = r.tipo || '';
                         if (type === 'lead' || type === 'lead_confirmado') {
@@ -5221,7 +5317,25 @@
                 { id: 1, nome: 'Rebecca', whatsapp: '5521999999999', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
                 { id: 2, nome: 'Paulo', whatsapp: '5521888888888', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true }
             ],
-            crm: { periodoLeads: 'mes', nomeDashboard: 'Escola de Idiomas', autoRefresh: true, botUrl: '', tema: 'dark', github: 'https://github.com/CarvalhodLucas/CRM-WhatsApp', excluirNumeros: [] }
+            crm: {
+                periodoLeads: 'mes',
+                nomeDashboard: 'Escola de Idiomas',
+                autoRefresh: true,
+                botUrl: '',
+                tema: 'dark',
+                github: 'https://github.com/CarvalhodLucas/CRM-WhatsApp',
+                excluirNumeros: [
+                    '126980808814712',
+                    '175440840884282',
+                    '261035395178609',
+                    '164927130095704',
+                    '240569792077856',
+                    '105488742109424',
+                    '53700076765240',
+                    '147132795355153',
+                    '134282303537185'
+                ]
+            }
         };
 
         function applyTheme() {
@@ -5412,6 +5526,22 @@
         function loadConfigView() {
             const saved = localStorage.getItem('crm_config');
             if (saved) crmConfig = JSON.parse(saved);
+
+            // Forçar a inclusão dos novos números de exclusão se não estiverem presentes
+            const novosPadroes = [
+                '126980808814712', '175440840884282', '261035395178609',
+                '164927130095704', '240569792077856', '105488742109424',
+                '53700076765240', '147132795355153', '134282303537185'
+            ];
+            if (!crmConfig.crm.excluirNumeros) crmConfig.crm.excluirNumeros = [];
+            let mudou = false;
+            novosPadroes.forEach(n => {
+                if (!crmConfig.crm.excluirNumeros.includes(n)) {
+                    crmConfig.crm.excluirNumeros.push(n);
+                    mudou = true;
+                }
+            });
+            if (mudou) localStorage.setItem('crm_config', JSON.stringify(crmConfig));
 
             if (currentUser !== 'Admin') {
                 // Setup Vendedor View
@@ -5680,6 +5810,49 @@
             saveConfig('crm');
         }
 
+        // ─── BLOQUEAR / DESBLOQUEAR NÚMERO (Admin only) ──
+        function toggleBlockNumber(tel) {
+            if (currentUser !== 'Admin') return;
+            const clean = String(tel || '').replace(/\D/g, '');
+            if (!clean) return;
+            if (!crmConfig.crm.excluirNumeros) crmConfig.crm.excluirNumeros = [];
+
+            const isBlocked = isExcluded(clean);
+            if (isBlocked) {
+                // Desbloquear
+                crmConfig.crm.excluirNumeros = crmConfig.crm.excluirNumeros.filter(n => {
+                    const c = String(n).replace(/\D/g, '');
+                    return c !== clean && !clean.endsWith(c);
+                });
+                showToast();
+                // Atualiza o botão inline se existir
+                const btn = document.getElementById('btnBlockNum');
+                if (btn) {
+                    btn.title = 'Bloquear número';
+                    btn.style.color = 'var(--muted2)';
+                    btn.innerHTML = '🚫';
+                }
+            } else {
+                // Bloquear
+                if (!confirm(`Bloquear ${fmtTel(tel)}? Ele será ocultado de conversas, leads e relatórios.`)) return;
+                crmConfig.crm.excluirNumeros.push(clean);
+                showToast();
+                // Fecha o modal de lead se estiver aberto
+                const leadModal = document.getElementById('leadModal');
+                if (leadModal && leadModal.classList.contains('open')) {
+                    leadModal.classList.remove('open');
+                }
+            }
+
+            localStorage.setItem('crm_config', JSON.stringify(crmConfig));
+            renderExclusionList();
+            // Recarrega listas para refletir a mudança
+            setTimeout(() => {
+                loadConversas();
+                if (document.getElementById('viewLeads').style.display !== 'none') loadLeadsView();
+            }, 300);
+        }
+
         // ─── MASTER SCALE LOGIC ─────────────────────
         let masterScaleData = [];
 
@@ -5905,26 +6078,30 @@
         }
 
         async function init() {
-            initAuth();
-            if (!currentUser) return; // Wait for login
-
-            // Load config
+            // 1. Carrega a configuração do localStorage imediatamente
             const saved = localStorage.getItem('crm_config');
             if (saved) {
                 crmConfig = JSON.parse(saved);
-                applyTheme();
-                document.querySelector('.logo-sub').textContent = crmConfig.crm.nomeDashboard;
-                if (document.getElementById('leadFilterPeriod')) {
-                    document.getElementById('leadFilterPeriod').value = crmConfig.crm.periodoLeads;
-                }
-                renderNumerosSidebar();
-            } else {
-                renderNumerosSidebar();
             }
 
+            // 2. Aplica o tema imediatamente (para afetar inclusive a tela de login)
+            applyTheme();
+
+            // 3. Inicializa autenticação
+            initAuth();
+            if (!currentUser) return; // Se não estiver logado, para aqui (a tela de login está visível)
+
+            // 4. Configura elementos da UI com base no config carregado
+            document.querySelector('.logo-sub').textContent = crmConfig.crm.nomeDashboard;
+            if (document.getElementById('leadFilterPeriod')) {
+                document.getElementById('leadFilterPeriod').value = crmConfig.crm.periodoLeads;
+            }
+            renderNumerosSidebar();
+
+            // 5. Carrega os dados do Supabase
             await loadAllData();
 
-            // Listener para o Enter no simulador
+            // 6. Listener para o Enter no simulador
             const simInput = document.getElementById('simInput');
             if (simInput && !simInput.dataset.listener) {
                 simInput.addEventListener('keydown', (e) => {
