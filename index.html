@@ -3071,6 +3071,12 @@
                                             buscar status em tempo real</div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="form-label">Token Admin do Bot</label>
+                                        <input type="password" class="filter-input" id="cfgCrmBotToken"
+                                            placeholder="Mesmo valor de ADMIN_TOKEN no Railway" style="width:100%">
+                                        <div style="font-size:0.65rem; color:var(--muted2); margin-top:4px">Protege as rotas /status e /simulate contra acesso externo</div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="form-label">URL do Repositório GitHub</label>
                                         <input type="text" class="filter-input" id="cfgCrmGithub"
                                             placeholder="Ex: https://github.com/usuario/projeto">
@@ -3811,7 +3817,11 @@
                 try {
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 3000);
-                    const res = await fetch(botUrl.replace(/\/$/, '') + '/status', { signal: controller.signal });
+                    const botToken = crmConfig.crm.botAdminToken || '';
+                    const res = await fetch(botUrl.replace(/\/$/, '') + '/status', {
+                        signal: controller.signal,
+                        headers: botToken ? { 'x-admin-token': botToken } : {}
+                    });
                     clearTimeout(timeoutId);
 
                     if (res.ok) {
@@ -3962,9 +3972,13 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+                const botToken = crmConfig.crm.botAdminToken || '';
                 const res = await fetch(botUrl.replace(/\/$/, '') + '/simulate', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(botToken ? { 'x-admin-token': botToken } : {})
+                    },
                     body: JSON.stringify({ mensagem: msg }),
                     signal: controller.signal
                 });
@@ -5322,6 +5336,7 @@
                 nomeDashboard: 'Escola de Idiomas',
                 autoRefresh: true,
                 botUrl: '',
+                botAdminToken: '',
                 tema: 'dark',
                 github: 'https://github.com/CarvalhodLucas/CRM-WhatsApp',
                 excluirNumeros: [
@@ -5566,6 +5581,7 @@
             document.getElementById('cfgCrmNome').value = crmConfig.crm.nomeDashboard || '';
             document.getElementById('cfgCrmRefresh').checked = crmConfig.crm.autoRefresh;
             document.getElementById('cfgCrmBotUrl').value = crmConfig.crm.botUrl || '';
+            document.getElementById('cfgCrmBotToken').value = crmConfig.crm.botAdminToken || '';
             document.getElementById('cfgCrmTema').value = crmConfig.crm.tema || 'dark';
             document.getElementById('cfgCrmGithub').value = crmConfig.crm.github || '';
             renderExclusionList();
@@ -5765,6 +5781,7 @@
                 crmConfig.crm.nomeDashboard = document.getElementById('cfgCrmNome').value;
                 crmConfig.crm.autoRefresh = document.getElementById('cfgCrmRefresh').checked;
                 crmConfig.crm.botUrl = document.getElementById('cfgCrmBotUrl').value.trim();
+                crmConfig.crm.botAdminToken = document.getElementById('cfgCrmBotToken').value.trim();
                 crmConfig.crm.tema = document.getElementById('cfgCrmTema').value;
                 crmConfig.crm.github = document.getElementById('cfgCrmGithub').value.trim();
                 document.querySelector('.logo-sub').textContent = crmConfig.crm.nomeDashboard;
@@ -5994,7 +6011,11 @@
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
-                const res = await fetch(url.replace(/\/$/, '') + '/status', { signal: controller.signal });
+                const botToken = crmConfig.crm.botAdminToken || '';
+                const res = await fetch(url.replace(/\/$/, '') + '/status', {
+                    signal: controller.signal,
+                    headers: botToken ? { 'x-admin-token': botToken } : {}
+                });
                 clearTimeout(timeoutId);
 
                 if (res.ok) {
