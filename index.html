@@ -1671,6 +1671,44 @@
             border-color: var(--green);
         }
 
+        .status-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .status-tab {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted2);
+            font-size: 0.72rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .status-tab:hover { border-color: var(--muted2); color: var(--text); }
+        .status-tab.active { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+        .status-tab .tab-count {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .fl-date-separator {
+            padding: 8px 16px 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--muted2);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
         .full-leads-table {
             width: 100%;
             background: var(--surface);
@@ -1775,6 +1813,16 @@
         .badge-perdido {
             background: var(--red-dim);
             color: var(--red);
+        }
+
+        .badge-pausado {
+            background: var(--yellow-dim);
+            color: var(--yellow);
+        }
+
+        .badge-aluno {
+            background: var(--cyan-dim, rgba(0,207,232,0.12));
+            color: var(--cyan);
         }
 
         /* LEAD MODAL */
@@ -2730,6 +2778,8 @@
                         <option value="novo">Novo</option>
                         <option value="em_andamento">Em Andamento</option>
                         <option value="matriculado">Matriculado</option>
+                        <option value="aluno">Aluno</option>
+                        <option value="pausado">Pausado</option>
                         <option value="perdido">Perdido</option>
                     </select>
                     <input type="text" class="filter-input" id="leadFilterSearch" placeholder="Buscar telefone..."
@@ -2768,6 +2818,17 @@
                         <div class="metric-sub" id="metLeadsBotSub">do total convertido</div>
                         <div class="metric-trend" id="metLeadsBotTrend" style="background:rgba(0,207,232,0.12);color:var(--cyan)">—</div>
                     </div>
+                </div>
+
+                <!-- SUB-ABAS DE STATUS -->
+                <div class="status-tabs" id="statusTabs">
+                    <div class="status-tab active" data-tab="todos" onclick="setStatusTab('todos')">Todos <span class="tab-count" id="tabCount-todos">0</span></div>
+                    <div class="status-tab" data-tab="novo" onclick="setStatusTab('novo')">Novo <span class="tab-count" id="tabCount-novo">0</span></div>
+                    <div class="status-tab" data-tab="em_andamento" onclick="setStatusTab('em_andamento')">Em Andamento <span class="tab-count" id="tabCount-em_andamento">0</span></div>
+                    <div class="status-tab" data-tab="pausado" onclick="setStatusTab('pausado')">Pausado <span class="tab-count" id="tabCount-pausado">0</span></div>
+                    <div class="status-tab" data-tab="matriculado" onclick="setStatusTab('matriculado')">Matriculado <span class="tab-count" id="tabCount-matriculado">0</span></div>
+                    <div class="status-tab" data-tab="aluno" onclick="setStatusTab('aluno')">Aluno <span class="tab-count" id="tabCount-aluno">0</span></div>
+                    <div class="status-tab" data-tab="perdido" onclick="setStatusTab('perdido')">Perdido <span class="tab-count" id="tabCount-perdido">0</span></div>
                 </div>
 
                 <!-- TABLE LEADS -->
@@ -3343,11 +3404,17 @@
                         <option value="Sumiu">Parou de responder (Sumiu)</option>
                         <option value="Outro">Outro motivo</option>
                     </select>
+                    <div id="lmDataRetornoBox" style="display: none;">
+                        <label class="form-label" style="font-size:0.7rem; color:var(--muted2); margin-bottom:4px; display:block">📅 Lembrar vendedor em:</label>
+                        <input type="date" class="filter-input" id="lmDataRetorno" style="width:100%">
+                    </div>
                     <div class="lead-modal-footer">
                         <select class="filter-select" id="lmStatus" onchange="toggleMotivoPerda()">
                             <option value="novo">Selecione o status...</option>
                             <option value="em_andamento">Em Andamento</option>
                             <option value="matriculado">Matriculado</option>
+                            <option value="aluno">Aluno</option>
+                            <option value="pausado">Pausado</option>
                             <option value="perdido">Perdido</option>
                         </select>
                         <button class="action-btn primary" style="padding:8px 24px"
@@ -4704,11 +4771,12 @@
                         tipo:           r.tipo    || 'desconhecido',
                         totalMsgs:      r.total_msgs || 0,
                         temMsgBot:      r.tem_msg_bot || false,
-                        status:         st.status   || 'novo',
-                        nota:           st.anotacao || '',
-                        nome:           st.nome     || '',
-                        idade:          st.idade    || '',
-                        interesse:      st.interesse || ''
+                        status:         st.status      || 'novo',
+                        nota:           st.anotacao    || '',
+                        nome:           st.nome        || '',
+                        idade:          st.idade       || '',
+                        interesse:      st.interesse   || '',
+                        dataRetorno:    st.data_retorno || ''
                     };
                 });
 
@@ -4767,43 +4835,14 @@
                 document.getElementById('metLeadsBotSub').textContent = taxaBot + '% dos convertidos';
                 document.getElementById('metLeadsBotTrend').textContent = matriculadosBot + ' bot';
 
-                // Render Table
-                const tbody = document.getElementById('fullLeadsTableBody');
-                if (leadsList.length === 0) {
-                    tbody.innerHTML = '<div class="state-msg">Nenhum lead encontrado para os filtros.</div>';
-                    return;
-                }
-
-                const statusLabels = {
-                    'novo': 'Novo',
-                    'em_andamento': 'Em Andamento',
-                    'matriculado': 'Matriculado',
-                    'perdido': 'Perdido'
-                };
-
-                tbody.innerHTML = leadsList.map(l => {
-                    const preview = l.ultimaMensagem.substring(0, 40) + (l.ultimaMensagem.length > 40 ? '...' : '');
-                    const hasNota = l.nota.trim().length > 0;
-                    return `
-          <div class="fl-row" data-telefone="${l.telefone}" data-vendedor="${escapeHtml(l.vendedor || '')}" data-contato="${l.primeiroContato}">
-            <div class="fl-phone">${fmtTel(l.telefone)}</div>
-            <div><span class="badge badge-muted" style="font-size:0.6rem">${l.vendedor || '—'}</span></div>
-            <div class="fl-msg-count">${l.totalMsgs}</div>
-            <div class="fl-preview">${escapeHtml(preview) || '—'}</div>
-            <div class="fl-time">${new Date(l.primeiroContato).toLocaleDateString('pt-BR')} ${fmtHora(l.primeiroContato)}</div>
-            <div><span class="badge badge-${l.status}">${statusLabels[l.status] || l.status}</span></div>
-            <div class="fl-action" title="${hasNota ? 'Ver anotação' : 'Adicionar anotação'}">${hasNota ? '📝' : '➕'}</div>
-          </div>
-        `;
-                }).join('');
-
-                // Adiciona listeners para abrir o modal
-                tbody.querySelectorAll('.fl-row').forEach(el => {
-                    el.addEventListener('click', () => {
-                        const { telefone, vendedor, contato } = el.dataset;
-                        openLeadModal(telefone, vendedor, contato);
-                    });
+                // Atualiza contadores das sub-abas
+                ['todos', 'novo', 'em_andamento', 'matriculado', 'aluno', 'pausado', 'perdido'].forEach(s => {
+                    const el = document.getElementById('tabCount-' + s);
+                    if (el) el.textContent = s === 'todos' ? leadsList.length : leadsList.filter(l => l.status === s).length;
                 });
+
+                // Renderiza tabela com agrupamento por data e filtro de aba ativa
+                renderLeadsTable();
 
             } catch (e) {
                 console.error(e);
@@ -4831,6 +4870,85 @@
             exportToExcel(data, 'relatorio_leads_' + new Date().toISOString().slice(0, 10), "Relatório Completo");
         }
 
+        let activeStatusTab = 'todos';
+
+        function setStatusTab(tab) {
+            activeStatusTab = tab;
+            document.querySelectorAll('.status-tab').forEach(el => {
+                el.classList.toggle('active', el.dataset.tab === tab);
+            });
+            renderLeadsTable();
+        }
+
+        function getDateGroup(dateStr) {
+            const d = new Date(dateStr);
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const ontem = new Date(hoje); ontem.setDate(ontem.getDate() - 1);
+            const semana = new Date(hoje); semana.setDate(semana.getDate() - 7);
+            const mes = new Date(hoje); mes.setDate(mes.getDate() - 30);
+            if (d >= hoje) return '📅 Hoje';
+            if (d >= ontem) return '📅 Ontem';
+            if (d >= semana) return '📅 Esta semana';
+            if (d >= mes) return '📅 Este mês';
+            return '📅 Mais antigos';
+        }
+
+        function renderLeadsTable() {
+            const tbody = document.getElementById('fullLeadsTableBody');
+            const statusLabels = {
+                'novo': 'Novo', 'em_andamento': 'Em Andamento',
+                'matriculado': 'Matriculado', 'aluno': 'Aluno', 'pausado': 'Pausado', 'perdido': 'Perdido'
+            };
+
+            let lista = fullLeadsData;
+            if (activeStatusTab !== 'todos') {
+                lista = lista.filter(l => l.status === activeStatusTab);
+            }
+
+            if (lista.length === 0) {
+                tbody.innerHTML = '<div class="state-msg">Nenhum lead encontrado.</div>';
+                return;
+            }
+
+            // Agrupa por data
+            const grupos = {};
+            const ordemGrupos = ['📅 Hoje', '📅 Ontem', '📅 Esta semana', '📅 Este mês', '📅 Mais antigos'];
+            lista.forEach(l => {
+                const g = getDateGroup(l.ultimoContato || l.primeiroContato);
+                if (!grupos[g]) grupos[g] = [];
+                grupos[g].push(l);
+            });
+
+            let html = '';
+            ordemGrupos.forEach(grupo => {
+                if (!grupos[grupo]) return;
+                html += `<div class="fl-date-separator">${grupo} — ${grupos[grupo].length} lead(s)</div>`;
+                grupos[grupo].forEach(l => {
+                    const preview = l.ultimaMensagem.substring(0, 40) + (l.ultimaMensagem.length > 40 ? '...' : '');
+                    const hasNota = l.nota.trim().length > 0;
+                    html += `
+                        <div class="fl-row" data-telefone="${l.telefone}" data-vendedor="${escapeHtml(l.vendedor || '')}" data-contato="${l.primeiroContato}">
+                            <div class="fl-phone">${fmtTel(l.telefone)}</div>
+                            <div><span class="badge badge-muted" style="font-size:0.6rem">${l.vendedor || '—'}</span></div>
+                            <div class="fl-msg-count">${l.totalMsgs}</div>
+                            <div class="fl-preview">${escapeHtml(preview) || '—'}</div>
+                            <div class="fl-time">${new Date(l.primeiroContato).toLocaleDateString('pt-BR')} ${fmtHora(l.primeiroContato)}</div>
+                            <div><span class="badge badge-${l.status}">${statusLabels[l.status] || l.status}</span></div>
+                            <div class="fl-action" title="${hasNota ? 'Ver anotação' : 'Adicionar anotação'}">${hasNota ? '📝' : '➕'}</div>
+                        </div>`;
+                });
+            });
+
+            tbody.innerHTML = html;
+            tbody.querySelectorAll('.fl-row').forEach(el => {
+                el.addEventListener('click', () => {
+                    const { telefone, vendedor, contato } = el.dataset;
+                    openLeadModal(telefone, vendedor, contato);
+                });
+            });
+        }
+
         let currentModalLead = null;
 
         async function openLeadModal(telefone, vendedor, primeiroContato) {
@@ -4845,23 +4963,20 @@
             document.getElementById('lmNome').value = leadData ? (leadData.nome || '') : '';
             document.getElementById('lmIdade').value = leadData ? (leadData.idade || '') : '';
             document.getElementById('lmInteresse').value = leadData ? (leadData.interesse || '') : '';
+            document.getElementById('lmDataRetorno').value = leadData ? (leadData.dataRetorno || '') : '';
             toggleMotivoPerda();
 
-            // Mostrar botão de bloqueio apenas para Admin
+            // Botão de bloqueio disponível para todos os usuários
             const lmBlockBtn = document.getElementById('lmBlockBtn');
             if (lmBlockBtn) {
-                if (currentUser === 'Admin') {
-                    const isBlocked = isExcluded(telefone);
-                    lmBlockBtn.style.display = 'inline-flex';
-                    lmBlockBtn.dataset.blocked = isBlocked ? '1' : '0';
-                    lmBlockBtn.title = isBlocked ? 'Desbloquear número' : 'Bloquear número';
-                    lmBlockBtn.style.color = isBlocked ? 'var(--red)' : 'var(--muted2)';
-                    lmBlockBtn.style.borderColor = isBlocked ? 'var(--red)' : 'var(--border)';
-                    document.getElementById('lmBlockIcon').textContent = isBlocked ? '🔓' : '🚫';
-                    document.getElementById('lmBlockLabel').textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
-                } else {
-                    lmBlockBtn.style.display = 'none';
-                }
+                const isBlocked = isExcluded(telefone);
+                lmBlockBtn.style.display = 'inline-flex';
+                lmBlockBtn.dataset.blocked = isBlocked ? '1' : '0';
+                lmBlockBtn.title = isBlocked ? 'Desbloquear número' : 'Bloquear número';
+                lmBlockBtn.style.color = isBlocked ? 'var(--red)' : 'var(--muted2)';
+                lmBlockBtn.style.borderColor = isBlocked ? 'var(--red)' : 'var(--border)';
+                document.getElementById('lmBlockIcon').textContent = isBlocked ? '🔓' : '🚫';
+                document.getElementById('lmBlockLabel').textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
             }
 
             document.getElementById('lmChat').innerHTML = '<div class="state-msg"><span class="spinner"></span></div>';
@@ -4898,12 +5013,13 @@
         function toggleMotivoPerda() {
             const status = document.getElementById('lmStatus').value;
             const motivoSelect = document.getElementById('lmMotivoPerda');
-            if (status === 'perdido') {
-                motivoSelect.style.display = 'block';
-            } else {
-                motivoSelect.style.display = 'none';
-                motivoSelect.value = '';
-            }
+            const dataBox = document.getElementById('lmDataRetornoBox');
+
+            motivoSelect.style.display = status === 'perdido' ? 'block' : 'none';
+            if (status !== 'perdido') motivoSelect.value = '';
+
+            dataBox.style.display = status === 'pausado' ? 'block' : 'none';
+            if (status !== 'pausado') document.getElementById('lmDataRetorno').value = '';
         }
 
         async function saveLeadModal() {
@@ -4918,7 +5034,12 @@
             const btn = document.querySelector('#leadModal .primary');
 
             if (status === 'novo') {
-                alert('Por favor, selecione um status (Em Andamento, Matriculado ou Perdido).');
+                alert('Por favor, selecione um status (Em Andamento, Matriculado, Pausado ou Perdido).');
+                return;
+            }
+
+            if (status === 'pausado' && !document.getElementById('lmDataRetorno').value) {
+                alert('Por favor, selecione uma data de retorno para o lead pausado.');
                 return;
             }
 
@@ -4949,13 +5070,15 @@
             const interesse = document.getElementById('lmInteresse').value.trim();
 
             try {
+                const dataRetorno = document.getElementById('lmDataRetorno').value || null;
                 await sbUpsert('status_de_leads', [{
                     telefone: currentModalLead,
                     status: status,
                     anotacao: nota,
                     nome: nome,
                     idade: idade,
-                    interesse: interesse
+                    interesse: interesse,
+                    data_retorno: dataRetorno
                 }], 'telefone');
 
                 if (btn) {
