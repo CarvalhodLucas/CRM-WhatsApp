@@ -4181,9 +4181,6 @@
                     const v = firstVend[r.telefone];
                     return !v || matchVendedor(v, currentUser);
                 });
-                // E para vendedor, conta apenas os leads confirmados nas métricas de conversas
-                const confirmados = new Set(filteredRows.filter(r => r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor').map(r => r.telefone));
-                filteredRows = filteredRows.filter(r => confirmados.has(r.telefone));
             } else if (filtroVendedorAtivo !== 'todos') {
                 // Métricas: conta todas as conversas do vendedor (incluindo leads não confirmados)
                 const telefonesVend = new Set(rows.filter(r =>
