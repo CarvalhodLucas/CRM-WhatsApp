@@ -1578,7 +1578,7 @@
 
             /* Labels para os turnos via CSS */
             .master-scale-table tr:not(:last-child) td:nth-child(2)::before {
-                content: "Manhã (08:00 - 12:00)";
+                content: "Manhã (08:00 - 12:20)";
                 color: var(--muted2);
                 font-size: 0.62rem;
                 text-transform: uppercase;
@@ -1587,7 +1587,7 @@
             }
 
             .master-scale-table tr:not(:last-child) td:nth-child(3)::before {
-                content: "Tarde (12:00 - 16:50)";
+                content: "Tarde (12:20 - 16:40)";
                 color: var(--muted2);
                 font-size: 0.62rem;
                 text-transform: uppercase;
@@ -1596,7 +1596,7 @@
             }
 
             .master-scale-table tr:not(:last-child) td:nth-child(4)::before {
-                content: "Noite (16:50 - 21:00)";
+                content: "Noite (16:40 - 21:00)";
                 color: var(--muted2);
                 font-size: 0.62rem;
                 text-transform: uppercase;
@@ -2960,9 +2960,9 @@
                                     <thead>
                                         <tr>
                                             <th style="text-align: left; padding-left: 20px;">Dia da Semana</th>
-                                            <th>Manhã <span class="slot-time">08:00 - 12:00</span></th>
-                                            <th>Tarde <span class="slot-time">12:00 - 16:50</span></th>
-                                            <th>Noite <span class="slot-time">16:50 - 21:00</span></th>
+                                            <th>Manhã <span class="slot-time">08:00 - 12:20</span></th>
+                                            <th>Tarde <span class="slot-time">12:20 - 16:40</span></th>
+                                            <th>Noite <span class="slot-time">16:40 - 21:00</span></th>
                                         </tr>
                                     </thead>
                                     <tbody id="masterScaleBody">
@@ -4219,11 +4219,14 @@
             try {
                 const rows = await sbGet('conversas?select=vendedor&order=vendedor.asc');
                 const vendedoresRaw = rows.map(r => r.vendedor).filter(Boolean);
-                const vendedores = [...new Set(vendedoresRaw.map(v => {
+                const vendedoresBD = vendedoresRaw.map(v => {
                     const low = v.toLowerCase();
                     if (low === 'rebeca' || low === 'rebecca') return 'Rebecca';
                     return v;
-                }))].sort();
+                });
+                // Sempre inclui todos os vendedores ativos do config, mesmo sem conversas ainda
+                const vendedoresConfig = crmConfig.vendedores.filter(v => v.ativo).map(v => v.nome);
+                const vendedores = [...new Set([...vendedoresConfig, ...vendedoresBD])].sort();
 
                 const container = document.getElementById('sidebarNumeros');
                 if (!container) return;
@@ -5668,7 +5671,20 @@
 
         function loadConfigView() {
             const saved = localStorage.getItem('crm_config');
-            if (saved) crmConfig = JSON.parse(saved);
+            if (saved) {
+                crmConfig = JSON.parse(saved);
+                // Migração: garante que novos vendedores do código estejam sempre presentes
+                const vendedoresPadrao = [
+                    { id: 1, nome: 'Rebecca', whatsapp: '5521999999999', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
+                    { id: 2, nome: 'Paulo', whatsapp: '5521888888888', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
+                    { id: 3, nome: 'Taynara', whatsapp: '5521967701500', horarios: { manha: ['10:30', '12:00'], tarde: ['12:00', '19:30'], noite: ['19:00', '22:00'] }, ativo: true }
+                ];
+                vendedoresPadrao.forEach(dv => {
+                    if (!crmConfig.vendedores.find(v => v.nome.toLowerCase() === dv.nome.toLowerCase())) {
+                        crmConfig.vendedores.push(dv);
+                    }
+                });
+            }
 
             // Forçar a inclusão dos novos números de exclusão se não estiverem presentes
             const novosPadroes = [
@@ -6047,21 +6063,12 @@
             </select>
           `;
 
-                if (isSabado) {
-                    return `
-              <tr>
-                <td class="day-label">${dia.nome}</td>
-                <td colspan="3">${selectHtml(8, 12)}</td>
-              </tr>
-            `;
-                }
-
                 return `
             <tr>
               <td class="day-label">${dia.nome}</td>
-              <td>${selectHtml(8, 12)}</td>
-              <td>${selectHtml(12, 16.83)}</td>
-              <td>${selectHtml(16.83, 21)}</td>
+              <td>${selectHtml(8, 12.33)}</td>
+              <td>${selectHtml(12.33, 16.67)}</td>
+              <td>${selectHtml(16.67, 21)}</td>
             </tr>
           `;
             }).join('');
@@ -6234,6 +6241,17 @@
             const saved = localStorage.getItem('crm_config');
             if (saved) {
                 crmConfig = JSON.parse(saved);
+                // Migração: garante que novos vendedores do código estejam sempre presentes
+                const vendedoresPadrao = [
+                    { id: 1, nome: 'Rebecca', whatsapp: '5521999999999', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
+                    { id: 2, nome: 'Paulo', whatsapp: '5521888888888', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
+                    { id: 3, nome: 'Taynara', whatsapp: '5521967701500', horarios: { manha: ['10:30', '12:00'], tarde: ['12:00', '19:30'], noite: ['19:00', '22:00'] }, ativo: true }
+                ];
+                vendedoresPadrao.forEach(dv => {
+                    if (!crmConfig.vendedores.find(v => v.nome.toLowerCase() === dv.nome.toLowerCase())) {
+                        crmConfig.vendedores.push(dv);
+                    }
+                });
             }
 
             // 2. Aplica o tema imediatamente (para afetar inclusive a tela de login)
