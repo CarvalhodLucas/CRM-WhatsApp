@@ -3010,6 +3010,11 @@
                                             <input type="password" class="filter-input" id="pwd_paulo"
                                                 placeholder="Nova senha paulo" autocomplete="new-password">
                                         </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Senha Taynara</label>
+                                            <input type="password" class="filter-input" id="pwd_taynara"
+                                                placeholder="Nova senha Taynara" autocomplete="new-password">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -3711,7 +3716,8 @@
         let USUARIOS = JSON.parse(localStorage.getItem('crm_users')) || {
             'adm': { hash: '24459be3a000763dd9212258ee70f41655460c81d393910fdbfb1d236294bd7e', nome: 'Admin', role: 'admin' },
             'rebecca': { hash: '49442a8bccaa5b9c6ce95da7c7c16362c2cba5a7154ade43569894f8eaad3f69', nome: 'Rebecca', role: 'vendedor' },
-            'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Paulo', role: 'vendedor' }
+            'paulo': { hash: 'f89678cc6765848121941f97f563647a0fe77cc7947842dbddb67ba8bacf3c21', nome: 'Paulo', role: 'vendedor' },
+            'taynara': { hash: '2f676402b8b6a16c21aacc432f4eddf80632af6bf48594be60a94ee0146d0248', nome: 'Taynara', role: 'vendedor' }
         };
 
         let currentUserObj = null;
@@ -5449,7 +5455,8 @@
         let crmConfig = {
             vendedores: [
                 { id: 1, nome: 'Rebecca', whatsapp: '5521999999999', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
-                { id: 2, nome: 'Paulo', whatsapp: '5521888888888', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true }
+                { id: 2, nome: 'Paulo', whatsapp: '5521888888888', horarios: { manha: ['08:00', '12:00'], tarde: ['13:00', '18:00'], noite: ['19:00', '22:00'] }, ativo: true },
+                { id: 3, nome: 'Taynara', whatsapp: '5521967701500', horarios: { manha: ['10:30', '12:00'], tarde: ['12:00', '19:30'], noite: ['19:00', '22:00'] }, ativo: true }
             ],
             crm: {
                 periodoLeads: 'mes',
@@ -5723,18 +5730,21 @@
             const pAdm = document.getElementById('pwd_adm').value;
             const pRebecca = document.getElementById('pwd_rebecca').value;
             const pPaulo = document.getElementById('pwd_paulo').value;
+            const pTaynara = document.getElementById('pwd_taynara').value;
 
-            if (!pAdm && !pRebecca && !pPaulo) return alert('Digite ao menos uma nova senha.');
+            if (!pAdm && !pRebecca && !pPaulo && !pTaynara) return alert('Digite ao menos uma nova senha.');
 
             if (pAdm) USUARIOS['adm'].hash = btoa(pAdm);
             if (pRebecca) USUARIOS['rebecca'].hash = btoa(pRebecca);
             if (pPaulo) USUARIOS['paulo'].hash = btoa(pPaulo);
+            if (pTaynara) USUARIOS['taynara'].hash = btoa(pTaynara);
 
             localStorage.setItem('crm_users', JSON.stringify(USUARIOS));
 
             document.getElementById('pwd_adm').value = '';
             document.getElementById('pwd_rebecca').value = '';
             document.getElementById('pwd_paulo').value = '';
+            document.getElementById('pwd_taynara').value = '';
 
             showToast();
             alert('Senhas atualizadas com sucesso!');
