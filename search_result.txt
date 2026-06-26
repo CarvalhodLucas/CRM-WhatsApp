@@ -1,0 +1,1655 @@
+﻿2:<html lang="pt-BR">
+5:    <meta charset="UTF-8" />
+6:    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+8:    <link rel="icon"
+9:        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='%2325D366'><path d='M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.1 0-65.6-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.2-8.5-44.2-27.1-16.4-14.6-27.4-32.7-30.6-38.2-3.2-5.6-.3-8.6 2.5-11.3 2.5-2.5 5.5-6.5 8.3-9.7 2.8-3.2 3.7-5.5 5.6-9.2 1.9-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.8 23.5 9.2 31.5 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.5 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z'/></svg>">
+11:        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+12:        rel="stylesheet" />
+13:    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+49:        [data-theme="light"] {
+2510:    <div id="loginScreen" style="display:none">
+2511:        <div class="login-box">
+2512:            <div class="login-logo">CRM WhatsApp</div>
+2513:            <div class="login-sub">Escola de Idiomas</div>
+2514:            <input id="loginUser" type="text" placeholder="Usu├írio" class="login-input"
+2515:                onkeypress="if(event.key === 'Enter') fazerLogin()" />
+2516:            <input id="loginPass" type="password" placeholder="Senha" class="login-input"
+2517:                onkeypress="if(event.key === 'Enter') fazerLogin()" />
+2518:            <button onclick="fazerLogin()" class="login-btn">Entrar</button>
+2519:            <div id="loginErro" class="login-erro" style="display:none">Usu├írio ou senha incorretos</div>
+2523:    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+2525:    <div class="sidebar" id="sidebar">
+2526:        <div class="sidebar-logo">
+2527:            <div class="logo-name">­ƒô▓ CRM WhatsApp</div>
+2528:            <div class="logo-sub">Escola de Idiomas</div>
+2530:        <div class="sidebar-section">Principal</div>
+2531:        <div class="nav-item active" id="navDashboard" onclick="showView('dashboard')"><span class="nav-icon">Ôè×</span>
+2533:        <div class="nav-item" id="navLeads" onclick="showView('leads')"><span class="nav-icon">­ƒæÑ</span> Leads</div>
+2534:        <div class="nav-item" id="navRelatorios" onclick="showView('relatorios')"><span class="nav-icon">­ƒôè</span>
+2537:        <div class="sidebar-section" id="sidebarSectionNumeros">N├║meros</div>
+2538:        <div class="sub-nav" id="sidebarNumeros">
+2539:            <div class="sub-nav-item active" onclick="filterByNumero('todos', this)">
+2540:                <span class="status-dot-mini" style="background:var(--text)"></span> Todos
+2542:            <div class="sub-nav-item" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
+2543:                <span class="status-dot-mini" style="background:var(--yellow)"></span> Em atendimento
+2544:                <span id="badgeEmAtendimento"
+2545:                    style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
+2550:        <div class="sidebar-section">Sistema</div>
+2551:        <div class="nav-item" id="navConfig" onclick="showView('config')"><span class="nav-icon">ÔÜÖ</span> Configura├º├Áes
+2553:        <div class="nav-item" id="navBotIA" onclick="showView('botia')"><span class="nav-icon">­ƒñû</span> Bot IA</div>
+2554:        <div style="padding: 8px 20px; border-top: 1px solid var(--border);">
+2555:            <a href="#" onclick="showPrivacidade()" style="font-size:0.65rem;color:var(--muted2);text-decoration:none">
+2559:        <div class="sidebar-footer">
+2560:            <div class="user-info" style="justify-content: space-between; width: 100%;">
+2561:                <div style="display:flex; align-items:center; gap:10px;">
+2562:                    <div class="user-av" id="sidebarUserAv">GS</div>
+2564:                        <div class="user-name" id="sidebarUserName">ADM</div>
+2565:                        <div class="user-role" id="sidebarUserRole">Administrador</div>
+2568:                <button onclick="logout()" title="Sair / Trocar de conta"
+2569:                    style="background:none; border:none; color:var(--muted2); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; padding:6px; border-radius:6px"
+2570:                    onmouseover="this.style.color='var(--red)'; this.style.background='var(--red-dim)'"
+2571:                    onmouseout="this.style.color='var(--muted2)'; this.style.background='none'">
+2572:                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+2573:                        stroke-linecap="round" stroke-linejoin="round">
+2574:                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+2575:                        <polyline points="16 17 21 12 16 7"></polyline>
+2576:                        <line x1="21" y1="12" x2="9" y2="12"></line>
+2583:    <div class="main">
+2584:        <div class="topbar">
+2585:            <div style="display:flex;align-items:center">
+2586:                <button class="hamburger mobile-only" style="display:none" onclick="toggleSidebar()">Ôÿ░</button>
+2587:                <div class="topbar-title" id="topbarTitle">// dashboard ÔÇö vis├úo geral</div>
+2589:            <div class="topbar-right">
+2590:                <div class="topbar-time" id="clock">--:--:--</div>
+2591:                <div class="status-pill loading" id="statusPill"><span class="status-dot"></span> <span
+2592:                        id="statusText">Carregando...</span></div>
+2596:        <div class="content">
+2599:            <div id="viewDashboard"
+2600:                style="display:flex; flex-direction:column; gap:16px; width:100%; height:100%; overflow:hidden;">
+2603:                <div class="metrics" id="dashboardMetrics">
+2604:                    <div class="metric-card green">
+2605:                        <div class="metric-label">Conversas hoje</div>
+2606:                        <div class="metric-val green" id="metConv"><span class="spinner"></span></div>
+2607:                        <div class="metric-sub" id="metConvSub">em todos os n├║meros</div>
+2608:                        <div class="metric-trend up" id="metConvTrend">ÔÇö</div>
+2610:                    <div class="metric-card yellow">
+2611:                        <div class="metric-label">Alunos atendidos</div>
+2612:                        <div class="metric-val yellow" id="metAlunos"><span class="spinner"></span></div>
+2613:                        <div class="metric-sub" id="metAlunosSub">encaminhados hoje</div>
+2614:                        <div class="metric-trend warn">suporte</div>
+2616:                    <div class="metric-card blue">
+2617:                        <div class="metric-label">Leads capturados</div>
+2618:                        <div class="metric-val blue" id="metLeads"><span class="spinner"></span></div>
+2619:                        <div class="metric-sub" id="metLeadsSub">novos hoje</div>
+2620:                        <div class="metric-trend up" id="metLeadsTrend">ÔÇö</div>
+2625:                <div class="grid-row-3" id="mainContentGrid">
+2628:                    <div class="panel" id="conversasPanel">
+2629:                        <div class="panel-head">
+2630:                            <div class="panel-title"><span class="panel-title-dot"
+2631:                                    style="background:var(--blue)"></span> <span class="panel-title-text">Conversas
+2633:                            <button class="panel-action" onclick="loadConversas()">Ôå╗ atualizar</button>
+2635:                        <div class="conv-legend">
+2636:                            <div class="legend-item"><span class="dot lead"></span> Lead</div>
+2637:                            <div class="legend-item"><span class="dot aluno"></span> Aluno</div>
+2638:                            <div class="legend-item"><span class="dot unknown"></span> Desconhecido</div>
+2640:                        <div style="display:grid;grid-template-columns:1fr 1.5fr;flex:1;min-height:0"
+2641:                            class="chat-container-grid" id="chatContainerGrid">
+2642:                            <div style="border-right:1px solid var(--border);overflow-y:auto" class="conv-list"
+2643:                                id="convList">
+2644:                                <div class="state-msg">
+2645:                                    <div class="spinner"></div>
+2646:                                    <div style="margin-top:8px">Carregando conversas...</div>
+2649:                            <div class="chat-detail" id="chatDetail">
+2651:                                    style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px">
+2652:                                    <div style="font-size:2rem;opacity:0.2">­ƒÆ¼</div>
+2653:                                    <div style="font-size:0.75rem;color:var(--muted2)">Selecione uma conversa</div>
+2660:                    <div style="display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-right:4px"
+2661:                        id="sidePanels">
+2664:                        <div class="panel">
+2665:                            <div class="panel-head">
+2666:                                <div class="panel-title"><span class="panel-title-dot"
+2667:                                        style="background:var(--green)"></span>
+2670:                            <div id="vendedoresTable">
+2671:                                <div class="state-msg"><span class="spinner"></span></div>
+2676:                        <div class="panel">
+2677:                            <div class="panel-head">
+2678:                                <div class="panel-title"><span class="panel-title-dot"
+2679:                                        style="background:var(--green)"></span> Leads de
+2681:                                <button class="panel-action" id="exportBtn" onclick="exportLeads()">exportar xlsx
+2684:                            <div class="leads-table">
+2685:                                <div class="lead-row header">
+2690:                                <div id="leadsTable">
+2691:                                    <div class="state-msg"><span class="spinner"></span></div>
+2697:                        <div class="panel">
+2698:                            <div class="panel-head">
+2699:                                <div class="panel-title">Conversas ÔÇö 7 dias</div>
+2701:                            <div class="mini-chart" id="chartArea">
+2702:                                <div class="state-msg"><span class="spinner"></span></div>
+2712:            <div id="viewLeads" style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
+2715:                <div class="filters-bar">
+2716:                    <select class="filter-select" id="leadFilterPeriod" onchange="loadLeadsView()">
+2717:                        <option value="hoje">Hoje</option>
+2718:                        <option value="7d">├Ültimos 7 dias</option>
+2719:                        <option value="30d" selected>├Ültimos 30 dias</option>
+2720:                        <option value="mes">M├¬s atual</option>
+2721:                        <option value="tudo">Tudo</option>
+2723:                    <select class="filter-select" id="leadFilterVend" onchange="loadLeadsView()">
+2724:                        <option value="todos">Todos Vendedores</option>
+2725:                        <option value="Rebecca">Rebecca</option>
+2726:                        <option value="Paulo">Paulo</option>
+2728:                    <select class="filter-select" id="leadFilterStatus" onchange="loadLeadsView()">
+2729:                        <option value="todos">Todos Status</option>
+2730:                        <option value="novo">Novo</option>
+2731:                        <option value="em_andamento">Em Andamento</option>
+2732:                        <option value="matriculado">Matriculado</option>
+2733:                        <option value="perdido">Perdido</option>
+2735:                    <input type="text" class="filter-input" id="leadFilterSearch" placeholder="Buscar telefone..."
+2736:                        oninput="loadLeadsView()">
+2737:                    <button class="action-btn secondary" style="margin-left:auto; padding:8px 16px"
+2738:                        onclick="clearLeadsFilters()">limpar filtros Ôå║</button>
+2739:                    <button class="action-btn secondary" style="padding:8px 16px" onclick="exportFullLeads()">exportar
+2744:                <div class="metrics" id="leadsMetrics" style="grid-template-columns: repeat(5, 1fr);">
+2745:                    <div class="metric-card blue">
+2746:                        <div class="metric-label">Total Leads</div>
+2747:                        <div class="metric-val blue" id="metLeadsTotal"><span class="spinner"></span></div>
+2748:                        <div class="metric-sub">no per├¡odo selecionado</div>
+2750:                    <div class="metric-card green">
+2751:                        <div class="metric-label">Convertidos</div>
+2752:                        <div class="metric-val green" id="metLeadsConv"><span class="spinner"></span></div>
+2753:                        <div class="metric-sub">status: matriculado</div>
+2755:                    <div class="metric-card yellow">
+2756:                        <div class="metric-label">Em andamento</div>
+2757:                        <div class="metric-val yellow" id="metLeadsAnd"><span class="spinner"></span></div>
+2758:                        <div class="metric-sub">em negocia├º├úo</div>
+2760:                    <div class="metric-card purple">
+2761:                        <div class="metric-label">Convers├úo</div>
+2762:                        <div class="metric-val purple" id="metLeadsTaxa"><span class="spinner"></span></div>
+2763:                        <div class="metric-sub">% de matr├¡culas</div>
+2765:                    <div class="metric-card cyan">
+2766:                        <div class="metric-label">­ƒñû Matr├¡culas via Bot</div>
+2767:                        <div class="metric-val cyan" id="metLeadsBot"><span class="spinner"></span></div>
+2768:                        <div class="metric-sub" id="metLeadsBotSub">do total convertido</div>
+2769:                        <div class="metric-trend" id="metLeadsBotTrend" style="background:rgba(0,207,232,0.12);color:var(--cyan)">ÔÇö</div>
+2774:                <div class="full-leads-table">
+2775:                    <div class="fl-header">
+2782:                        <div style="text-align:center">A├º├úo</div>
+2784:                    <div class="fl-body" id="fullLeadsTableBody">
+2785:                        <div class="state-msg"><span class="spinner"></span></div>
+2792:            <div id="viewRelatorios"
+2793:                style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
+2794:                <div class="filters-bar" style="flex-shrink:0">
+2795:                    <select class="filter-select" id="reportFilterPeriod" onchange="loadRelatorios()">
+2796:                        <option value="hoje">Hoje</option>
+2797:                        <option value="7d">├Ültimos 7 dias</option>
+2798:                        <option value="mes" selected>M├¬s atual</option>
+2799:                        <option value="tudo">Tudo</option>
+2801:                    <button class="action-btn secondary" style="margin-left:auto; padding:8px 16px"
+2802:                        onclick="exportReportExcel(this)">exportar excel profissional Ôåô</button>
+2806:                <div class="metrics" id="reportMetrics" style="grid-template-columns: repeat(5, 1fr);">
+2807:                    <div class="metric-card blue">
+2808:                        <div class="metric-label">Leads Bot</div>
+2809:                        <div class="metric-val blue" id="repLeadsBot">0</div>
+2810:                        <div class="metric-sub">pelo fluxo bot</div>
+2812:                    <div class="metric-card orange">
+2813:                        <div class="metric-label">Leads Vendedor</div>
+2814:                        <div class="metric-val orange" id="repLeadsVend">0</div>
+2815:                        <div class="metric-sub">humanos</div>
+2817:                    <div class="metric-card cyan">
+2818:                        <div class="metric-label">Total de Leads</div>
+2819:                        <div class="metric-val cyan" id="repTotalLeads">0</div>
+2820:                        <div class="metric-sub">per├¡odo total</div>
+2822:                    <div class="metric-card yellow">
+2823:                        <div class="metric-label">Alunos Atendidos</div>
+2824:                        <div class="metric-val yellow" id="repTotalAlunos">0</div>
+2825:                        <div class="metric-sub">pelo bot</div>
+2827:                    <div class="metric-card green">
+2828:                        <div class="metric-label">Mensagens</div>
+2829:                        <div class="metric-val green" id="repTotalMsgs">0</div>
+2830:                        <div class="metric-sub">total per├¡odo</div>
+2834:                <div class="report-row">
+2836:                    <div class="chart-container">
+2837:                        <div class="config-section-title" style="margin-bottom:20px">// leads por dia</div>
+2838:                        <svg class="chart-svg" id="reportLeadsChart" viewBox="0 0 800 200"></svg>
+2842:                    <div class="panel">
+2843:                        <div class="panel-head">
+2844:                            <div class="panel-title">// desempenho por vendedor</div>
+2846:                        <table class="report-table">
+2855:                            <tbody id="reportVendorTable">
+2863:                <div class="panel" style="margin-bottom:20px">
+2864:                    <div class="panel-head">
+2865:                        <div class="panel-title">// mapa de calor: hor├írios de pico (mensagens)</div>
+2867:                    <div class="heatmap-container" style="padding:20px">
+2868:                        <div class="heatmap-grid" id="reportHeatmap">
+2871:                            <div class="heatmap-label">Seg</div>
+2872:                            <div class="heatmap-label">Ter</div>
+2873:                            <div class="heatmap-label">Qua</div>
+2874:                            <div class="heatmap-label">Qui</div>
+2875:                            <div class="heatmap-label">Sex</div>
+2876:                            <div class="heatmap-label">S├íb</div>
+2877:                            <div class="heatmap-label">Dom</div>
+2885:            <div id="viewConfig"
+2886:                style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
+2887:                <div class="config-grid">
+2889:                    <div id="configAdminSections" style="display: flex; flex-direction: column; gap: 32px;">
+2892:                            <div class="config-section-title">// escala semanal de atendimento</div>
+2893:                            <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
+2897:                            <div class="master-scale-card">
+2898:                                <table class="master-scale-table">
+2901:                                            <th style="text-align: left; padding-left: 20px;">Dia da Semana</th>
+2902:                                            <th>Manh├ú <span class="slot-time">08:00 - 12:00</span></th>
+2903:                                            <th>Tarde <span class="slot-time">12:00 - 16:50</span></th>
+2904:                                            <th>Noite <span class="slot-time">16:50 - 21:00</span></th>
+2907:                                    <tbody id="masterScaleBody">
+2912:                                    style="padding: 16px; background: var(--surface2); display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border);">
+2913:                                    <button class="action-btn secondary" onclick="loadMasterScale()">Restaurar</button>
+2914:                                    <button class="action-btn primary" onclick="saveMasterScale()">Salvar Escala
+2924:                            <div class="config-section-title">// gerenciar acessos</div>
+2925:                            <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
+2928:                            <div class="config-card">
+2929:                                <div class="config-card-header">
+2930:                                    <div class="config-card-title">Alterar Senhas</div>
+2931:                                    <button class="action-btn primary" onclick="saveAdminPasswords()">Salvar
+2934:                                <div class="config-card-body">
+2935:                                    <div class="form-row"
+2936:                                        style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+2937:                                        <div class="form-group">
+2938:                                            <label class="form-label">Senha Administrador (adm)</label>
+2939:                                            <input type="password" class="filter-input" id="pwd_adm"
+2940:                                                placeholder="Nova senha adm" autocomplete="new-password">
+2942:                                        <div class="form-group">
+2943:                                            <label class="form-label">Senha Rebecca</label>
+2944:                                            <input type="password" class="filter-input" id="pwd_rebecca"
+2945:                                                placeholder="Nova senha Rebecca" autocomplete="new-password">
+2947:                                        <div class="form-group">
+2948:                                            <label class="form-label">Senha Paulo</label>
+2949:                                            <input type="password" class="filter-input" id="pwd_paulo"
+2950:                                                placeholder="Nova senha paulo" autocomplete="new-password">
+2959:                            <div class="config-section-title">// base_de_conhecimento ÔÇö respostas verificadas do bot
+2961:                            <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
+2965:                            <div class="config-card">
+2966:                                <div class="config-card-header">
+2967:                                    <div class="config-card-title">Base Factual</div>
+2968:                                    <button class="action-btn primary" onclick="openBaseModal()">+ Nova entrada</button>
+2970:                                <div class="config-card-body"
+2971:                                    style="padding:0; max-height: 500px; overflow-y: auto; position: relative;">
+2972:                                    <table class="rag-table" style="position: relative;">
+2974:                                            style="position: sticky; top: 0; background: var(--surface); z-index: 10;">
+2980:                                                <th style="text-align:center">A├º├Áes</th>
+2983:                                        <tbody id="ragTableBody">
+2985:                                                <td colspan="5" class="state-msg"><span class="spinner"></span></td>
+2994:                        <div style="margin-top: 32px;">
+2995:                            <div class="config-section-title">// filtros de exclus├úo</div>
+2996:                            <div style="font-size:0.7rem; color:var(--muted2); margin-bottom:12px; padding-left:4px">
+2999:                            <div class="config-card">
+3000:                                <div class="config-card-body" style="gap:16px;">
+3001:                                    <div style="display:flex; gap:10px;">
+3002:                                        <input type="text" id="cfgExcluirInput" class="filter-input"
+3003:                                            placeholder="Novo n├║mero (ex: 5521999999999)" style="flex:1">
+3004:                                        <button class="action-btn secondary" onclick="addExclusionNumber()"
+3005:                                            style="font-size:0.7rem; padding:0 15px;">Adicionar</button>
+3007:                                    <div id="cfgExcluirList"
+3008:                                        style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; background:var(--bg2);">
+3017:                            <div class="config-section-title">// crm</div>
+3018:                            <div class="config-card">
+3019:                                <div class="config-card-header">
+3020:                                    <div class="config-card-title">Prefer├¬ncias do Sistema</div>
+3021:                                    <button class="action-btn primary" style="padding:4px 12px;font-size:0.7rem"
+3022:                                        onclick="saveConfig('crm')">Salvar</button>
+3024:                                <div class="config-card-body">
+3025:                                    <div class="form-row">
+3026:                                        <div class="form-group">
+3027:                                            <label class="form-label">Per├¡odo Padr├úo Leads</label>
+3028:                                            <select class="filter-select" id="cfgCrmPeriodo">
+3029:                                                <option value="hoje">Hoje</option>
+3030:                                                <option value="7d">├Ültimos 7 dias</option>
+3031:                                                <option value="mes">M├¬s atual</option>
+3032:                                                <option value="tudo">Tudo</option>
+3035:                                        <div class="form-group">
+3036:                                            <label class="form-label">Nome Exibido no Dashboard</label>
+3037:                                            <input type="text" class="filter-input" id="cfgCrmNome"
+3038:                                                placeholder="Ex: Dashboard VIP">
+3041:                                    <div class="form-row">
+3042:                                        <div class="form-group">
+3043:                                            <label class="form-label">Auto-refresh (60s)</label>
+3044:                                            <label class="switch-container" style="margin-top:4px">
+3045:                                                <div class="switch">
+3046:                                                    <input type="checkbox" id="cfgCrmRefresh">
+3047:                                                    <span class="slider"></span>
+3049:                                                <span style="font-size:0.75rem"
+3050:                                                    id="cfgCrmRefreshLabel">Desativado</span>
+3053:                                        <div class="form-group">
+3054:                                            <label class="form-label">Tema do Sistema</label>
+3055:                                            <select class="filter-select" id="cfgCrmTema">
+3056:                                                <option value="dark">Escuro (Padr├úo)</option>
+3057:                                                <option value="light">Claro</option>
+3061:                                    <div class="form-group">
+3062:                                        <div style="display:flex; gap:10px">
+3063:                                            <input type="text" class="filter-input" id="cfgCrmBotUrl"
+3064:                                                placeholder="Ex: http://localhost:3000" style="flex:1">
+3065:                                            <button class="action-btn secondary" onclick="testBotConnection()"
+3066:                                                id="btnTestBot" style="padding:0 12px; font-size:0.7rem">Testar
+3069:                                        <div style="font-size:0.65rem; color:var(--muted2); margin-top:4px">Usado pela
+3073:                                    <div class="form-group">
+3074:                                        <label class="form-label">URL do Reposit├│rio GitHub</label>
+3075:                                        <input type="text" class="filter-input" id="cfgCrmGithub"
+3076:                                            placeholder="Ex: https://github.com/usuario/projeto">
+3084:                            <div class="config-section-title">// sobre</div>
+3085:                            <div class="config-card">
+3086:                                <div class="config-card-body"
+3087:                                    style="flex-direction: row; align-items: center; justify-content: space-between;">
+3088:                                    <div style="display:flex; flex-direction:column; gap:4px">
+3089:                                        <div style="font-size:0.85rem; font-weight:600">CRM WhatsApp <span
+3090:                                                style="font-size:0.7rem; color:var(--muted2); font-weight:400">v1.0.0</span>
+3092:                                        <div style="font-size:0.7rem; color:var(--muted2)">Desenvolvido por <a
+3093:                                                href="https://rastrostudio.com" target="_blank"
+3094:                                                style="color:var(--green);text-decoration:none">Rastro Studio</a></div>
+3095:                                        <div style="margin-top:8px">
+3096:                                            <a href="https://github.com/CarvalhodLucas/CRM-WhatsApp" target="_blank"
+3097:                                                class="action-btn secondary"
+3098:                                                style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:6px 12px">
+3099:                                                <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor">
+3101:                                                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+3108:                                    <span class="status-dot" style="animation:none"></span> Sistema ativo em produ├º├úo
+3116:                <div id="configVendedorSection" style="display: none; flex-direction: column; gap: 32px;">
+3119:                        <div class="config-section-title">// meus hor├írios de atendimento</div>
+3120:                        <div class="config-card">
+3121:                            <div class="config-card-body">
+3122:                                <div id="vendedorHorariosDisplay" class="horarios-grid"
+3123:                                    style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+3132:                        <div class="config-section-title">// seguran├ºa</div>
+3133:                        <div class="config-card">
+3134:                            <div class="config-card-header">
+3135:                                <div class="config-card-title">Alterar Senha</div>
+3136:                                <button class="action-btn primary" style="padding:4px 12px;font-size:0.7rem"
+3137:                                    onclick="showPasswordNotImplemented()">Salvar</button>
+3139:                            <div class="config-card-body">
+3140:                                <div class="form-row">
+3141:                                    <div class="form-group">
+3142:                                        <label class="form-label">Nova Senha</label>
+3143:                                        <input type="password" class="filter-input" id="vendNovaSenha"
+3144:                                            placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó" autocomplete="new-password">
+3146:                                    <div class="form-group">
+3147:                                        <label class="form-label">Confirmar Senha</label>
+3148:                                        <input type="password" class="filter-input" id="vendConfirmaSenha"
+3149:                                            placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó" autocomplete="new-password">
+3162:        <div id="viewBotIA" style="display:none; flex-direction:column; gap:20px; width:100%; padding-bottom:60px;">
+3165:            <div class="metrics" id="botStatusMetrics">
+3166:                <div class="metric-card" id="cardModelo">
+3167:                    <div class="metric-label">Modelo Ativo</div>
+3168:                    <div class="metric-val" id="botModeloVal" style="font-size:0.9rem">Groq ÔÇö LLaMA 3</div>
+3169:                    <div class="metric-sub">modelo principal</div>
+3171:                <div class="metric-card" id="cardFallbacks">
+3172:                    <div class="metric-label">Fallbacks Hoje</div>
+3173:                    <div class="metric-val" id="botFallbacksVal">0</div>
+3174:                    <div class="metric-sub">acionamentos Gemini</div>
+3176:                <div class="metric-card">
+3177:                    <div class="metric-label">Conversas em RAM</div>
+3178:                    <div class="metric-val" style="font-size:0.9rem" id="botMemoryVal">--</div>
+3179:                    <div class="metric-sub">dado do servidor</div>
+3181:                <div class="metric-card">
+3182:                    <div class="metric-label">├Ültimo Webhook</div>
+3183:                    <div class="metric-val" style="font-size:0.9rem" id="botWebhookVal">--</div>
+3184:                    <div class="metric-sub">vinda do Z-API</div>
+3187:            <div id="botStatusLine"
+3188:                style="font-size:0.75rem; display:flex; align-items:center; gap:8px; padding-left:4px">
+3189:                <span class="status-dot"></span> <span id="botStatusText">Carregando status...</span>
+3192:            <div class="grid-row-3" style="grid-template-columns: 1.2fr 0.8fr; flex:1">
+3195:                <div class="sim-container">
+3196:                    <div class="config-section-title" style="margin-bottom:0">// simulador ÔÇö teste o bot sem usar o
+3199:                    <div class="form-group" style="margin-top:10px">
+3200:                        <label class="form-label">Perfil da Mensagem</label>
+3201:                        <select class="filter-select" id="simProfile" onchange="updateSimInput()">
+3202:                            <option value="lead">Lead novo</option>
+3203:                            <option value="aluno">Aluno com d├║vida</option>
+3204:                            <option value="preco">Pergunta de pre├ºo</option>
+3205:                            <option value="ambiguo">Mensagem amb├¡gua</option>
+3206:                            <option value="custom" selected>Personalizado</option>
+3210:                    <div class="sim-chat" id="simChat">
+3211:                        <div style="margin:auto; text-align:center; color:var(--muted2); font-size:0.75rem">
+3216:                    <div style="display:flex; gap:12px; align-items:flex-end">
+3217:                        <div class="form-group" style="flex:1">
+3218:                            <label class="form-label">Sua Mensagem</label>
+3219:                            <textarea class="lead-modal-textarea" id="simInput" placeholder="Digite algo para testar..."
+3220:                                style="height:60px"></textarea>
+3222:                        <button class="action-btn secondary"
+3223:                            style="height:60px; padding:0 16px; border-color:var(--red); color:var(--red)"
+3224:                            onclick="clearSimChat()" title="Limpar mem├│ria do bot e reiniciar o chat">Limpar</button>
+3225:                        <button class="action-btn primary" style="height:60px; padding:0 24px" id="btnSimular"
+3226:                            onclick="simulateResponse()">Simular Resposta</button>
+3231:                <div class="panel" style="display:flex; flex-direction:column">
+3232:                    <div class="panel-head">
+3233:                        <div class="panel-title">// log de eventos</div>
+3234:                        <div style="display:flex; gap:8px">
+3235:                            <button class="panel-action" onclick="copySimChat()" style="color:var(--blue)">copiar
+3237:                            <button class="panel-action" onclick="clearBotLog()">limpar log</button>
+3240:                    <div style="flex:1; overflow-y:auto; padding:16px" id="botLogList">
+3249:    <div id="toast">Ô£ô Salvo!</div>
+3252:    <div class="lead-modal-overlay" id="scaleModal">
+3253:        <div class="lead-modal-content" style="max-width: 800px; height: auto; max-height: 90vh;">
+3254:            <div class="lead-modal-header">
+3256:                    <div class="lead-modal-title">Escala de Vendedores</div>
+3257:                    <div class="lead-modal-sub">Defina os hor├írios e paridade para <span id="smVendedor"
+3258:                            style="color:var(--text);font-weight:600"></span></div>
+3260:                <button class="lead-modal-close" onclick="closeScaleModal()">├ù</button>
+3262:            <div class="lead-modal-body" style="padding: 20px; overflow-y: auto;">
+3263:                <table class="scale-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+3265:                        <tr style="text-align: left; border-bottom: 1px solid var(--border); color: var(--muted2);">
+3266:                            <th style="padding: 8px;">Dia</th>
+3267:                            <th style="padding: 8px;">In├¡cio</th>
+3268:                            <th style="padding: 8px;">Fim</th>
+3269:                            <th style="padding: 8px;">Tipo</th>
+3270:                            <th style="padding: 8px;">S├íb. Parid.</th>
+3271:                            <th style="padding: 8px; text-align: center;">A├º├úo</th>
+3274:                    <tbody id="scaleTableBody">
+3278:                <button class="btn-add-vend" style="margin-top: 16px; padding: 8px;" onclick="addScaleRow()">+ Adicionar
+3281:            <div class="lead-modal-footer"
+3282:                style="padding: 16px 20px; background: var(--surface); display:flex; justify-content:flex-end">
+3283:                <button class="action-btn primary" style="padding:10px 24px" onclick="saveScale()">Salvar Escala
+3290:    <div class="conv-detail-overlay" id="mobileOverlay">
+3291:        <div class="overlay-back" onclick="closeMobileOverlay()">ÔåÉ voltar</div>
+3292:        <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2)">
+3293:            <div style="font-size:0.85rem;font-weight:600;color:var(--text)" id="mobileDetailName"></div>
+3294:            <div style="font-size:0.7rem;color:var(--muted2);margin-top:2px" id="mobileDetailSub"></div>
+3296:        <div class="overlay-msgs" id="mobileDetailMsgs"></div>
+3300:    <div class="lead-modal-overlay" id="leadModal">
+3301:        <div class="lead-modal-content">
+3302:            <div class="lead-modal-header">
+3304:                    <div class="lead-modal-title" id="lmTitle"></div>
+3305:                    <div class="lead-modal-sub" id="lmSub"></div>
+3307:                <div style="display:flex;align-items:center;gap:8px">
+3308:                    <button id="lmBlockBtn" onclick="toggleBlockNumber(currentModalLead)" title="Bloquear n├║mero" style="
+3314:                    " onmouseover="this.style.background='var(--red-dim)'; this.style.color='var(--red)'; this.style.borderColor='var(--red)'"
+3315:                        onmouseout="this.style.background='none'; this.style.color=this.dataset.blocked==='1' ? 'var(--red)':'var(--muted2)'; this.style.borderColor='var(--border)'">
+3316:                        <span id="lmBlockIcon">­ƒÜ½</span> <span id="lmBlockLabel">Bloquear</span>
+3318:                    <button class="lead-modal-close" onclick="closeLeadModal()">├ù</button>
+3321:            <div class="lead-modal-body">
+3322:                <div class="lead-modal-chat" id="lmChat"></div>
+3323:                <div class="lead-modal-controls">
+3324:                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+3325:                        <input type="text" class="filter-input" id="lmNome" placeholder="Nome" autocomplete="off">
+3326:                        <input type="text" class="filter-input" id="lmIdade" placeholder="Idade" autocomplete="off">
+3327:                        <input type="text" class="filter-input" id="lmInteresse" placeholder="Interesse"
+3328:                            style="grid-column: span 2;" autocomplete="off">
+3330:                    <textarea class="lead-modal-textarea" id="lmNota"
+3331:                        placeholder="Anota├º├Áes sobre este lead..."></textarea>
+3332:                    <select class="filter-select" id="lmMotivoPerda" style="display: none;">
+3333:                        <option value="">Selecione o motivo da perda...</option>
+3334:                        <option value="Pre├ºo">Pre├ºo muito alto</option>
+3335:                        <option value="Concorrente">Fechou com concorrente</option>
+3336:                        <option value="Hor├írio">N├úo tinha hor├írio compat├¡vel</option>
+3337:                        <option value="Sumiu">Parou de responder (Sumiu)</option>
+3338:                        <option value="Outro">Outro motivo</option>
+3340:                    <div class="lead-modal-footer">
+3341:                        <select class="filter-select" id="lmStatus" onchange="toggleMotivoPerda()">
+3342:                            <option value="novo">Selecione o status...</option>
+3343:                            <option value="em_andamento">Em Andamento</option>
+3344:                            <option value="matriculado">Matriculado</option>
+3345:                            <option value="perdido">Perdido</option>
+3347:                        <button class="action-btn primary" style="padding:8px 24px"
+3348:                            onclick="saveLeadModal()">Salvar</button>
+3356:    <div class="lead-modal-overlay" id="ragModal">
+3357:        <div class="lead-modal-content" style="height: auto; max-width: 500px;">
+3358:            <div class="lead-modal-header">
+3360:                    <div class="lead-modal-title" id="ragModalTitle">Nova entrada na Base</div>
+3361:                    <div class="lead-modal-sub">Configure a resposta factual do bot</div>
+3363:                <button class="lead-modal-close" onclick="closeBaseModal()">├ù</button>
+3365:            <div class="lead-modal-body" style="padding: 20px; gap: 16px; display: flex; flex-direction: column;">
+3366:                <input type="hidden" id="ragId">
+3367:                <div class="form-group">
+3368:                    <label class="form-label">Categoria</label>
+3369:                    <select class="filter-select" id="ragCategoria">
+3370:                        <option value="professores">Professores</option>
+3371:                        <option value="metodologia">Metodologia</option>
+3372:                        <option value="material">Material</option>
+3373:                        <option value="espanhol">Espanhol</option>
+3374:                        <option value="online">Aulas Online</option>
+3375:                        <option value="ia_robotica">IA e Rob├│tica</option>
+3376:                        <option value="endereco">Endere├ºo / Localiza├º├úo</option>
+3377:                        <option value="vagas">Vagas / Disponibilidade</option>
+3378:                        <option value="horario">Hor├írios de Funcionamento</option>
+3379:                        <option value="nivelamento">Nivelamento</option>
+3380:                        <option value="outro">Outro</option>
+3383:                <div class="form-group">
+3384:                    <label class="form-label">Palavras-chave</label>
+3385:                    <input type="text" class="filter-input" id="ragPalavras"
+3386:                        placeholder="ex: professor americano nativo nacionalidade">
+3388:                <div class="form-group">
+3389:                    <label class="form-label">Resposta do Bot</label>
+3390:                    <textarea class="lead-modal-textarea" id="ragResposta" style="height: 100px;"
+3391:                        placeholder="O que o bot deve responder quando encontrar as palavras-chave..."></textarea>
+3393:                <div class="form-group">
+3394:                    <label class="switch-container">
+3395:                        <div class="switch">
+3396:                            <input type="checkbox" id="ragAtivo" checked>
+3397:                            <span class="slider"></span>
+3399:                        <span style="font-size: 0.75rem;">Entrada Ativa</span>
+3403:            <div class="lead-modal-footer"
+3404:                style="padding: 16px 20px; background: var(--surface); display: flex; justify-content: flex-end; gap: 10px;">
+3405:                <button class="action-btn secondary" onclick="closeBaseModal()">Cancelar</button>
+3406:                <button class="action-btn primary" id="btnSaveRag" onclick="saveBaseEntry()">Salvar</button>
+3411:    <div class="lead-modal-overlay" id="viewRagModal">
+3412:        <div class="lead-modal-content" style="height: auto; max-width: 500px;">
+3413:            <div class="lead-modal-header">
+3415:                    <div class="lead-modal-title">Resposta Completa</div>
+3416:                    <div class="lead-modal-sub" id="viewRagCategory"></div>
+3418:                <button class="lead-modal-close" onclick="closeViewRagModal()">├ù</button>
+3420:            <div class="lead-modal-body" style="padding: 20px;">
+3421:                <div id="viewRagContent"
+3422:                    style="color: var(--text); font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
+3425:            <div class="lead-modal-footer"
+3426:                style="padding: 16px 20px; background: var(--surface); display: flex; justify-content: flex-end;">
+3427:                <button class="action-btn primary" onclick="closeViewRagModal()">Fechar</button>
+3433:        const SUPABASE_URL = 'https://gnyvfslxoiobgmohejqf.supabase.co';
+3434:        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdueXZmc2x4b2lvYmdtb2hlanFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMTcwNTYsImV4cCI6MjA5Mjg5MzA1Nn0.wwk_IKVia7R3_QTjnbDcRxWA_HQwHURO5lXcHIAzgRc';
+3436:        const headers = {
+3443:            const controller = new AbortController();
+3444:            const timeoutId = setTimeout(() => controller.abort(), 15000);
+3446:                const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, { headers, signal: controller.signal });
+3457:        async function sbUpsert(table, data, onConflict = null) {
+3458:            let url = SUPABASE_URL + '/rest/v1/' + table;
+3459:            if (onConflict) url += '?on_conflict=' + onConflict;
+3461:            const r = await fetch(url, {
+3466:                    'Prefer': 'resolution=merge-duplicates'
+3471:                const errData = await r.json().catch(() => ({}));
+3477:            const controller = new AbortController();
+3478:            const timeoutId = setTimeout(() => controller.abort(), 10000);
+3480:                const r = await fetch(SUPABASE_URL + '/rest/v1/' + path + '?select=id', {
+3482:                    headers: { ...headers, 'Prefer': 'count=exact' },
+3509:        function exportToExcel(data, filename, sheetName = "Dados") {
+3510:            const worksheet = XLSX.utils.aoa_to_sheet(data);
+3513:            const wscols = data[0].map((_, i) => {
+3514:                let max = 10;
+3515:                data.forEach((row, rIdx) => {
+3516:                    const val = String(row[i] || "");
+3517:                    if (val.length > max) max = val.length;
+3520:                    if (rIdx > 0 && val.length >= 10 && !isNaN(val)) {
+3521:                        const cellRef = XLSX.utils.encode_cell({ r: rIdx, c: i });
+3522:                        if (worksheet[cellRef]) worksheet[cellRef].t = 's';
+3527:            worksheet['!cols'] = wscols;
+3529:            const workbook = XLSX.utils.book_new();
+3539:        function brISO(date, hours = 0, minutes = 0, seconds = 0) {
+3540:            const d = new Date(date);
+3542:            if (hours !== null) d.setHours(hours, minutes, seconds, 0);
+3547:            const fmt = new Intl.DateTimeFormat('sv-SE', {
+3553:            const p = {};
+3554:            fmt.forEach(part => p[part.type] = part.value);
+3560:            const now = brNow();
+3578:            const d = new Date(iso);
+3579:            const now = brNow();
+3581:            const dateStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+3582:            const todayStr = now.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+3584:            const yesterday = new Date(now);
+3586:            const yesterdayStr = yesterday.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+3588:            if (dateStr === todayStr) return 'Hoje';
+3589:            if (dateStr === yesterdayStr) return 'Ontem';
+3595:            const t = String(tel).replace(/\D/g, '');
+3596:            if (t.length >= 11) return t.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 $2 $3-$4');
+3602:            const s = String(tel || '').replace(/\D/g, '');
+3603:            return crmConfig.crm.excluirNumeros.some(n => {
+3604:                const cleanN = String(n).replace(/\D/g, '');
+3605:                return s === cleanN || s.endsWith(cleanN);
+3611:            const s = String(tel).replace(/\D/g, '');
+3617:            const n = nome.toLowerCase();
+3618:            if (n === 'rebeca' || n === 'rebecca') return 'Vendedor Manh├ú';
+3619:            if (n === 'paulo') return 'Vendedor Tarde';
+3625:            const a = v1.toLowerCase();
+3626:            const b = v2.toLowerCase();
+3627:            if (a === b) return true;
+3628:            if ((a === 'rebeca' || a === 'rebecca') && (b === 'rebeca' || b === 'rebecca')) return true;
+3633:        let USUARIOS = JSON.parse(localStorage.getItem('crm_users')) || {
+3639:        let currentUserObj = null;
+3640:        let currentUser = null; // para compatibilidade legada ('Admin', 'Rebecca', etc)
+3643:            const saved = sessionStorage.getItem('crm_user');
+3645:                document.getElementById('loginScreen').style.display = 'flex';
+3647:                currentUserObj = JSON.parse(saved);
+3648:                // Sincroniza o nome com a configura├º├úo atual de USUARIOS para evitar nomes legados (ex: Vendedor Manh├ú)
+3649:                if (USUARIOS[currentUserObj.usuario]) {
+3650:                    currentUserObj.nome = USUARIOS[currentUserObj.usuario].nome;
+3652:                currentUser = currentUserObj.role === 'admin' ? 'Admin' : currentUserObj.nome;
+3653:                document.getElementById('loginScreen').style.display = 'none';
+3656:                if (currentUserObj.role === 'vendedor') {
+3657:                    filtroVendedorAtivo = 'todos';
+3658:                    setTimeout(() => {
+3659:                        document.querySelectorAll('.sub-nav-item').forEach(i => {
+3671:            const user = document.getElementById('loginUser').value.toLowerCase().trim();
+3672:            const pass = document.getElementById('loginPass').value;
+3673:            const erro = document.getElementById('loginErro');
+3675:            if (USUARIOS[user]) {
+3676:                const msgBuffer = new TextEncoder().encode(pass);
+3677:                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+3678:                const hashArray = Array.from(new Uint8Array(hashBuffer));
+3679:                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+3681:                if (USUARIOS[user].hash === hashHex) {
+3682:                    erro.style.display = 'none';
+3683:                    const u = USUARIOS[user];
+3686:                    currentUserObj = { usuario: user, nome: u.nome, role: u.role };
+3687:                    currentUser = u.role === 'admin' ? 'Admin' : u.nome;
+3688:                    document.getElementById('loginScreen').style.display = 'none';
+3692:                    if (u.role === 'vendedor') {
+3693:                        filtroVendedorAtivo = 'todos';
+3694:                        setTimeout(() => {
+3695:                            document.querySelectorAll('.sub-nav-item').forEach(i => {
+3709:            erro.style.display = 'block';
+3713:            currentUserObj = null;
+3714:            currentUser = null;
+3720:            const isVendedor = currentUser !== 'Admin';
+3723:            document.getElementById('sidebarUserName').textContent = fmtVendedor(currentUser);
+3724:            document.getElementById('sidebarUserRole').textContent = isVendedor ? 'Vendedor' : 'Administrador';
+3725:            document.getElementById('sidebarUserAv').textContent = isVendedor ? currentUser.substring(0, 2).toUpperCase() : 'GS';
+3726:            document.getElementById('sidebarUserAv').style.background = isVendedor ? 'var(--blue-dim)' : 'var(--green-dim)';
+3727:            document.getElementById('sidebarUserAv').style.color = isVendedor ? 'var(--blue)' : 'var(--green)';
+3728:            document.getElementById('sidebarUserAv').style.borderColor = isVendedor ? 'var(--blue)' : 'var(--green)';
+3732:                document.getElementById('navBotIA').style.display = 'none';
+3733:                document.getElementById('sidebarSectionNumeros').style.display = 'none';
+3734:                document.getElementById('sidebarNumeros').style.display = 'none';
+3735:                document.getElementById('configAdminSections').style.display = 'none';
+3736:                document.getElementById('configVendedorSection').style.display = 'flex';
+3739:                const vendCard = document.getElementById('vendedoresTable')?.closest('.panel');
+3740:                if (vendCard) vendCard.style.display = 'none';
+3743:                const totalCard = document.getElementById('metTotalCard');
+3744:                if (totalCard) totalCard.style.display = 'none';
+3747:                const subConv = document.getElementById('metConvSub');
+3748:                const subAlunos = document.getElementById('metAlunosSub');
+3749:                const subLeads = document.getElementById('metLeadsSub');
+3750:                if (subConv) subConv.textContent = 'suas conversas hoje';
+3751:                if (subAlunos) subAlunos.textContent = 'alunos que voc├¬ atendeu';
+3752:                if (subLeads) subLeads.textContent = 'leads encaminhados a voc├¬';
+3755:                const lfVend = document.getElementById('leadFilterVend');
+3756:                if (lfVend) lfVend.style.display = 'none';
+3759:                const exportBtns = document.querySelectorAll('[onclick^="export"]');
+3760:                exportBtns.forEach(btn => btn.style.display = 'none');
+3762:                document.getElementById('navBotIA').style.display = 'flex';
+3763:                document.getElementById('sidebarSectionNumeros').style.display = 'block';
+3764:                document.getElementById('sidebarNumeros').style.display = 'flex';
+3765:                document.getElementById('configAdminSections').style.display = 'flex';
+3766:                document.getElementById('configVendedorSection').style.display = 'none';
+3769:                const lfVend = document.getElementById('leadFilterVend');
+3770:                if (lfVend) lfVend.style.display = 'block';
+3773:                const vendCard = document.getElementById('vendedoresTable')?.closest('.panel');
+3774:                if (vendCard) vendCard.style.display = 'block';
+3775:                const totalCard = document.getElementById('metTotalCard');
+3776:                if (totalCard) totalCard.style.display = '';
+3785:        const SIM_PROFILES = {
+3793:        const BOT_SYSTEM_PROMPT = `Voc├¬ ├® a assistente virtual de uma escola de idiomas no Recreio dos Bandeirantes, Rio de Janeiro. Fale sempre em portugu├¬s. Seja simp├ítica e profissional. Responda de forma curta (m├íximo 3 linhas). Identifique se a mensagem ├® de um ALUNO (j├í estuda) ou LEAD (quer se matricular) e responda adequadamente.`;
+3795:        async function loadBotIAView(shouldLog = true) {
+3797:            const botUrl = crmConfig.crm.botUrl || '';
+3799:            let modelo = 'groq';
+3800:            let fallbacks = 0;
+3801:            let ultimoWebhook = null;
+3802:            let uptime = null;
+3803:            let conversasAtivas = null;
+3807:                    const controller = new AbortController();
+3808:                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+3809:                    const res = await fetch(botUrl.replace(/\/$/, '') + '/status', { signal: controller.signal });
+3813:                        const s = await res.json();
+3814:                        modelo = s.modelo || 'groq';
+3815:                        fallbacks = s.fallbacksHoje || 0;
+3816:                        ultimoWebhook = s.ultimoWebhook || null;
+3817:                        uptime = s.uptime || null;
+3818:                        conversasAtivas = s.conversasAtivas ?? null;
+3819:                        if (shouldLog) addBotLog('Ô£à', `Status atualizado: ${modelo === 'groq' ? 'Groq ativo' : 'Gemini fallback'} ÔÇö ${fallbacks} fallbacks hoje`);
+3827:            const modeloVal = document.getElementById('botModeloVal');
+3828:            const cardModelo = document.getElementById('cardModelo');
+3829:            if (modelo === 'gemini') {
+3830:                modeloVal.textContent = 'Gemini Flash ÔÇö Fallback';
+3831:                modeloVal.style.color = 'var(--yellow)';
+3832:                cardModelo.style.borderColor = 'var(--yellow)';
+3834:                modeloVal.textContent = 'Groq ÔÇö LLaMA 3.3 70B';
+3835:                modeloVal.style.color = 'var(--green)';
+3836:                cardModelo.style.borderColor = 'var(--green)';
+3839:            const fallbackEl = document.getElementById('botFallbacksVal');
+3840:            fallbackEl.textContent = fallbacks;
+3842:                fallbackEl.style.color = 'var(--red)';
+3843:                document.getElementById('cardFallbacks').style.borderColor = 'var(--red)';
+3845:                fallbackEl.style.color = '';
+3846:                document.getElementById('cardFallbacks').style.borderColor = '';
+3849:            const webhookEl = document.getElementById('botWebhookVal');
+3851:                const d = new Date(ultimoWebhook);
+3852:                webhookEl.textContent = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+3853:                webhookEl.style.color = '';
+3855:                webhookEl.textContent = 'Nenhum registrado';
+3856:                webhookEl.style.color = 'var(--muted2)';
+3860:            const memEl = document.getElementById('botMemoryVal');
+3861:            if (conversasAtivas !== null) {
+3862:                memEl.textContent = conversasAtivas + (conversasAtivas === 1 ? ' conversa' : ' conversas');
+3863:                memEl.style.color = conversasAtivas > 0 ? 'var(--blue)' : 'var(--muted2)';
+3865:                memEl.textContent = '--';
+3866:                memEl.style.color = 'var(--muted2)';
+3870:            const dot = document.querySelector('#botStatusLine .status-dot');
+3871:            const txt = document.getElementById('botStatusText');
+3872:            const uptimeStr = uptime ? ` ÔÇó Uptime: ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m` : '';
+3875:                dot.style.background = 'var(--muted2)';
+3876:                txt.style.color = 'var(--muted2)';
+3877:                txt.textContent = 'ÔÇö URL do bot n├úo configurada em Configura├º├Áes ÔåÆ CRM';
+3878:            } else if (modelo === 'gemini') {
+3879:                dot.style.background = 'var(--yellow)';
+3880:                txt.style.color = 'var(--yellow)';
+3881:                txt.textContent = 'ÔÜá Operando em modo fallback ÔÇö Groq indispon├¡vel' + uptimeStr;
+3883:                dot.style.background = 'var(--green)';
+3884:                txt.style.color = 'var(--green)';
+3885:                txt.textContent = 'ÔùÅ Sistema operando normalmente' + uptimeStr;
+3893:            const profile = document.getElementById('simProfile').value;
+3894:            document.getElementById('simInput').value = SIM_PROFILES[profile] || '';
+3898:            const m = (msg + ' ' + reply).toLowerCase();
+3905:            document.getElementById('simChat').innerHTML = ''; // Limpa o visual do chat
+3906:            const inputEl = document.getElementById('simInput');
+3907:            inputEl.value = '/clear';
+3912:            const inputEl = document.getElementById('simInput');
+3913:            const msg = inputEl.value.trim();
+3917:            inputEl.value = '';
+3919:            const btn = document.getElementById('btnSimular');
+3920:            btn.disabled = true;
+3921:            btn.textContent = 'Aguardando...';
+3923:            const chat = document.getElementById('simChat');
+3925:            if (chat.querySelector('[style*="margin:auto"]')) chat.innerHTML = '';
+3928:            const userBubble = document.createElement('div');
+3929:            userBubble.className = 'msg-bubble msg-user';
+3930:            userBubble.textContent = msg;
+3932:            chat.scrollTop = chat.scrollHeight;
+3935:            const botBubble = document.createElement('div');
+3936:            botBubble.className = 'msg-bubble msg-bot';
+3937:            botBubble.textContent = '...';
+3939:            chat.scrollTop = chat.scrollHeight;
+3941:            const t0 = Date.now();
+3942:            let reply = '';
+3943:            let success = true;
+3946:            const botUrl = crmConfig.crm.botUrl || '';
+3948:                botBubble.className = 'msg-bubble msg-bot';
+3949:                botBubble.innerHTML = 'ÔÜá Configure a URL do bot em <strong>Configura├º├Áes ÔåÆ CRM ÔåÆ URL do Servidor Bot</strong> para usar o simulador.';
+3950:                chat.scrollTop = chat.scrollHeight;
+3951:                btn.disabled = false;
+3952:                btn.textContent = 'Simular Resposta';
+3957:                const controller = new AbortController();
+3958:                const timeoutId = setTimeout(() => controller.abort(), 30000);
+3960:                const res = await fetch(botUrl.replace(/\/$/, '') + '/simulate', {
+3969:                const data = await res.json();
+3970:                reply = data.reply || 'Sem resposta.';
+3972:                const tipoBot = data.tipo || inferTipo(msg, reply);
+3973:                const elapsed = Date.now() - t0;
+3974:                const tipoColors = { lead: 'var(--green)', aluno: 'var(--blue)', indefinido: 'var(--muted2)' };
+3975:                const modeloBadge = data.modelo === 'gemini' ? '<span style="background:var(--yellow);color:#000;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:700">gemini</span>' : '';
+3976:                botBubble.innerHTML = `
+3978:        <div class="sim-meta" style="color:var(--muted2)">
+3979:          <span style="background:${tipoColors[tipoBot]};color:#000;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:700">${tipoBot}</span>
+3984:                chat.scrollTop = chat.scrollHeight;
+3990:                btn.disabled = false;
+3991:                btn.textContent = 'Simular Resposta';
+3995:                reply = 'ÔÜá N├úo foi poss├¡vel conectar ao bot. Verifique se ele est├í rodando e a URL est├í correta.';
+3996:                success = false;
+3999:            const elapsed = Date.now() - t0;
+4000:            const tipo = inferTipo(msg, reply);
+4003:            const tipoColors = { lead: 'var(--green)', aluno: 'var(--blue)', indefinido: 'var(--muted2)' };
+4004:            botBubble.innerHTML = `
+4006:      <div class="sim-meta" style="color:var(--muted2)">
+4007:        <span style="background:${tipoColors[tipo]};color:#000;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:700">${tipo}</span>
+4011:            chat.scrollTop = chat.scrollHeight;
+4016:            btn.disabled = false;
+4017:            btn.textContent = 'Simular Resposta';
+4021:            const log = JSON.parse(localStorage.getItem('crm_bot_log') || '[]');
+4029:            const el = document.getElementById('botLogList');
+4031:            const log = JSON.parse(localStorage.getItem('crm_bot_log') || '[]');
+4033:                el.innerHTML = '<div class="empty-state">// nenhum evento registrado</div>';
+4036:            el.innerHTML = `<div class="event-list">${log.map(e => {
+4037:                const d = new Date(e.ts);
+4038:                const ts = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ' ' +
+4040:                return `<div class="event-item">
+4041:        <span style="font-size:1rem">${e.icon}</span>
+4042:        <span class="event-time">${ts}</span>
+4043:        <span class="event-desc">${e.desc}</span>
+4054:            const chat = document.getElementById('simChat');
+4055:            const msgs = chat.querySelectorAll('.msg-bubble');
+4056:            let text = '';
+4057:            msgs.forEach(m => {
+4058:                const isUser = m.classList.contains('msg-user');
+4059:                text += (isUser ? 'VOC├è: ' : 'BOT: ') + m.innerText + '\n\n';
+4064:            navigator.clipboard.writeText(text).then(() => {
+4071:            document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+4078:            const { start, end } = todayRange();
+4080:            const rows = await sbGet(`conversas?select=telefone,vendedor,tipo,de&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`);
+4083:            const firstVend = {};
+4084:            rows.forEach(r => {
+4086:                    firstVend[r.telefone] = r.vendedor;
+4091:            let filteredRows = rows;
+4092:            if (currentUser !== 'Admin') {
+4093:                filteredRows = rows.filter(r => {
+4094:                    const v = firstVend[r.telefone];
+4098:                const confirmados = new Set(filteredRows.filter(r => r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor').map(r => r.telefone));
+4099:                filteredRows = filteredRows.filter(r => confirmados.has(r.telefone));
+4100:            } else if (filtroVendedorAtivo !== 'todos') {
+4102:                const confirmados = new Set(rows.filter(r =>
+4103:                    (r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') &&
+4105:                ).map(r => r.telefone));
+4106:                filteredRows = rows.filter(r => confirmados.has(r.telefone));
+4109:            const totalRows = currentUser === 'Admin' ? await sbCount('conversas') : 0;
+4111:            const telefonesHoje = new Set(filteredRows.map(r => r.telefone));
+4112:            const leadsUnicos = new Set(filteredRows.filter(r => r.tipo === 'lead' && r.de === 'cliente').map(r => r.telefone));
+4113:            const alunosUnicos = new Set(filteredRows.filter(r => r.tipo === 'aluno' && r.de === 'cliente').map(r => r.telefone));
+4115:            document.getElementById('metConv').textContent = telefonesHoje.size;
+4116:            document.getElementById('metAlunos').textContent = alunosUnicos.size;
+4117:            document.getElementById('metLeads').textContent = leadsUnicos.size;
+4118:            const metTotal = document.getElementById('metTotal');
+4119:            if (metTotal) metTotal.textContent = currentUser === 'Admin' ? totalRows : '--';
+4120:            document.getElementById('metConvTrend').textContent = telefonesHoje.size + ' ├║nicos';
+4121:            document.getElementById('metLeadsTrend').textContent = leadsUnicos.size + ' hoje';
+4127:            if (currentUser !== 'Admin') return;
+4130:                const rows = await sbGet('conversas?select=vendedor&order=vendedor.asc');
+4131:                const vendedoresRaw = rows.map(r => r.vendedor).filter(Boolean);
+4132:                const vendedores = [...new Set(vendedoresRaw.map(v => {
+4133:                    const low = v.toLowerCase();
+4134:                    if (low === 'rebeca' || low === 'rebecca') return 'Rebecca';
+4138:                const container = document.getElementById('sidebarNumeros');
+4142:                container.querySelectorAll('.sub-nav-item').forEach((el, idx) => {
+4147:                const cores = ['var(--green)', 'var(--blue)', 'var(--yellow)', '#A78BFA'];
+4149:                vendedores.forEach((vendedor, i) => {
+4150:                    const cor = cores[i % cores.length];
+4151:                    const div = document.createElement('div');
+4152:                    div.className = 'sub-nav-item';
+4153:                    div.innerHTML = `<span class="status-dot-mini" style="background:${cor}"></span> ${fmtVendedor(vendedor)}`;
+4154:                    div.onclick = () => filterByNumero(vendedor, div);
+4163:        let allConvsData = {};
+4164:        let activeChatTel = null;
+4169:                const now = brNow();
+4170:                const end = brISO(now, 23, 59, 59);
+4171:                const d = new Date(now);
+4173:                const start = brISO(d, 0, 0, 0);
+4175:                document.getElementById('convList').innerHTML = '<div class="state-msg"><span class="spinner"></span><div style="margin-top:8px">Carregando...</div></div>';
+4177:                // Pegar mensagens do per├¡odo ÔÇö busca em DESC para garantir as mais recentes (limite Supabase = 1000 rows)
+4179:                let rows = (await sbGet(`conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.desc,id.desc&limit=5000`)).filter(r => !isExcluded(r.telefone));
+4182:                //rows.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+4185:                const firstVend = {};
+4186:                rows.forEach(r => {
+4187:                    if (!firstVend[r.telefone] && r.vendedor) firstVend[r.telefone] = r.vendedor;
+4191:                let rowsFiltradas = rows;
+4192:                if (currentUser !== 'Admin') {
+4193:                    rowsFiltradas = rows.filter(r => {
+4194:                        const v = firstVend[r.telefone];
+4201:                if (filtroVendedorAtivo === 'coord') {
+4202:                    rowsFiltradas = rowsFiltradas.filter(r => {
+4203:                        const v = firstVend[r.telefone]?.toLowerCase();
+4204:                        const isCoord = v === 'coord' || v === 'coordena├º├úo' || v === 'coordenacao';
+4205:                        return isCoord || (r.tipo === 'aluno' && !v);
+4207:                } else if (filtroVendedorAtivo !== 'todos' && currentUser === 'Admin') {
+4209:                    const telefonesConfirmados = new Set(
+4211:                            .filter(r =>
+4212:                                (r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') &&
+4215:                            .map(r => r.telefone)
+4219:                    rowsFiltradas = rows.filter(r => telefonesConfirmados.has(r.telefone));
+4223:                    const msg = filtroVendedorAtivo === 'todos' ? 'Nenhuma conversa recente encontrada' : `Nenhuma conversa recente para ${filtroVendedorAtivo}`;
+4224:                    document.getElementById('convList').innerHTML = `<div class="state-msg"><div>${msg}</div></div>`;
+4229:                const byTel = {};
+4230:                rowsFiltradas.forEach(r => {
+4231:                    if (!byTel[r.telefone]) byTel[r.telefone] = { telefone: r.telefone, msgs: [], tipo: r.tipo || 'desconhecido', vendedor: r.vendedor, lastTime: r.created_at };
+4233:                    byTel[r.telefone].lastTime = r.created_at;
+4234:                    if (r.tipo && r.tipo !== 'desconhecido') byTel[r.telefone].tipo = r.tipo;
+4235:                    if (r.vendedor) byTel[r.telefone].vendedor = r.vendedor;
+4238:                // Filtro por tipo (ex: Em atendimento = ainda n├úo confirmado)
+4239:                if (filtroTipoAtivo === 'em_atendimento') {
+4240:                    Object.keys(byTel).forEach(tel => {
+4241:                        const tipos = byTel[tel].msgs.map(m => m.tipo);
+4242:                        const foiConfirmado = tipos.includes('lead_confirmado');
+4243:                        const foiAluno = tipos.includes('aluno');
+4244:                        const isVendedor = tipos.some(t => t === 'conversa_vendedor' || t === 'lead-vendedor');
+4251:                let convs = Object.values(byTel);
+4252:                convs.sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
+4255:                const titleEl = document.querySelector('.panel-title-text');
+4257:                    titleEl.textContent = filtroVendedorAtivo === 'todos' ? 'Conversas recentes' : `Conversas ÔÇö ${filtroVendedorAtivo === 'coord' ? 'Coordena├º├úo' : filtroVendedorAtivo}`;
+4260:                allConvsData = byTel;
+4262:                const listEl = document.getElementById('convList');
+4263:                listEl.innerHTML = '';
+4265:                let lastDateHeader = null;
+4266:                convs.forEach((conv, i) => {
+4267:                    const dateHeader = fmtDataFriendly(conv.lastTime);
+4268:                    if (dateHeader !== lastDateHeader) {
+4269:                        const headerEl = document.createElement('div');
+4270:                        headerEl.className = 'conv-date-header';
+4271:                        headerEl.textContent = dateHeader;
+4273:                        lastDateHeader = dateHeader;
+4276:                    const lastMsg = conv.msgs[conv.msgs.length - 1];
+4277:                    const preview = lastMsg ? lastMsg.mensagem.substring(0, 50) + (lastMsg.mensagem.length > 50 ? '...' : '') : '';
+4278:                    const tipo = conv.tipo;
+4279:                    const avClass = tipo === 'lead' ? 'lead' : tipo === 'aluno' ? 'aluno' : '';
+4281:                    const item = document.createElement('div');
+4282:                    item.className = 'conv-item';
+4283:                    item.innerHTML = `
+4284:        <div class="conv-av ${avClass}">${initials(conv.telefone)}</div>
+4285:        <div class="conv-info">
+4286:          <div class="conv-name" style="font-family:var(--mono);font-size:0.72rem">${fmtTel(conv.telefone)}</div>
+4287:          <div class="conv-preview">${escapeHtml(preview) || 'ÔÇö'}</div>
+4289:        <div class="conv-meta">
+4290:          <div class="conv-time">${fmtHora(conv.lastTime)}</div>
+4291:          <span class="badge ${tipo === 'lead' ? 'badge-green' : (tipo === 'aluno' ? 'badge-blue' : (tipo === 'conversa_vendedor' || tipo === 'lead-vendedor' ? 'badge-orange' : 'badge-muted'))}" style="font-size:0.55rem">${tipo === 'conversa_vendedor' ? 'lead-vendedor' : tipo}</span>
+4294:                    item.onclick = () => showConv(conv, item);
+4299:                const currentChatId = document.querySelector('.chat-detail-name')?.textContent;
+4301:                    const firstItem = listEl.querySelector('.conv-item');
+4306:                document.getElementById('convList').innerHTML = '<div class="state-msg">Erro ao carregar conversas.</div>';
+4310:        async function showConv(conv, itemEl, isAutoRefresh = false) {
+4312:            document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+4316:                const items = document.querySelectorAll('.conv-item');
+4317:                items.forEach(el => {
+4323:            const oldMsgsEl = document.getElementById('chatMsgs');
+4324:            const wasAtBottom = oldMsgsEl ? (oldMsgsEl.scrollHeight - oldMsgsEl.scrollTop <= oldMsgsEl.clientHeight + 60) : true;
+4326:            activeChatTel = conv.telefone;
+4327:            const isMobile = window.innerWidth <= 768;
+4331:                document.getElementById('chatDetail').innerHTML = '<div class="state-msg"><span class="spinner"></span></div>';
+4336:                const fullMsgs = await sbGet(`conversas?select=*&telefone=eq.${conv.telefone}&order=created_at.asc,id.asc&limit=200`);
+4337:                const newMsgs = fullMsgs;
+4341:                    const currentMsgs = allConvsData[conv.telefone].msgs;
+4342:                    if (currentMsgs.length === newMsgs.length) {
+4343:                        const lastOld = currentMsgs[currentMsgs.length - 1];
+4344:                        const lastNew = newMsgs[newMsgs.length - 1];
+4345:                        if (lastOld && lastNew && lastOld.id === lastNew.id) {
+4351:                conv.msgs = newMsgs;
+4354:                    allConvsData[conv.telefone].msgs = conv.msgs;
+4360:            const msgsHtml = conv.msgs.map(m => {
+4361:                const isBot = m.de === 'bot';
+4362:                const isVendedor = m.de === 'vendedor';
+4363:                const wrapClass = isBot ? 'bot' : (isVendedor ? 'bot' : 'user'); // Vendedor aparece do lado "bot" (direita)
+4364:                const bubbleClass = isBot ? 'ai' : (isVendedor ? 'vendedor' : 'user');
+4365:                const tagClass = isBot ? 'ai-tag' : (isVendedor ? 'vendedor-tag' : '');
+4367:                let tagLabel = '­ƒæñ Cliente ┬À ' + fmtHora(m.created_at);
+4368:                if (isBot) tagLabel = '­ƒñû Bot IA ┬À ' + fmtHora(m.created_at);
+4369:                if (isVendedor) tagLabel = `­ƒæñ ${fmtVendedor(m.vendedor)} ┬À ` + fmtHora(m.created_at);
+4372:        <div class="msg-wrap ${wrapClass}">
+4373:          <div class="msg-bubble ${bubbleClass}">${escapeHtml(m.mensagem)}</div>
+4374:          <div class="msg-tag ${tagClass}">${tagLabel}</div>
+4379:            const subText = `${conv.vendedor || 'ÔÇö'} ┬À ${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || 'desconhecido')} ┬À ${fmtHora(conv.lastTime)}`;
+4382:                document.getElementById('mobileDetailName').textContent = fmtTel(conv.telefone);
+4383:                document.getElementById('mobileDetailSub').textContent = subText;
+4384:                document.getElementById('mobileDetailMsgs').innerHTML = msgsHtml;
+4385:                const mMsgsEl = document.getElementById('mobileDetailMsgs');
+4387:                    mMsgsEl.scrollTop = mMsgsEl.scrollHeight;
+4391:                const isBlockedChat = isExcluded(conv.telefone);
+4392:                const blockBtnHtml = currentUser === 'Admin' ? `
+4393:                  <button id="btnBlockNum" onclick="toggleBlockNumber('${conv.telefone}')" title="${isBlockedChat ? 'Desbloquear n├║mero' : 'Bloquear n├║mero'}" style="
+4398:                  " onmouseover="this.style.background='var(--red-dim)'; this.style.color='var(--red)'" onmouseout="this.style.background='none'; this.style.color='${isBlockedChat ? 'var(--red)' : 'var(--muted2)'}'">${isBlockedChat ? '­ƒöô' : '­ƒÜ½'}</button>
+4400:                document.getElementById('chatDetail').innerHTML = `
+4401:        <div class="chat-detail-head">
+4403:            <div class="chat-detail-name" style="font-family:var(--mono);font-size:0.8rem">${fmtTel(conv.telefone)}</div>
+4404:            <div class="chat-detail-sub">${subText}</div>
+4406:          <div class="chat-detail-actions" style="display:flex;align-items:center;gap:6px">
+4407:            <span class="badge ${conv.tipo === 'lead' ? 'badge-green' : (conv.tipo === 'aluno' ? 'badge-blue' : (conv.tipo === 'conversa_vendedor' || conv.tipo === 'lead-vendedor' ? 'badge-orange' : 'badge-muted'))}">${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || 'ÔÇö')}</span>
+4411:        <div style="position:relative; flex:1; overflow:hidden; display:flex; flex-direction:column">
+4412:          <div class="chat-msgs" id="chatMsgs" onscroll="handleChatScroll()">${msgsHtml}</div>
+4413:          <div class="btn-scroll-bottom" id="scrollBtn" onclick="scrollToBottomMsgs()">Ôåô</div>
+4416:                const msgsEl = document.getElementById('chatMsgs');
+4418:                    msgsEl.scrollTop = msgsEl.scrollHeight;
+4420:                    setTimeout(() => { if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight; }, 50);
+4426:            const el = document.getElementById('chatMsgs');
+4431:            const el = document.getElementById('chatMsgs');
+4432:            const btn = document.getElementById('scrollBtn');
+4434:            const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
+4445:            const { start, end } = todayRange();
+4448:            const rows = await sbGet(
+4449:                `conversas?select=vendedor,telefone,created_at&tipo=in.(lead_confirmado,conversa_vendedor,lead-vendedor)&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`
+4453:            const primeiroVendedor = {};
+4454:            rows.forEach(r => {
+4455:                const v = r.vendedor;
+4457:                const vLow = v.toLowerCase();
+4458:                if (vLow === 'bot') {
+4459:                    if (!primeiroVendedor[r.telefone]) primeiroVendedor[r.telefone] = 'bot';
+4461:                    if (!primeiroVendedor[r.telefone] || primeiroVendedor[r.telefone] === 'bot') {
+4462:                        primeiroVendedor[r.telefone] = v;
+4468:            const byVend = {};
+4469:            Object.entries(primeiroVendedor).forEach(([tel, vend]) => {
+4470:                if (!byVend[vend]) byVend[vend] = [];
+4474:            const el = document.getElementById('vendedoresTable');
+4476:                el.innerHTML = '<div class="state-msg">Sem dados hoje</div>';
+4480:            el.innerHTML = Object.entries(byVend)
+4481:                .sort((a, b) => b[1].length - a[1].length) // ordena por mais atendimentos
+4482:                .map(([nome, tels]) => `
+4483:        <div class="num-row">
+4484:          <div class="num-indicator" style="background:var(--green)"></div>
+4486:            <div class="num-name">${nome}</div>
+4487:            <div class="num-number">${tels.length} conversa${tels.length !== 1 ? 's' : ''} ├║nica${tels.length !== 1 ? 's' : ''} hoje</div>
+4489:          <div class="num-stat">
+4490:            <div class="num-stat-val" style="color:var(--green)">${tels.length}</div>
+4491:            <div class="num-stat-key">├║nicos</div>
+4493:          <span class="badge badge-green">ATIVO</span>
+4499:        let leadsData = [];
+4502:            const { start, end } = todayRange();
+4504:            const query = `conversas?select=telefone,vendedor,created_at,tipo&de=eq.cliente&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc`;
+4505:            const rows = await sbGet(query);
+4508:            const primeiroVend = {};
+4509:            rows.forEach(r => {
+4511:                    primeiroVend[r.telefone] = { telefone: r.telefone, vendedor: r.vendedor || 'desconhecido', created_at: r.created_at };
+4516:            leadsData = Object.values(primeiroVend);
+4517:            if (currentUser !== 'Admin') {
+4518:                leadsData = leadsData.filter(r => {
+4519:                    const v = r.vendedor?.toLowerCase();
+4520:                    const cur = currentUser.toLowerCase();
+4521:                    return !v || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+4525:            const el = document.getElementById('leadsTable');
+4527:                el.innerHTML = '<div class="state-msg">Nenhum lead hoje ainda</div>';
+4531:            el.innerHTML = leadsData.map(r => `
+4532:      <div class="lead-row">
+4533:        <div class="lead-name" style="font-family:var(--mono);font-size:0.72rem">${fmtTel(r.telefone)}</div>
+4534:        <div><span class="badge badge-green" style="font-size:0.6rem">${r.vendedor || 'ÔÇö'}</span></div>
+4535:        <div class="lead-time">${fmtHora(r.created_at)}</div>
+4542:            const days = [];
+4543:            const labels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'S├íb'];
+4544:            const today = brNow();
+4546:            for (let i = 6; i >= 0; i--) {
+4547:                const d = new Date(today);
+4549:                const start = brISO(d, 0, 0, 0);
+4550:                const end = brISO(d, 23, 59, 59);
+4551:                days.push({ label: i === 0 ? 'Hoje' : labels[d.getDay()], start, end });
+4554:            const counts = await Promise.all(days.map(async d => {
+4555:                let q = `conversas?select=telefone,vendedor&de=eq.cliente&created_at=gte.${d.start}&created_at=lt.${d.end}&order=created_at.asc`;
+4556:                const rows = await sbGet(q);
+4558:                if (currentUser === 'Admin') {
+4559:                    return new Set(rows.map(r => r.telefone)).size;
+4561:                    const firstVend = {};
+4562:                    rows.forEach(r => {
+4563:                        if (!firstVend[r.telefone] && r.vendedor) firstVend[r.telefone] = r.vendedor;
+4565:                    return Object.entries(firstVend).filter(([tel, v]) => {
+4566:                        const vend = v?.toLowerCase();
+4567:                        const cur = currentUser.toLowerCase();
+4568:                        return !vend || vend === cur || (cur === 'rebeca' && vend === 'rebecca') || (cur === 'rebecca' && vend === 'rebeca');
+4573:            const max = Math.max(...counts, 1);
+4574:            const chartEl = document.getElementById('chartArea');
+4575:            chartEl.innerHTML = '<div class="chart-bars"></div>';
+4576:            const barsEl = chartEl.querySelector('.chart-bars');
+4578:            days.forEach((d, i) => {
+4579:                const wrap = document.createElement('div');
+4580:                wrap.className = 'bar-wrap';
+4581:                const bar = document.createElement('div');
+4582:                bar.className = 'bar' + (i === 6 ? ' today' : '');
+4583:                bar.style.height = Math.max((counts[i] / max) * 52, 2) + 'px';
+4584:                bar.title = `${d.label}: ${counts[i]} conversas`;
+4585:                const label = document.createElement('div');
+4586:                label.className = 'bar-label';
+4587:                label.textContent = d.label;
+4597:            const data = [['Telefone', 'Vendedor', 'Hora']];
+4598:            leadsData.forEach(r => data.push([
+4607:        let fullLeadsData = [];
+4610:            document.getElementById('leadFilterPeriod').value = '30d';
+4611:            document.getElementById('leadFilterVend').value = 'todos';
+4612:            document.getElementById('leadFilterStatus').value = 'todos';
+4613:            document.getElementById('leadFilterSearch').value = '';
+4618:            const period = document.getElementById('leadFilterPeriod').value;
+4619:            const vend = document.getElementById('leadFilterVend').value;
+4620:            const statusFilter = document.getElementById('leadFilterStatus').value;
+4621:            const search = document.getElementById('leadFilterSearch').value.toLowerCase();
+4624:            const now = brNow();
+4625:            let start, end = brISO(now, 23, 59, 59);
+4627:            if (period === 'hoje') {
+4628:                start = brISO(now, 0, 0, 0);
+4629:            } else if (period === '7d') {
+4630:                const d = new Date(now);
+4632:                start = brISO(d, 0, 0, 0);
+4633:            } else if (period === '30d') {
+4634:                const d = new Date(now);
+4636:                start = brISO(d, 0, 0, 0);
+4637:            } else if (period === 'mes') {
+4638:                const d = new Date(now.getFullYear(), now.getMonth(), 1);
+4639:                start = brISO(d, 0, 0, 0);
+4641:                start = '2000-01-01T00:00:00-03:00'; // Tudo
+4644:            document.getElementById('fullLeadsTableBody').innerHTML = '<div class="state-msg"><span class="spinner"></span><div style="margin-top:8px">Carregando leads...</div></div>';
+4648:                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=10000`;
+4650:                let [rows, statusRows] = await Promise.all([
+4652:                    sbGet('status_de_leads?select=*')
+4654:                rows = rows.filter(r => !isExcluded(r.telefone));
+4656:                const statusMap = {};
+4657:                statusRows.forEach(s => statusMap[s.telefone] = s);
+4660:                const firstVend = {};
+4661:                rows.forEach(r => {
+4662:                    const v = r.vendedor;
+4664:                    const vLow = v.toLowerCase();
+4665:                    if (vLow === 'bot') {
+4666:                        if (!firstVend[r.telefone]) firstVend[r.telefone] = 'bot';
+4668:                        if (!firstVend[r.telefone] || firstVend[r.telefone] === 'bot') {
+4669:                            firstVend[r.telefone] = v;
+4675:                const leadsMap = {};
+4676:                rows.forEach(r => {
+4679:                        const st = statusMap[r.telefone] || {};
+4680:                        const assignedVend = firstVend[r.telefone];
+4681:                        leadsMap[r.telefone] = {
+4694:                    leadsMap[r.telefone].ultimaMensagem = r.mensagem;
+4695:                    leadsMap[r.telefone].ultimoContato = r.created_at;
+4698:                let leadsList = Object.values(leadsMap);
+4701:                leadsList = leadsList.filter(l => {
+4702:                    const isClientMsg = l.msgs.some(m => m.de === 'cliente');
+4703:                    const hasStatus = statusMap[l.telefone];
+4707:                leadsList.sort((a, b) => new Date(b.ultimoContato) - new Date(a.ultimoContato));
+4711:                if (currentUser !== 'Admin') {
+4712:                    leadsList = leadsList.filter(l => {
+4713:                        const v = l.vendedor?.toLowerCase();
+4714:                        const cur = currentUser.toLowerCase();
+4715:                        return !v || v === 'bot' || v === 'desconhecido' || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+4717:                } else if (vend !== 'todos') {
+4718:                    leadsList = leadsList.filter(l => matchVendedor(l.vendedor, vend));
+4722:                    leadsList = leadsList.filter(l => String(l.telefone).includes(search));
+4725:                if (statusFilter !== 'todos') {
+4726:                    leadsList = leadsList.filter(l => l.status === statusFilter);
+4729:                fullLeadsData = leadsList;
+4732:                const total = leadsList.length;
+4733:                const matriculados = leadsList.filter(l => l.status === 'matriculado').length;
+4734:                const andamento = leadsList.filter(l => l.status === 'em_andamento').length;
+4735:                const taxa = total > 0 ? Math.round((matriculados / total) * 100) : 0;
+4737:                // Matriculados via bot: leads com status='matriculado' que tiveram msg do bot na conversa
+4738:                const matriculadosBot = leadsList.filter(l =>
+4739:                    l.status === 'matriculado' &&
+4740:                    l.msgs.some(m => m.de === 'bot')
+4742:                const taxaBot = matriculados > 0 ? Math.round((matriculadosBot / matriculados) * 100) : 0;
+4744:                document.getElementById('metLeadsTotal').textContent = total;
+4745:                document.getElementById('metLeadsConv').textContent = matriculados;
+4746:                document.getElementById('metLeadsAnd').textContent = andamento;
+4747:                document.getElementById('metLeadsTaxa').textContent = taxa + '%';
+4748:                document.getElementById('metLeadsBot').textContent = matriculadosBot;
+4749:                document.getElementById('metLeadsBotSub').textContent = taxaBot + '% dos convertidos';
+4750:                document.getElementById('metLeadsBotTrend').textContent = matriculadosBot + ' bot';
+4753:                const tbody = document.getElementById('fullLeadsTableBody');
+4754:                if (leadsList.length === 0) {
+4755:                    tbody.innerHTML = '<div class="state-msg">Nenhum lead encontrado para os filtros.</div>';
+4759:                const statusLabels = {
+4766:                tbody.innerHTML = leadsList.map(l => {
+4767:                    const preview = l.ultimaMensagem.substring(0, 40) + (l.ultimaMensagem.length > 40 ? '...' : '');
+4768:                    const hasNota = l.nota.trim().length > 0;
+4770:          <div class="fl-row" data-telefone="${l.telefone}" data-vendedor="${escapeHtml(l.vendedor || '')}" data-contato="${l.primeiroContato}">
+4771:            <div class="fl-phone">${fmtTel(l.telefone)}</div>
+4772:            <div><span class="badge badge-muted" style="font-size:0.6rem">${l.vendedor || 'ÔÇö'}</span></div>
+4773:            <div class="fl-msg-count">${l.msgs.length}</div>
+4774:            <div class="fl-preview">${escapeHtml(preview) || 'ÔÇö'}</div>
+4775:            <div class="fl-time">${new Date(l.primeiroContato).toLocaleDateString('pt-BR')} ${fmtHora(l.primeiroContato)}</div>
+4776:            <div><span class="badge badge-${l.status}">${statusLabels[l.status] || l.status}</span></div>
+4777:            <div class="fl-action" title="${hasNota ? 'Ver anota├º├úo' : 'Adicionar anota├º├úo'}">${hasNota ? '­ƒôØ' : 'Ô×ò'}</div>
+4783:                tbody.querySelectorAll('.fl-row').forEach(el => {
+4784:                    el.addEventListener('click', () => {
+4785:                        const { telefone, vendedor, contato } = el.dataset;
+4792:                document.getElementById('fullLeadsTableBody').innerHTML = '<div class="state-msg">Erro ao carregar leads.</div>';
+4798:            const data = [['Telefone', 'Nome', 'Idade', 'Interesse', 'Vendedor', 'Total Mensagens', 'Primeiro Contato', 'Ultimo Contato', 'Status', 'Anota├º├úo']];
+4799:            fullLeadsData.forEach(l => {
+4816:        let currentModalLead = null;
+4819:            currentModalLead = telefone;
+4820:            document.getElementById('lmTitle').textContent = fmtTel(telefone);
+4821:            document.getElementById('lmSub').textContent = `Vendedor: ${vendedor || 'ÔÇö'} ┬À Desde: ${new Date(primeiroContato).toLocaleDateString('pt-BR')}`;
+4824:            const leadData = fullLeadsData.find(l => l.telefone === telefone);
+4825:            document.getElementById('lmStatus').value = leadData ? leadData.status : 'novo';
+4826:            document.getElementById('lmNota').value = leadData ? leadData.nota : '';
+4827:            document.getElementById('lmNome').value = leadData ? (leadData.nome || '') : '';
+4828:            document.getElementById('lmIdade').value = leadData ? (leadData.idade || '') : '';
+4829:            document.getElementById('lmInteresse').value = leadData ? (leadData.interesse || '') : '';
+4833:            const lmBlockBtn = document.getElementById('lmBlockBtn');
+4835:                if (currentUser === 'Admin') {
+4836:                    const isBlocked = isExcluded(telefone);
+4837:                    lmBlockBtn.style.display = 'inline-flex';
+4838:                    lmBlockBtn.dataset.blocked = isBlocked ? '1' : '0';
+4839:                    lmBlockBtn.title = isBlocked ? 'Desbloquear n├║mero' : 'Bloquear n├║mero';
+4840:                    lmBlockBtn.style.color = isBlocked ? 'var(--red)' : 'var(--muted2)';
+4841:                    lmBlockBtn.style.borderColor = isBlocked ? 'var(--red)' : 'var(--border)';
+4842:                    document.getElementById('lmBlockIcon').textContent = isBlocked ? '­ƒöô' : '­ƒÜ½';
+4843:                    document.getElementById('lmBlockLabel').textContent = isBlocked ? 'Desbloquear' : 'Bloquear';
+4845:                    lmBlockBtn.style.display = 'none';
+4849:            document.getElementById('lmChat').innerHTML = '<div class="state-msg"><span class="spinner"></span></div>';
+4854:                const fullMsgs = await sbGet(`conversas?select=*&telefone=eq.${telefone}&order=created_at.desc&limit=100`);
+4855:                const msgs = fullMsgs.reverse();
+4857:                const msgsHtml = msgs.map(m => {
+4858:                    const isBot = m.de === 'bot';
+4860:          <div class="msg-wrap ${isBot ? 'bot' : 'user'}">
+4861:            <div class="msg-bubble ${isBot ? 'ai' : 'user'}">${escapeHtml(m.mensagem)}</div>
+4862:            <div class="msg-tag ${isBot ? 'ai-tag' : ''}">${isBot ? '­ƒñû Bot IA' : '­ƒæñ Cliente'} ┬À ${fmtHora(m.created_at)}</div>
+4867:                document.getElementById('lmChat').innerHTML = msgsHtml || '<div class="state-msg">Sem mensagens</div>';
+4868:                const chatEl = document.getElementById('lmChat');
+4869:                setTimeout(() => chatEl.scrollTop = chatEl.scrollHeight, 50);
+4871:                document.getElementById('lmChat').innerHTML = '<div class="state-msg">Erro ao carregar hist├│rico</div>';
+4877:            currentModalLead = null;
+4881:            const status = document.getElementById('lmStatus').value;
+4882:            const motivoSelect = document.getElementById('lmMotivoPerda');
+4883:            if (status === 'perdido') {
+4884:                motivoSelect.style.display = 'block';
+4886:                motivoSelect.style.display = 'none';
+4887:                motivoSelect.value = '';
+4897:            const status = document.getElementById('lmStatus').value;
+4898:            let nota = document.getElementById('lmNota').value || '';
+4899:            const motivo = document.getElementById('lmMotivoPerda').value;
+4900:            const btn = document.querySelector('#leadModal .primary');
+4902:            if (status === 'novo') {
+4912:            if (status === 'perdido' && !motivo) {
+4917:            if (status === 'perdido' && motivo) {
+4918:                const prefix = `[Motivo Perda: ${motivo}]`;
+4920:                    nota = `${prefix} ${nota}`;
+4925:                btn.textContent = 'Salvando...';
+4926:                btn.disabled = true;
+4929:            const nome = document.getElementById('lmNome').value.trim();
+4930:            const idade = document.getElementById('lmIdade').value.trim();
+4931:            const interesse = document.getElementById('lmInteresse').value.trim();
+4944:                    btn.textContent = 'Salvar';
+4945:                    btn.disabled = false;
+4954:                    btn.textContent = 'Erro!';
+4955:                    setTimeout(() => {
+4956:                        btn.textContent = 'Salvar';
+4957:                        btn.disabled = false;
+4966:            const allViews = ['viewDashboard', 'viewLeads', 'viewConfig', 'viewBotIA', 'viewRelatorios'];
+4967:            const allNavs = ['navDashboard', 'navConversas', 'navLeads', 'navRelatorios', 'navConfig', 'navBotIA'];
+4970:            allViews.forEach(id => {
+4971:                const el = document.getElementById(id);
+4974:            allNavs.forEach(id => {
+4975:                const el = document.getElementById(id);
+4979:            const topTitle = document.getElementById('topbarTitle');
+4981:            if (view === 'dashboard' || view === 'conversas') {
+4982:                const viewDash = document.getElementById('viewDashboard');
+4985:                const met = document.getElementById('dashboardMetrics');
+4986:                const grid = document.getElementById('mainContentGrid');
+4987:                const side = document.getElementById('sidePanels');
+4988:                const chatGrid = document.getElementById('chatContainerGrid');
+4990:                if (view === 'dashboard') {
+4995:                    chatGrid.style.height = '65vh';
+4996:                    topTitle.textContent = '// dashboard ÔÇö vis├úo geral';
+5002:                    chatGrid.style.height = 'calc(100vh - 170px)';
+5003:                    topTitle.textContent = '// conversas ÔÇö todas';
+5005:            } else if (view === 'leads') {
+5008:                topTitle.textContent = '// leads ÔÇö gest├úo completa';
+5010:            } else if (view === 'config') {
+5013:                topTitle.textContent = '// configura├º├Áes ÔÇö sistema';
+5015:            } else if (view === 'botia') {
+5018:                topTitle.textContent = '// bot ia ÔÇö monitoramento';
+5020:            } else if (view === 'relatorios') {
+5023:                topTitle.textContent = '// relat├│rios ÔÇö m├®tricas e desempenho';
+5027:            if (window.innerWidth <= 768) {
+5035:            const period = document.getElementById('reportFilterPeriod').value;
+5036:            const { start, end } = getDateRange(period);
+5039:            const statsIds = ['repLeadsBot', 'repLeadsVend', 'repTotalLeads', 'repTotalAlunos', 'repTotalMsgs'];
+5040:            statsIds.forEach(id => {
+5041:                const el = document.getElementById(id);
+5042:                if (el) el.innerHTML = '<span class="spinner" style="width:12px;height:12px"></span>';
+5048:                let query = `conversas?select=*&created_at=gte.${start}&created_at=lt.${end}&order=created_at.asc&limit=10000`;
+5052:                const rows = (await sbGet(query)).filter(r => !isExcluded(r.telefone));
+5055:                const firstVend = {};
+5056:                rows.forEach(r => {
+5057:                    const v = r.vendedor;
+5059:                    const vLow = v.toLowerCase();
+5060:                    if (vLow === 'bot') {
+5061:                        if (!firstVend[r.telefone]) firstVend[r.telefone] = 'bot';
+5063:                        if (!firstVend[r.telefone] || firstVend[r.telefone] === 'bot') {
+5064:                            firstVend[r.telefone] = v;
+5070:                let filteredRows = rows.filter(r => !isExcluded(r.telefone));
+5071:                if (currentUser !== 'Admin') {
+5072:                    const cur = currentUser.toLowerCase();
+5073:                    filteredRows = rows.filter(r => {
+5074:                        const v = firstVend[r.telefone]?.toLowerCase();
+5075:                        return !v || v === 'bot' || v === 'desconhecido' || v === cur || (cur === 'rebeca' && v === 'rebecca') || (cur === 'rebecca' && v === 'rebeca');
+5080:                const leadsBotSet = new Set(filteredRows.filter(r => (r.tipo === 'lead' || r.tipo === 'lead_confirmado') && r.de === 'cliente').map(r => r.telefone));
+5081:                const leadsVendSet = new Set(filteredRows.filter(r => (r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && r.de === 'cliente').map(r => r.telefone));
+5082:                const alunosSet = new Set(filteredRows.filter(r => r.tipo === 'aluno' && r.de === 'cliente').map(r => r.telefone));
+5083:                const totalMsgs = filteredRows.length;
+5085:                const totalLeads = new Set([...leadsBotSet, ...leadsVendSet]);
+5087:                if (document.getElementById('repLeadsBot')) document.getElementById('repLeadsBot').textContent = leadsBotSet.size;
+5088:                if (document.getElementById('repLeadsVend')) document.getElementById('repLeadsVend').textContent = leadsVendSet.size;
+5089:                if (document.getElementById('repTotalLeads')) document.getElementById('repTotalLeads').textContent = totalLeads.size;
+5090:                if (document.getElementById('repTotalAlunos')) document.getElementById('repTotalAlunos').textContent = alunosSet.size;
+5091:                if (document.getElementById('repTotalMsgs')) document.getElementById('repTotalMsgs').textContent = totalMsgs;
+5097:                const vendors = {};
+5098:                const performanceRows = currentUser === 'Admin' ? rows : filteredRows;
+5100:                performanceRows.forEach(r => {
+5101:                    const vOwner = firstVend[r.telefone] || 'Desconhecido';
+5103:                        vendors[vOwner] = {
+5110:                    if (r.de === 'cliente') {
+5111:                        const type = r.tipo || '';
+5112:                        if (type === 'lead' || type === 'lead_confirmado') {
+5115:                        } else if (type === 'conversa_vendedor' || type === 'lead-vendedor') {
+5122:                const vendorTable = document.getElementById('reportVendorTable');
+5124:                    vendorTable.innerHTML = Object.keys(vendors)
+5125:                        .filter(v => v !== 'bot' && v !== 'Desconhecido')
+5126:                        .sort((a, b) => vendors[b].totalLeads.size - vendors[a].totalLeads.size)
+5127:                        .map(v => {
+5129:                      <tr class="report-row-hover">
+5130:                        <td style="font-weight:600; color:var(--text)">${v}</td>
+5131:                        <td style="font-family:var(--mono); font-weight:500">${vendors[v].leadsBot.size}</td>
+5132:                        <td style="font-family:var(--mono); font-weight:500">${vendors[v].leadsVend.size}</td>
+5133:                        <td style="font-family:var(--mono); font-weight:600; color:var(--green)">${vendors[v].totalLeads.size}</td>
+5143:                window.lastReportRows = filteredRows;
+5147:                statsIds.forEach(id => {
+5148:                    const el = document.getElementById(id);
+5149:                    if (el) el.textContent = 'Erro';
+5155:            const leadsByDay = {};
+5156:            const sDate = new Date(start);
+5157:            const eDate = new Date(end);
+5160:            for (let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
+5161:                leadsByDay[brISO(d).split('T')[0]] = 0;
+5164:            rows.forEach(r => {
+5165:                if ((r.tipo === 'lead' || r.tipo === 'lead_confirmado' || r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') && r.de === 'cliente') {
+5166:                    const brDate = new Date(new Date(r.created_at).toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+5167:                    const day = brISO(brDate).split('T')[0];
+5168:                    if (leadsByDay[day] !== undefined) leadsByDay[day]++;
+5172:            const entries = Object.entries(leadsByDay);
+5175:            const max = Math.max(...entries.map(e => e[1]), 5);
+5176:            const svg = document.getElementById('reportLeadsChart');
+5177:            const w = 800;
+5178:            const h = 200;
+5179:            const padding = 20;
+5181:            const points = entries.map((e, i) => {
+5182:                const x = (i / (entries.length - 1 || 1)) * (w - padding * 2) + padding;
+5183:                const y = h - padding - (e[1] / max) * (h - padding * 2);
+5187:            svg.innerHTML = `
+5188:      <polyline points="${points}" fill="none" stroke="var(--green)" stroke-width="2" />
+5189:      ${entries.map((e, i) => {
+5190:                const x = (i / (entries.length - 1 || 1)) * (w - padding * 2) + padding;
+5191:                const y = h - padding - (e[1] / max) * (h - padding * 2);
+5192:                return `<circle cx="${x}" cy="${y}" r="3" fill="var(--green)" title="${e[0]}: ${e[1]}">
+5196:      <line x1="${padding}" y1="${h - padding}" x2="${w - padding}" y2="${h - padding}" stroke="var(--border)" />
+5201:            const grid = document.getElementById('reportHeatmap');
+5203:            const labels = Array.from(grid.children).slice(0, 8);
+5204:            grid.innerHTML = '';
+5205:            labels.forEach(l => grid.appendChild(l));
+5207:            const matrix = Array(14).fill(0).map(() => Array(7).fill(0)); // 8h ├ás 21h
+5208:            let max = 1;
+5210:            rows.forEach(r => {
+5211:                const brDate = new Date(new Date(r.created_at).toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+5212:                const day = (brDate.getDay() + 6) % 7; // Seg=0, Dom=6
+5213:                const hour = brDate.getHours();
+5214:                if (hour >= 8 && hour <= 21) {
+5216:                    if (matrix[hour - 8][day] > max) max = matrix[hour - 8][day];
+5220:            for (let h = 8; h <= 21; h++) {
+5221:                const label = document.createElement('div');
+5222:                label.className = 'heatmap-label';
+5223:                label.textContent = h + 'h';
+5226:                for (let d = 0; d < 7; d++) {
+5227:                    const val = matrix[h - 8][d];
+5228:                    const opacity = val === 0 ? 0.02 : 0.1 + (val / max) * 0.9;
+5229:                    const cell = document.createElement('div');
+5230:                    cell.className = 'heatmap-cell';
+5231:                    cell.style.background = `rgba(0, 217, 126, ${opacity})`;
+5232:                    cell.title = `${val} mensagens`;
+5233:                    cell.textContent = val > 0 ? val : '';
+5240:            const rows = window.lastReportRows;
+5242:            const originalText = btn.textContent;
+5243:            btn.textContent = 'gerando...';
+5244:            btn.disabled = true;
+5247:                const statusRows = await sbGet('status_de_leads?select=*');
+5248:                const statusMap = {};
+5249:                statusRows.forEach(s => statusMap[s.telefone] = s);
+5251:                const leadsMap = {};
+5252:                rows.forEach(r => {
+5254:                        const st = statusMap[r.telefone] || {};
+5255:                        leadsMap[r.telefone] = {
+5268:                const excelData = [['Data', 'Telefone', 'Nome', 'Idade', 'Interesse', 'Status', 'Anota├º├úo']];
+5269:                Object.values(leadsMap).forEach(l => {
+5286:                btn.textContent = originalText;
+5287:                btn.disabled = false;
+5292:            const now = brNow();
+5294:            let end = brISO(now, 23, 59, 59);
+5296:            if (period === 'hoje') {
+5297:                start = brISO(now, 0, 0, 0);
+5298:            } else if (period === '7d') {
+5299:                const d = new Date(now);
+5301:                start = brISO(d, 0, 0, 0);
+5302:            } else if (period === 'mes') {
+5303:                start = brISO(new Date(now.getFullYear(), now.getMonth(), 1), 0, 0, 0);
+5305:                start = '2000-01-01T00:00:00-03:00';
+5311:        let crmConfig = {
+5338:            const theme = crmConfig.crm.tema || 'dark';
+5343:        let baseConhecimento = [];
+5346:            const tableBody = document.getElementById('ragTableBody');
+5347:            tableBody.innerHTML = '<tr><td colspan="5" class="state-msg"><span class="spinner"></span></td></tr>';
+5350:                baseConhecimento = await sbGet('base_conhecimento?order=created_at.desc');
+5354:                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--red)">Erro ao carregar dados</td></tr>';
+5359:            const body = document.getElementById('ragTableBody');
+5361:                body.innerHTML = '<tr><td colspan="5" class="empty-state" style="padding:40px">// nenhuma entrada cadastrada</td></tr>';
+5365:            const catBadges = {
+5379:            body.innerHTML = baseConhecimento.map(entry => `
+5380:      <tr id="rag-row-${entry.id}">
+5381:        <td><span class="badge ${catBadges[entry.categoria] || 'badge-muted'}">${entry.categoria}</span></td>
+5382:        <td><span class="rag-keyword" title="${escapeHtml(entry.palavras_chave)}">${escapeHtml(entry.palavras_chave)}</span></td>
+5384:          <div class="rag-res-container" style="cursor: pointer;" onclick="openViewRagModal('${entry.id}')" title="Clique para ver a resposta completa">
+5385:            <div class="rag-res-preview">${escapeHtml(entry.resposta)}</div>
+5389:          <div class="switch" style="transform: scale(0.7); origin: left center;">
+5390:            <input type="checkbox" ${entry.ativo ? 'checked' : ''} onchange="toggleBaseAtivo('${entry.id}', this.checked)">
+5391:            <span class="slider"></span>
+5394:        <td style="text-align:center">
+5395:          <div class="rag-actions">
+5396:            <button class="rag-btn edit" onclick="openBaseModal('${entry.id}')" title="Editar">Ô£Å´©Å</button>
+5397:            <button class="rag-btn delete" onclick="deleteBaseEntry('${entry.id}')" title="Excluir">­ƒùæ´©Å</button>
+5405:            const entry = baseConhecimento.find(e => String(e.id) === String(id));
+5408:            document.getElementById('viewRagCategory').textContent = 'Categoria: ' + entry.categoria;
+5409:            document.getElementById('viewRagContent').textContent = entry.resposta;
+5417:        function openBaseModal(id = null) {
+5418:            const modal = document.getElementById('ragModal');
+5419:            const title = document.getElementById('ragModalTitle');
+5420:            const btnSave = document.getElementById('btnSaveRag');
+5423:            document.getElementById('ragId').value = id || '';
+5424:            document.getElementById('ragCategoria').value = 'professores';
+5425:            document.getElementById('ragPalavras').value = '';
+5426:            document.getElementById('ragResposta').value = '';
+5427:            document.getElementById('ragAtivo').checked = true;
+5430:                title.textContent = 'Editar entrada';
+5431:                const entry = baseConhecimento.find(e => String(e.id) === String(id));
+5433:                    document.getElementById('ragCategoria').value = entry.categoria;
+5434:                    document.getElementById('ragPalavras').value = entry.palavras_chave;
+5435:                    document.getElementById('ragResposta').value = entry.resposta;
+5436:                    document.getElementById('ragAtivo').checked = entry.ativo;
+5439:                title.textContent = 'Nova entrada na Base';
+5450:            const btn = document.getElementById('btnSaveRag');
+5451:            const id = document.getElementById('ragId').value;
+5452:            const data = {
+5461:            btn.textContent = 'Salvando...';
+5462:            btn.disabled = true;
+5467:                    const res = await fetch(SUPABASE_URL + '/rest/v1/base_conhecimento?id=eq.' + id, {
+5469:                        headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+5485:                btn.textContent = 'Salvar';
+5486:                btn.disabled = false;
+5494:                const res = await fetch(SUPABASE_URL + '/rest/v1/base_conhecimento?id=eq.' + id, {
+5509:                await fetch(SUPABASE_URL + '/rest/v1/base_conhecimento?id=eq.' + id, {
+5523:            const saved = localStorage.getItem('crm_config');
+5524:            if (saved) crmConfig = JSON.parse(saved);
+5527:            const novosPadroes = [
+5532:            if (!crmConfig.crm.excluirNumeros) crmConfig.crm.excluirNumeros = [];
+5533:            let mudou = false;
+5534:            novosPadroes.forEach(n => {
+5537:                    mudou = true;
+5542:            if (currentUser !== 'Admin') {
+5544:                const vendData = crmConfig.vendedores.find(v => v.nome === currentUser);
+5546:                    document.getElementById('vendedorHorariosDisplay').innerHTML = `
+5547:              <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--muted2); font-size: 0.8rem;">
+5561:            document.getElementById('cfgCrmPeriodo').value = crmConfig.crm.periodoLeads || 'mes';
+5562:            document.getElementById('cfgCrmNome').value = crmConfig.crm.nomeDashboard || '';
+5563:            document.getElementById('cfgCrmRefresh').checked = crmConfig.crm.autoRefresh;
+5564:            document.getElementById('cfgCrmBotUrl').value = crmConfig.crm.botUrl || '';
+5565:            document.getElementById('cfgCrmTema').value = crmConfig.crm.tema || 'dark';
+5566:            document.getElementById('cfgCrmGithub').value = crmConfig.crm.github || '';
+5571:            document.getElementById('cfgCrmRefresh').onchange = (e) => updateSwitchLabel('cfgCrmRefresh', 'cfgCrmRefreshLabel', 'Ativo', 'Desativado');
+5583:            const pAdm = document.getElementById('pwd_adm').value;
+5584:            const pRebecca = document.getElementById('pwd_rebecca').value;
+5585:            const pPaulo = document.getElementById('pwd_paulo').value;
+5589:            if (pAdm) USUARIOS['adm'].hash = btoa(pAdm);
+5590:            if (pRebecca) USUARIOS['rebecca'].hash = btoa(pRebecca);
+5591:            if (pPaulo) USUARIOS['paulo'].hash = btoa(pPaulo);
+5593:            localStorage.setItem('crm_users', JSON.stringify(USUARIOS));
+5595:            document.getElementById('pwd_adm').value = '';
+5596:            document.getElementById('pwd_rebecca').value = '';
+5597:            document.getElementById('pwd_paulo').value = '';
+5604:            const raw = localStorage.getItem('crm_numeros');
+5605:            const defaultNums = [
+5609:            let nums = raw ? JSON.parse(raw) : defaultNums;
+5610:            nums = nums.filter(n => n.id !== 'coord');
+5613:            const colors = { ativo: 'var(--green)', inativo: 'var(--yellow)', desconectado: 'var(--muted2)' };
+5614:            const list = document.getElementById('sidebarNumeros');
+5615:            const todosHtml = `
+5616:                <div class="sub-nav-item active" onclick="filterByNumero('todos', this)">
+5617:                    <span class="status-dot-mini" style="background:var(--text)"></span> Todos
+5619:                <div class="sub-nav-item" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
+5620:                    <span class="status-dot-mini" style="background:var(--yellow)"></span> Em atendimento
+5621:                    <span id="badgeEmAtendimento" style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
+5625:            list.innerHTML = todosHtml + nums.map(n => `
+5626:      <div class="sub-nav-item" onclick="filterByNumero('${n.vendedor}', this)">
+5627:        <span class="status-dot-mini" style="background:${colors[n.status]}"></span> ${fmtVendedor(n.nome)}
+5635:        let filtroVendedorAtivo = 'todos';
+5636:        let filtroTipoAtivo = null;
+5639:            filtroTipoAtivo = null; // Reseta filtro de tipo ao clicar em vendedor
+5640:            document.querySelectorAll('.sub-nav-item').forEach(i => i.classList.remove('active'));
+5642:            filtroVendedorAtivo = vendedor;
+5645:            const currentView = document.querySelector('.nav-item.active')?.id;
+5646:            if (currentView !== 'navDashboard' && currentView !== 'navConversas') {
+5654:            document.querySelectorAll('.sub-nav-item').forEach(i => i.classList.remove('active'));
+5656:            filtroTipoAtivo = tipo;
+5657:            filtroVendedorAtivo = 'todos';
+5660:            const currentView = document.querySelector('.nav-item.active')?.id;
+5661:            if (currentView !== 'navDashboard' && currentView !== 'navConversas') {
+5670:                const { start, end } = todayRange();
+5671:                const rows = (await sbGet(`conversas?select=telefone,tipo&created_at=gte.${start}&created_at=lt.${end}`)).filter(r => !isExcluded(r.telefone));
+5673:                const byTel = {};
+5674:                rows.forEach(r => {
+5676:                    if (!byTel[r.telefone]) byTel[r.telefone] = [];
+5680:                let count = 0;
+5681:                Object.values(byTel).forEach(tipos => {
+5682:                    const foiConfirmado = tipos.includes('lead_confirmado');
+5683:                    const foiAluno = tipos.includes('aluno');
+5684:                    const isVendedor = tipos.some(t => t === 'conversa_vendedor' || t === 'lead-vendedor');
+5688:                const badge = document.getElementById('badgeEmAtendimento');
+5689:                if (badge) badge.textContent = count;
+5694:            const list = document.getElementById('configVendedoresList');
+5696:            list.innerHTML = crmConfig.vendedores.map((v, idx) => `
+5697:      <div class="config-card">
+5698:        <div class="config-card-header">
+5699:          <div class="config-card-title">${v.nome || 'Novo Vendedor'}</div>
+5700:          <button class="action-btn secondary" style="color:var(--red); padding:4px 8px; font-size:0.65rem" onclick="removeVendedor(${idx})">Remover</button>
+5702:        <div class="config-card-body">
+5703:          <div class="form-row">
+5704:            <div class="form-group">
+5705:              <label class="form-label">Nome</label>
+5706:              <input type="text" class="filter-input" value="${v.nome}" onchange="updateVendedor(${idx}, 'nome', this.value)">
+5708:            <div class="form-group">
+5709:              <label class="form-label">WhatsApp</label>
+5710:              <input type="text" class="filter-input" value="${v.whatsapp}" onchange="updateVendedor(${idx}, 'whatsapp', this.value)">
+5714:          <div class="form-group">
+5715:            <label class="switch-container">
+5716:              <div class="switch">
+5717:                <input type="checkbox" ${v.ativo ? 'checked' : ''} onchange="updateVendedor(${idx}, 'ativo', this.checked)">
+5718:                <span class="slider"></span>
+5720:              <span style="font-size:0.75rem">${v.ativo ? 'Ativo' : 'Inativo'}</span>
+5724:          <div style="display:flex; gap:10px; margin-top:8px">
+5725:            <button class="action-btn primary" style="padding:6px; font-size:0.7rem; flex:1" onclick="saveConfig('vendedores')">Salvar Vendedor</button>
+5733:            crmConfig.vendedores[idx][field] = val;
+5734:            if (field === 'nome' || field === 'ativo') renderMasterScale();
+5759:            if (section === 'crm') {
+5760:                crmConfig.crm.periodoLeads = document.getElementById('cfgCrmPeriodo').value;
+5761:                crmConfig.crm.nomeDashboard = document.getElementById('cfgCrmNome').value;
+5762:                crmConfig.crm.autoRefresh = document.getElementById('cfgCrmRefresh').checked;
+5763:                crmConfig.crm.botUrl = document.getElementById('cfgCrmBotUrl').value.trim();
+5764:                crmConfig.crm.tema = document.getElementById('cfgCrmTema').value;
+5765:                crmConfig.crm.github = document.getElementById('cfgCrmGithub').value.trim();
+5766:                document.querySelector('.logo-sub').textContent = crmConfig.crm.nomeDashboard;
+5775:            const list = document.getElementById('cfgExcluirList');
+5777:            const nums = crmConfig.crm.excluirNumeros || [];
+5778:            if (nums.length === 0) {
+5779:                list.innerHTML = '<div style="padding:15px; color:var(--muted); font-size:0.75rem; text-align:center;">// nenhum n├║mero na lista</div>';
+5782:            list.innerHTML = nums.map(n => `
+5783:                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid var(--border);">
+5784:                    <span style="font-family:var(--mono); font-size:0.8rem; color:var(--text);">${fmtTel(n)}</span>
+5785:                    <button class="rag-btn delete" onclick="removeExclusionNumber('${n}')" style="padding:4px; font-size:0.7rem; border:none; background:none; cursor:pointer;">­ƒùæ´©Å</button>
+5791:            const input = document.getElementById('cfgExcluirInput');
+5792:            const val = input.value.trim().replace(/\D/g, '');
+5794:            if (!crmConfig.crm.excluirNumeros) crmConfig.crm.excluirNumeros = [];
+5798:                input.value = '';
+5804:            crmConfig.crm.excluirNumeros = crmConfig.crm.excluirNumeros.filter(num => num !== n);
+5811:            if (currentUser !== 'Admin') return;
+5812:            const clean = String(tel || '').replace(/\D/g, '');
+5814:            if (!crmConfig.crm.excluirNumeros) crmConfig.crm.excluirNumeros = [];
+5816:            const isBlocked = isExcluded(clean);
+5819:                crmConfig.crm.excluirNumeros = crmConfig.crm.excluirNumeros.filter(n => {
+5820:                    const c = String(n).replace(/\D/g, '');
+5821:                    return c !== clean && !clean.endsWith(c);
+5825:                const btn = document.getElementById('btnBlockNum');
+5827:                    btn.title = 'Bloquear n├║mero';
+5828:                    btn.style.color = 'var(--muted2)';
+5829:                    btn.innerHTML = '­ƒÜ½';
+5837:                const leadModal = document.getElementById('leadModal');
+5846:            setTimeout(() => {
+5848:                if (document.getElementById('viewLeads').style.display !== 'none') loadLeadsView();
+5853:        let masterScaleData = [];
+5856:            const body = document.getElementById('masterScaleBody');
+5857:            body.innerHTML = '<tr><td colspan="4" class="state-msg"><span class="spinner"></span></td></tr>';
+5860:                const data = await sbGet('escala_vendedores');
+5861:                masterScaleData = data;
+5865:                body.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--red)">Erro ao carregar dados</td></tr>';
+5870:            const body = document.getElementById('masterScaleBody');
+5871:            const dias = [
+5880:            const vendedores = crmConfig.vendedores.filter(v => v.ativo).map(v => v.nome);
+5882:            body.innerHTML = dias.map(dia => {
+5883:                const isSabado = dia.id === 6;
+5885:                const getVendedor = (hIni, hFim) => {
+5886:                    const match = masterScaleData.find(r => r.dia_semana === dia.id && r.hora_inicio === hIni && r.hora_fim === hFim);
+5890:                const selectHtml = (hIni, hFim) => `
+5891:            <select class="slot-select" data-dia="${dia.id}" data-ini="${hIni}" data-fim="${hFim}" onchange="updateLocalScale(this)">
+5892:              <option value="">-- Nenhum --</option>
+5893:              ${vendedores.map(v => `<option value="${v}" ${getVendedor(hIni, hFim) === v ? 'selected' : ''}>${v}</option>`).join('')}
+5894:              <option value="rodizio" ${getVendedor(hIni, hFim) === 'rodizio' ? 'selected' : ''}>­ƒöä Rod├¡zio</option>
+5901:                <td class="day-label">${dia.nome}</td>
+5902:                <td colspan="3">${selectHtml(8, 12)}</td>
+5909:              <td class="day-label">${dia.nome}</td>
+5919:            const dia = parseInt(sel.dataset.dia);
+5920:            const ini = parseFloat(sel.dataset.ini);
+5921:            const fim = parseFloat(sel.dataset.fim);
+5922:            const vendedor = sel.value;
+5924:            let match = masterScaleData.find(r => r.dia_semana === dia && r.hora_inicio === ini && r.hora_fim === fim);
+5927:                    masterScaleData = masterScaleData.filter(r => r !== match);
+5929:                    match.vendedor = vendedor;
+5937:                    tipo: vendedor === 'rodizio' ? 'rodizio' : 'exclusivo'
+5943:            const btn = document.querySelector('button[onclick="saveMasterScale()"]');
+5944:            btn.textContent = 'Salvando...';
+5945:            btn.disabled = true;
+5947:            const rowsToSave = masterScaleData.map(r => {
+5948:                const { id, created_at, ...cleanRow } = r;
+5954:                const delRes = await fetch(SUPABASE_URL + '/rest/v1/escala_vendedores?id=gt.0', {
+5962:                    const res = await fetch(SUPABASE_URL + '/rest/v1/escala_vendedores', {
+5964:                        headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+5976:                btn.textContent = 'Salvar Escala Semanal';
+5977:                btn.disabled = false;
+5983:            const url = document.getElementById('cfgCrmBotUrl').value.trim();
+5984:            const btn = document.getElementById('btnTestBot');
+5987:            btn.textContent = 'Testando...';
+5988:            btn.disabled = true;
+5991:                const controller = new AbortController();
+5992:                const timeoutId = setTimeout(() => controller.abort(), 5000);
+5993:                const res = await fetch(url.replace(/\/$/, '') + '/status', { signal: controller.signal });
+5997:                    const data = await res.json();
+5999:                        btn.textContent = 'Ô£à Bot respondendo corretamente';
+6000:                        btn.style.color = 'var(--green)';
+6002:                        btn.textContent = 'ÔÜá Servidor responde mas n├úo parece ser o bot';
+6003:                        btn.style.color = 'var(--yellow)';
+6009:                btn.textContent = 'ÔØî Falha na conex├úo';
+6010:                btn.style.color = 'var(--red)';
+6014:                setTimeout(() => {
+6015:                    btn.textContent = 'Testar Conex├úo';
+6016:                    btn.style.color = '';
+6017:                    btn.disabled = false;
+6023:            const checked = document.getElementById(id).checked;
+6024:            document.getElementById(labelId).textContent = checked ? activeText : inactiveText;
+6028:            const t = document.getElementById('toast');
+6030:            setTimeout(() => t.classList.remove('show'), 2000);
+6040:            document.getElementById('privacidadeModal').style.display = 'flex';
+6044:            document.getElementById('privacidadeModal').style.display = 'none';
+6051:            const pill = document.getElementById('statusPill');
+6052:            pill.className = 'status-pill loading';
+6053:            document.getElementById('statusText').textContent = 'Carregando...';
+6065:                pill.className = 'status-pill';
+6066:                document.getElementById('statusText').textContent = 'Bot ativo ÔÇö dados ao vivo';
+6069:                pill.className = 'status-pill';
+6070:                pill.style.background = 'var(--red-dim)';
+6071:                pill.style.color = 'var(--red)';
+6072:                document.getElementById('statusText').textContent = 'Erro ao carregar dados';
+6078:            const saved = localStorage.getItem('crm_config');
+6080:                crmConfig = JSON.parse(saved);
+6091:            document.querySelector('.logo-sub').textContent = crmConfig.crm.nomeDashboard;
+6093:                document.getElementById('leadFilterPeriod').value = crmConfig.crm.periodoLeads;
+6101:            const simInput = document.getElementById('simInput');
+6103:                simInput.addEventListener('keydown', (e) => {
+6104:                    if (e.key === 'Enter' && !e.shiftKey) {
+6109:                simInput.dataset.listener = 'true';
+6116:        setInterval(async () => {
+6117:            if (crmConfig.crm.autoRefresh === false || !currentUser) return;
+6122:                const currentCount = allConvsData[activeChatTel].msgs ? allConvsData[activeChatTel].msgs.length : 0;
+6123:                const serverCount = await sbCount(`conversas?telefone=eq.${activeChatTel}`);
+6130:    <div id="privacidadeModal"
+6131:        style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);align-items:center;justify-content:center">
+6133:            style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto">
+6134:            <div style="font-family:var(--mono);font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:16px">
+6137:            <div style="font-size:0.78rem;color:var(--muted2);line-height:1.7">
+6138:                <p><strong style="color:var(--text)">1. Quem somos</strong><br>
+6141:                <p><strong style="color:var(--text)">2. Dados coletados</strong><br>
+6144:                <p><strong style="color:var(--text)">3. Finalidade</strong><br>
+6147:                <p><strong style="color:var(--text)">4. Armazenamento</strong><br>
+6151:                <p><strong style="color:var(--text)">5. Seus direitos (LGPD)</strong><br>
+6155:                <p><strong style="color:var(--text)">6. Contato</strong><br>
+6158:            <button onclick="hidePrivacidade()"
+6159:                style="margin-top:24px;background:var(--green);color:var(--bg);border:none;border-radius:6px;padding:10px 24px;cursor:pointer;font-weight:700;font-family:var(--sans)">
+6164:    <div id="ragGlobalTooltip"></div>
