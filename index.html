@@ -4388,6 +4388,15 @@
         // ─── CONVERSAS RECENTES ──────────────────────
         let allConvsData = {};
         let activeChatTel = null;
+        let activeChatKey = null;
+
+        // Gera chave única para agrupamento: conversas de vendedor ficam separadas do bot
+        function chatKeyFor(r) {
+            if (r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor') {
+                return `${r.telefone}__v__${(r.vendedor || 'desconhecido').toLowerCase()}`;
+            }
+            return r.telefone;
+        }
 
         async function loadConversas() {
             try {
@@ -4444,14 +4453,23 @@
                         return isCoord || (r.tipo === 'aluno' && !v);
                     });
                 } else if (filtroVendedorAtivo !== 'todos' && currentUser === 'Admin') {
-                    // Mostra TODAS as conversas do vendedor selecionado (incluindo leads novos ainda não confirmados)
-                    // Usa qualquer mensagem com esse vendedor como critério (não só lead_confirmado)
-                    const telefonesVendedor = new Set(
+                    // Filtra por vendedor:
+                    // - Conversas diretas (conversa_vendedor/lead-vendedor): mostra só as desse vendedor
+                    // - Conversas do bot: só mostra se o lead foi confirmado (tipo=lead_confirmado) com esse vendedor
+                    const confirmedTels = new Set(
                         rows
-                            .filter(r => r.vendedor && matchVendedor(r.vendedor, filtroVendedorAtivo))
+                            .filter(r => r.tipo === 'lead_confirmado' && r.vendedor && matchVendedor(r.vendedor, filtroVendedorAtivo))
                             .map(r => r.telefone)
                     );
-                    rowsFiltradas = rows.filter(r => telefonesVendedor.has(r.telefone));
+                    rowsFiltradas = rows.filter(r => {
+                        const isVendChat = r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor';
+                        if (isVendChat) {
+                            return r.vendedor && matchVendedor(r.vendedor, filtroVendedorAtivo);
+                        } else {
+                            // Só aparece na aba do vendedor depois que o lead for confirmado
+                            return confirmedTels.has(r.telefone) && r.vendedor && matchVendedor(r.vendedor, filtroVendedorAtivo);
+                        }
+                    });
                 }
 
                 if (!rowsFiltradas.length) {
@@ -4460,14 +4478,15 @@
                     return;
                 }
 
-                // Agrupar por telefone usando os dados filtrados
+                // Agrupar por chatKey: conversas de vendedor ficam separadas do bot
                 const byTel = {};
                 rowsFiltradas.forEach(r => {
-                    if (!byTel[r.telefone]) byTel[r.telefone] = { telefone: r.telefone, msgs: [], tipo: r.tipo || 'desconhecido', vendedor: r.vendedor, lastTime: r.created_at };
-                    byTel[r.telefone].msgs.push(r);
-                    byTel[r.telefone].lastTime = r.created_at;
-                    if (r.tipo && r.tipo !== 'desconhecido') byTel[r.telefone].tipo = r.tipo;
-                    if (r.vendedor) byTel[r.telefone].vendedor = r.vendedor;
+                    const key = chatKeyFor(r);
+                    if (!byTel[key]) byTel[key] = { key: key, telefone: r.telefone, isVendedorChat: r.tipo === 'conversa_vendedor' || r.tipo === 'lead-vendedor', msgs: [], tipo: r.tipo || 'desconhecido', vendedor: r.vendedor, lastTime: r.created_at };
+                    byTel[key].msgs.push(r);
+                    byTel[key].lastTime = r.created_at;
+                    if (r.tipo && r.tipo !== 'desconhecido') byTel[key].tipo = r.tipo;
+                    if (r.vendedor) byTel[key].vendedor = r.vendedor;
                 });
 
                 // Filtro por tipo (ex: Em atendimento = ainda não confirmado)
@@ -4487,13 +4506,15 @@
                 convs.sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
 
                 // Atualiza o contador "Conversas hoje" com o número real de conversas de HOJE visíveis
-                // (garante consistência com o que é exibido na lista)
-                if (filtroVendedorAtivo === 'todos' && currentUser === 'Admin') {
+                // Sempre reflete o filtro ativo (vendedor ou todos)
+                {
                     const convsHoje = convs.filter(c => fmtDataFriendly(c.lastTime) === 'Hoje').length;
                     const metEl = document.getElementById('metConv');
                     const trendEl = document.getElementById('metConvTrend');
+                    const subEl = document.getElementById('metConvSub');
                     if (metEl) metEl.textContent = convsHoje;
                     if (trendEl) trendEl.textContent = convsHoje + ' únicos';
+                    if (subEl) subEl.textContent = filtroVendedorAtivo === 'todos' ? 'em todos os números' : `de ${filtroVendedorAtivo === 'coord' ? 'Coordenação' : filtroVendedorAtivo}`;
                 }
 
                 // Atualiza título do painel
@@ -4525,10 +4546,13 @@
 
                     const item = document.createElement('div');
                     item.className = 'conv-item';
+                    item.dataset.chatKey = conv.key || conv.telefone;
+                    const vendedorLabel = conv.isVendedorChat && conv.vendedor ? `<div style="font-size:0.62rem;color:var(--orange);margin-top:1px">via ${conv.vendedor}</div>` : '';
                     item.innerHTML = `
         <div class="conv-av ${avClass}">${initials(conv.telefone)}</div>
         <div class="conv-info">
           <div class="conv-name" style="font-family:var(--mono);font-size:0.72rem">${fmtTel(conv.telefone)}</div>
+          ${vendedorLabel}
           <div class="conv-preview">${escapeHtml(preview) || '—'}</div>
         </div>
         <div class="conv-meta">
@@ -4557,10 +4581,11 @@
             document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
             if (itemEl) itemEl.classList.add('active');
             else {
-                // Se não passou o itemEl, tenta achar na lista pelo telefone
+                // Tenta achar na lista pelo chatKey (evita destacar múltiplos itens do mesmo telefone)
+                const targetKey = conv.key || conv.telefone;
                 const items = document.querySelectorAll('.conv-item');
                 items.forEach(el => {
-                    if (el.innerHTML.includes(fmtTel(conv.telefone))) el.classList.add('active');
+                    if (el.dataset.chatKey === targetKey) el.classList.add('active');
                 });
             }
 
@@ -4569,6 +4594,7 @@
             const wasAtBottom = oldMsgsEl ? (oldMsgsEl.scrollHeight - oldMsgsEl.scrollTop <= oldMsgsEl.clientHeight + 60) : true;
 
             activeChatTel = conv.telefone;
+            activeChatKey = conv.key || conv.telefone;
             const isMobile = window.innerWidth <= 768;
 
             // Se estivermos abrindo, mostramos um loading state no detalhe
@@ -4578,12 +4604,22 @@
 
             try {
                 // Buscar histórico completo (últimas 200 mensagens) em ordem cronológica
-                const fullMsgs = await sbGet(`conversas?select=*&telefone=eq.${conv.telefone}&order=created_at.asc,id.asc&limit=200`);
+                // Para chats de vendedor: filtra pelo vendedor. Para bot: exclui conversa_vendedor.
+                let fetchQuery;
+                if (conv.isVendedorChat && conv.vendedor) {
+                    // Conversa direta: só mensagens com tipo conversa_vendedor/lead-vendedor desse vendedor
+                    fetchQuery = `conversas?select=*&telefone=eq.${conv.telefone}&vendedor=eq.${encodeURIComponent(conv.vendedor)}&tipo=in.(conversa_vendedor,lead-vendedor)&order=created_at.asc,id.asc&limit=200`;
+                } else {
+                    // Conversa do bot: exclui as conversas diretas com vendedores
+                    fetchQuery = `conversas?select=*&telefone=eq.${conv.telefone}&tipo=not.in.(conversa_vendedor,lead-vendedor)&order=created_at.asc,id.asc&limit=200`;
+                }
+                const fullMsgs = await sbGet(fetchQuery);
                 const newMsgs = fullMsgs;
 
                 // Se for auto-refresh e as mensagens forem as mesmas, não faz nada para evitar flicker
-                if (isAutoRefresh && allConvsData[conv.telefone] && allConvsData[conv.telefone].msgs) {
-                    const currentMsgs = allConvsData[conv.telefone].msgs;
+                const chatKey = conv.key || conv.telefone;
+                if (isAutoRefresh && allConvsData[chatKey] && allConvsData[chatKey].msgs) {
+                    const currentMsgs = allConvsData[chatKey].msgs;
                     if (currentMsgs.length === newMsgs.length) {
                         const lastOld = currentMsgs[currentMsgs.length - 1];
                         const lastNew = newMsgs[newMsgs.length - 1];
@@ -4595,8 +4631,8 @@
 
                 conv.msgs = newMsgs;
                 // Atualiza o cache local
-                if (allConvsData[conv.telefone]) {
-                    allConvsData[conv.telefone].msgs = conv.msgs;
+                if (allConvsData[chatKey]) {
+                    allConvsData[chatKey].msgs = conv.msgs;
                 }
             } catch (e) {
                 console.error("Erro ao buscar histórico:", e);
@@ -4621,7 +4657,9 @@
       `;
             }).join('');
 
-            const subText = `${conv.vendedor || '—'} · ${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || 'desconhecido')} · ${fmtHora(conv.lastTime)}`;
+            const subText = conv.isVendedorChat && conv.vendedor
+                ? `via WhatsApp de ${conv.vendedor} · ${fmtHora(conv.lastTime)}`
+                : `${conv.vendedor || '—'} · ${conv.tipo === 'conversa_vendedor' ? 'lead-vendedor' : (conv.tipo || 'desconhecido')} · ${fmtHora(conv.lastTime)}`;
 
             if (isMobile) {
                 document.getElementById('mobileDetailName').textContent = fmtTel(conv.telefone);
@@ -6433,11 +6471,17 @@
             await loadAllData();
 
             // Se tiver um chat aberto, atualiza ele apenas se houver novas mensagens
-            if (activeChatTel && allConvsData[activeChatTel]) {
-                const currentCount = allConvsData[activeChatTel].msgs ? allConvsData[activeChatTel].msgs.length : 0;
-                const serverCount = await sbCount(`conversas?telefone=eq.${activeChatTel}`);
+            if (activeChatKey && allConvsData[activeChatKey]) {
+                const conv = allConvsData[activeChatKey];
+                const currentCount = conv.msgs ? conv.msgs.length : 0;
+                // Para chats de vendedor, filtra a contagem pelo vendedor
+                let countQuery = `conversas?telefone=eq.${activeChatTel}`;
+                if (conv.isVendedorChat && conv.vendedor) {
+                    countQuery = `conversas?telefone=eq.${activeChatTel}&vendedor=eq.${conv.vendedor}`;
+                }
+                const serverCount = await sbCount(countQuery);
                 if (serverCount > currentCount) {
-                    showConv(allConvsData[activeChatTel], null, true);
+                    showConv(conv, null, true);
                 }
             }
         }, 60000);
@@ -6782,18 +6826,22 @@
         }
 
         async function selectConversationFromSearch(telefone, vendedor, tipo) {
-            let conv = allConvsData[telefone];
+            const isVend = tipo === 'conversa_vendedor' || tipo === 'lead-vendedor';
+            const key = isVend && vendedor ? `${telefone}__v__${vendedor.toLowerCase()}` : telefone;
+            let conv = allConvsData[key];
             if (!conv) {
                 conv = {
+                    key: key,
                     telefone: telefone,
+                    isVendedorChat: isVend,
                     vendedor: vendedor || 'desconhecido',
                     tipo: tipo || 'desconhecido',
                     lastTime: new Date().toISOString(),
                     msgs: []
                 };
-                allConvsData[telefone] = conv;
+                allConvsData[key] = conv;
             }
-            
+
             showView('dashboard');
             await showConv(conv, null);
             closeGlobalSearch();
