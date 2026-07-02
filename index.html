@@ -945,6 +945,41 @@
             background: var(--green);
         }
 
+        .btn-scroll-bottom {
+            position: absolute;
+            bottom: 20px;
+            right: 25px;
+            width: 30px;
+            height: 30px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--muted2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            font-size: 1rem;
+        }
+
+        .btn-scroll-bottom.show {
+            opacity: 1;
+            pointer-events: auto;
+            bottom: 25px;
+        }
+
+        .btn-scroll-bottom:hover {
+            background: var(--surface);
+            color: var(--green);
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+
         .msg-wrap {
             display: flex;
             flex-direction: column;
@@ -4545,8 +4580,10 @@
                     const avClass = tipo === 'lead' ? 'lead' : tipo === 'aluno' ? 'aluno' : '';
 
                     const item = document.createElement('div');
-                    item.className = 'conv-item';
-                    item.dataset.chatKey = conv.key || conv.telefone;
+                    const chatKey = conv.key || conv.telefone;
+                    const isActive = activeChatKey === chatKey;
+                    item.className = `conv-item${isActive ? ' active' : ''}`;
+                    item.dataset.chatKey = chatKey;
                     const vendedorLabel = conv.isVendedorChat && conv.vendedor ? `<div style="font-size:0.62rem;color:var(--orange);margin-top:1px">via ${conv.vendedor}</div>` : '';
                     item.innerHTML = `
         <div class="conv-av ${avClass}">${initials(conv.telefone)}</div>
@@ -4589,13 +4626,13 @@
                 });
             }
 
-            // Verifica se o usuário está no fim do scroll antes de atualizar
-            const oldMsgsEl = document.getElementById('chatMsgs');
+            const isMobile = window.innerWidth <= 768;
+            const oldMsgsEl = isMobile ? document.getElementById('mobileDetailMsgs') : document.getElementById('chatMsgs');
+            const oldScrollTop = oldMsgsEl ? oldMsgsEl.scrollTop : 0;
             const wasAtBottom = oldMsgsEl ? (oldMsgsEl.scrollHeight - oldMsgsEl.scrollTop <= oldMsgsEl.clientHeight + 60) : true;
 
             activeChatTel = conv.telefone;
             activeChatKey = conv.key || conv.telefone;
-            const isMobile = window.innerWidth <= 768;
 
             // Se estivermos abrindo, mostramos um loading state no detalhe
             if (!isMobile && !document.getElementById('chatMsgs')) {
@@ -4666,8 +4703,12 @@
                 document.getElementById('mobileDetailSub').textContent = subText;
                 document.getElementById('mobileDetailMsgs').innerHTML = msgsHtml;
                 const mMsgsEl = document.getElementById('mobileDetailMsgs');
-                if (mMsgsEl && (!isAutoRefresh || wasAtBottom)) {
-                    mMsgsEl.scrollTop = mMsgsEl.scrollHeight;
+                if (mMsgsEl) {
+                    if (!isAutoRefresh || wasAtBottom) {
+                        mMsgsEl.scrollTop = mMsgsEl.scrollHeight;
+                    } else if (oldMsgsEl) {
+                        mMsgsEl.scrollTop = oldScrollTop;
+                    }
                 }
                 document.getElementById('mobileOverlay').classList.add('open');
             } else {
@@ -4697,10 +4738,14 @@
         </div>
       `;
                 const msgsEl = document.getElementById('chatMsgs');
-                if (msgsEl && (!isAutoRefresh || wasAtBottom)) {
-                    msgsEl.scrollTop = msgsEl.scrollHeight;
-                    // Scroll extra para garantir
-                    setTimeout(() => { if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight; }, 50);
+                if (msgsEl) {
+                    if (!isAutoRefresh || wasAtBottom) {
+                        msgsEl.scrollTop = msgsEl.scrollHeight;
+                        setTimeout(() => { if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight; }, 50);
+                    } else if (oldMsgsEl) {
+                        msgsEl.scrollTop = oldScrollTop;
+                        setTimeout(() => { if (msgsEl) msgsEl.scrollTop = oldScrollTop; }, 50);
+                    }
                 }
             }
         }
@@ -5950,21 +5995,27 @@
 
             const colors = { ativo: 'var(--green)', inativo: 'var(--yellow)', desconectado: 'var(--muted2)' };
             const list = document.getElementById('sidebarNumeros');
+            const isTodosActive = (filtroVendedorAtivo === 'todos' && filtroTipoAtivo === null) ? 'active' : '';
+            const isEmAtendimentoActive = (filtroTipoAtivo === 'em_atendimento') ? 'active' : '';
+
             const todosHtml = `
-                <div class="sub-nav-item active" onclick="filterByNumero('todos', this)">
+                <div class="sub-nav-item ${isTodosActive}" onclick="filterByNumero('todos', this)">
                     <span class="status-dot-mini" style="background:var(--text)"></span> Todos
                 </div>
-                <div class="sub-nav-item" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
+                <div class="sub-nav-item ${isEmAtendimentoActive}" onclick="filterByTipo('em_atendimento', this)" id="navEmAtendimento">
                     <span class="status-dot-mini" style="background:var(--yellow)"></span> Em atendimento
                     <span id="badgeEmAtendimento" style="background:var(--yellow-dim);color:var(--yellow);font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
                 </div>
             `;
 
-            list.innerHTML = todosHtml + nums.map(n => `
-      <div class="sub-nav-item" onclick="filterByNumero('${n.vendedor}', this)">
-        <span class="status-dot-mini" style="background:${colors[n.status]}"></span> ${fmtVendedor(n.nome)}
-      </div>
-    `).join('');
+            list.innerHTML = todosHtml + nums.map(n => {
+                const isActive = (filtroVendedorAtivo.toLowerCase() === n.vendedor.toLowerCase() && filtroTipoAtivo === null) ? 'active' : '';
+                return `
+                    <div class="sub-nav-item ${isActive}" onclick="filterByNumero('${n.vendedor}', this)">
+                        <span class="status-dot-mini" style="background:${colors[n.status]}"></span> ${fmtVendedor(n.nome)}
+                    </div>
+                `;
+            }).join('');
 
             // Chama a atualização do badge imediatamente
             updateBadgeEmAtendimento();
